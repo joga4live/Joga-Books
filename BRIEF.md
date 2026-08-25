@@ -54,24 +54,28 @@ joga-books/
 
 ## SISTEMA DE COLOR
 
+FILOSOFIA: Oscuro + un solo acento fuerte = premium y profesional.
+Referencia visual: Linear, GitHub, Notion. Serio, confiable, tech.
+
 ### Base compartida (todas las pantallas):
 ```css
---color-bg-deep:    #0C0A00;   /* fondo principal negro calido */
---color-bg-card:    #1A1400;   /* fondo de cards */
---color-border:     #2A2000;   /* bordes */
---color-text:       #FFF8E8;   /* texto principal blanco calido */
---color-muted:      #8A7A60;   /* texto secundario */
+--color-bg-deep:    #0D1117;   /* negro azulado — fondo principal */
+--color-bg-card:    #161B22;   /* fondo de cards */
+--color-border:     #21262D;   /* bordes sutiles */
+--color-text:       #E6EDF3;   /* texto principal blanco frio */
+--color-muted:      #7D8590;   /* texto secundario */
 --color-success:    #22C55E;   /* estados positivos */
 --color-error:      #EF4444;   /* estados de error */
 ```
 
-### Color hero de Joga Books:
+### Color hero de Joga Books — "Tech Inteligente":
 ```css
---color-primary:      #E8A020;   /* ambar dorado — hero principal */
---color-primary-dark: #C47800;   /* hover y pressed */
---color-light:        #F5C842;   /* highlights y badges */
---color-glow:         #E8A02040; /* glow en botones y cards activas */
---color-bg-tint:      #1A1200;   /* cards con tono de la app */
+--color-primary:      #4F8EF7;   /* azul electrico — hero principal */
+--color-primary-dark: #2563EB;   /* hover y pressed */
+--color-light:        #93C5FD;   /* highlights y badges */
+--color-glow:         #4F8EF740; /* glow en botones y cards activas */
+--color-bg-tint:      #0D1B2E;   /* cards con tono azul profundo */
+--color-gold:         #F0C040;   /* dorado solo para highlights premium */
 ```
 
 ### Colores del humanizador (3 tonos):

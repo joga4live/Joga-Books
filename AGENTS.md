@@ -57,21 +57,25 @@ Si no se sube la version, el fix no llega al usuario.
 
 ## 4. Sistema de color
 
+Filosofia: Oscuro + un acento fuerte = premium y profesional.
+Referencia: Linear, GitHub, Notion.
+
 Base (todas las pantallas):
-  --color-bg-deep:    #0C0A00
-  --color-bg-card:    #1A1400
-  --color-border:     #2A2000
-  --color-text:       #FFF8E8
-  --color-muted:      #8A7A60
+  --color-bg-deep:    #0D1117
+  --color-bg-card:    #161B22
+  --color-border:     #21262D
+  --color-text:       #E6EDF3
+  --color-muted:      #7D8590
   --color-success:    #22C55E
   --color-error:      #EF4444
 
-Hero Joga Books:
-  --color-primary:      #E8A020
-  --color-primary-dark: #C47800
-  --color-light:        #F5C842
-  --color-glow:         #E8A02040
-  --color-bg-tint:      #1A1200
+Hero Joga Books — Tech Inteligente:
+  --color-primary:      #4F8EF7
+  --color-primary-dark: #2563EB
+  --color-light:        #93C5FD
+  --color-glow:         #4F8EF740
+  --color-bg-tint:      #0D1B2E
+  --color-gold:         #F0C040
 
 Humanizador:
   --color-profesional:    #60A5FA
