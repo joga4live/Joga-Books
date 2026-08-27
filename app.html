@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Joga Books — Mis libros</title>
+<meta name="theme-color" content="#4F8EF7">
+<link rel="manifest" href="./assets/manifest.json">
+<link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+<header class="header">
+  <div class="logo">📚 Joga Books</div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-primary btn-sm" id="newBookBtn" data-i18n="new"></button>
+    <button class="lang-toggle" id="langToggle" aria-label="Cambiar idioma / Change language">EN</button>
+  </div>
+</header>
+
+<main class="container">
+  <div id="emptyState" style="display:none;text-align:center;padding-top:48px">
+    <div style="font-size:48px">📚</div>
+    <h2 class="section-title" style="margin-top:12px" data-i18n="empty.title"></h2>
+    <p class="muted" style="margin-top:8px" data-i18n="empty.subtitle"></p>
+    <button class="btn btn-primary" style="margin-top:20px" id="emptyCta" data-i18n="empty.cta"></button>
+  </div>
+
+  <div id="libraryGrid" style="display:none;margin-top:16px"></div>
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="./assets/i18n.js"></script>
+<script src="./assets/common.js"></script>
+<script>
+"use strict";
+var i18n = {
+  es: {
+    title: "Joga Books — Mis libros",
+    new: "＋ Nuevo libro",
+    empty: { title: "Todavía no tienes libros", subtitle: "Crea tu primer libro de no ficción en 5 pasos.", cta: "＋ Crear mi primer libro" },
+    card: { chaps: "caps", edited: "Última edición", continueBtn: "Continuar", exportBtn: "Exportar" }
+  },
+  en: {
+    title: "Joga Books — My Books",
+    new: "＋ New book",
+    empty: { title: "You don't have any books yet", subtitle: "Create your first nonfiction book in 5 steps.", cta: "＋ Create my first book" },
+    card: { chaps: "ch", edited: "Last edited", continueBtn: "Continue", exportBtn: "Export" }
+  }
+};
+var t = jogaI18n(i18n);
+
+try { if (localStorage.getItem("jogaBooks_licensed") !== "true") location.replace("./index.html"); } catch (e) {}
+
+function fmtDate(iso, lang) {
+  if (!iso) return "";
+  if (iso === jbToday()) return lang === "es" ? "hoy" : "today";
+  return iso;
+}
+
+function bookCard(b, lang, table) {
+  var pct = b.total ? Math.round((b.progreso / b.total) * 100) : 0;
+  var div = document.createElement("div");
+  div.className = "card";
+  div.style.marginBottom = "12px";
+  div.innerHTML =
+    '<div class="section-title">📚 ' + jbEsc(b.titulo) + '</div>' +
+    '<p class="muted" style="margin-top:6px">' + (lang === "es" ? "Nicho" : "Niche") + ': ' + jbEsc(b.nicho) + '</p>' +
+    '<p class="muted">' + (lang === "es" ? "Audiencia" : "Audience") + ': ' + jbEsc(b.audiencia) + '</p>' +
+    '<div class="progress-bar" style="margin-top:10px"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+    '<p class="muted" style="margin-top:6px;font-size:13px">' + b.progreso + '/' + b.total + ' ' + table.card.chaps +
+    ' · ' + table.card.edited + ': ' + fmtDate(b.fechaEdicion, lang) + '</p>' +
+    '<div style="display:flex;gap:8px;margin-top:12px">' +
+      '<button class="btn btn-primary btn-sm" data-act="continue" data-id="' + b.id + '">' + table.card.continueBtn + '</button>' +
+      '<button class="btn btn-ghost btn-sm" data-act="export" data-id="' + b.id + '">' + table.card.exportBtn + '</button>' +
+    '</div>';
+  return div;
+}
+
+function render() {
+  var lang = t.lang(), table = t.table();
+  var lib = jbLibrary();
+  var empty = document.getElementById("emptyState");
+  var grid = document.getElementById("libraryGrid");
+  if (!lib.length) {
+    empty.style.display = "block";
+    grid.style.display = "none";
+    return;
+  }
+  empty.style.display = "none";
+  grid.style.display = "block";
+  grid.innerHTML = "";
+  lib.slice().sort(function (a, b2) { return (b2.fechaEdicion || "").localeCompare(a.fechaEdicion || ""); })
+    .forEach(function (b) { grid.appendChild(bookCard(b, lang, table)); });
+}
+
+document.addEventListener("jogaLangChange", render);
+document.getElementById("libraryGrid").addEventListener("click", function (e) {
+  var btnEl = e.target.closest("button[data-act]");
+  if (!btnEl) return;
+  var id = btnEl.getAttribute("data-id");
+  if (btnEl.getAttribute("data-act") === "continue") location.href = "./editor.html?id=" + id;
+  else location.href = "./export.html?id=" + id;
+});
+document.getElementById("newBookBtn").addEventListener("click", function () { location.href = "./wizard.html"; });
+document.getElementById("emptyCta").addEventListener("click", function () { location.href = "./wizard.html"; });
+
+render();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("./sw.js").catch(function () {}); });
+}
+</script>
+</body>
+</html>

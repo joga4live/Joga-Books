@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Joga Books</title>
+<meta name="theme-color" content="#4F8EF7">
+<link rel="manifest" href="./assets/manifest.json">
+<link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+<header class="header">
+  <div class="logo">📚 Joga Books</div>
+  <button class="lang-toggle" id="langToggle" aria-label="Cambiar idioma / Change language">EN</button>
+</header>
+
+<main class="container">
+  <section style="padding-top:24px">
+    <h1 class="hero-title" data-i18n="hero.title"></h1>
+    <p class="muted" style="margin-top:12px" data-i18n="hero.subtitle"></p>
+  </section>
+
+  <!-- v2 (m4, aprobado por José): eran class="label" (11px, etiqueta) — son contenido de venta, no etiquetas; ahora 15px con class="muted" -->
+  <section class="grid-2" style="margin-top:24px">
+    <div class="card">🚀 <p class="muted" style="margin-top:8px" data-i18n="benefits.b1"></p></div>
+    <div class="card">✍️ <p class="muted" style="margin-top:8px" data-i18n="benefits.b2"></p></div>
+    <div class="card" style="grid-column:1/-1">✨ <p class="muted" style="margin-top:8px" data-i18n="benefits.b3"></p></div>
+  </section>
+
+  <section class="card card-tint" style="margin-top:24px">
+    <label class="label" for="accessCode" data-i18n="access.label"></label>
+    <input class="input" id="accessCode" type="text" style="margin-top:8px" data-i18n-placeholder="access.placeholder" autocomplete="off">
+    <p class="error-text" id="accessError" style="margin-top:8px;display:none"></p>
+    <button class="btn btn-primary btn-block" id="enterBtn" style="margin-top:14px" data-i18n="access.button"></button>
+  </section>
+
+  <footer class="footer" data-i18n="footer.text"></footer>
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="./assets/i18n.js"></script>
+<script src="./gate.js"></script>
+<script>
+"use strict";
+var i18n = {
+  es: {
+    title: "Joga Books",
+    hero: { title: "Tu libro de no ficción, en horas. No en años.",
+      subtitle: "Elige tu nicho, la IA crea el outline, escribe cada capítulo y humaniza el texto. Tú pones tu experiencia. Joga Books hace el resto." },
+    benefits: { b1: "Outline completo en segundos", b2: "Cada capítulo escrito por IA", b3: "Humanizador integrado — suena a ti" },
+    access: { label: "Código de acceso", placeholder: "Ingresa tu código de acceso", button: "Comenzar mi libro",
+      invalid: "Código inválido. Verifica e intenta de nuevo.", empty: "Ingresa un código." },
+    footer: { text: "Joga Books · parte de Joga Intelligence" }
+  },
+  en: {
+    title: "Joga Books",
+    hero: { title: "Your nonfiction book, in hours. Not years.",
+      subtitle: "Pick your niche, AI builds the outline, writes every chapter, and humanizes the text. You bring the expertise. Joga Books does the rest." },
+    benefits: { b1: "Full outline in seconds", b2: "Every chapter written by AI", b3: "Built-in humanizer — sounds like you" },
+    access: { label: "Access code", placeholder: "Enter your access code", button: "Start my book",
+      invalid: "Invalid code. Check it and try again.", empty: "Enter a code." },
+    footer: { text: "Joga Books · part of Joga Intelligence" }
+  }
+};
+var t = jogaI18n(i18n);
+
+// Ya con licencia: saltar directo al dashboard. / Already licensed: skip straight to the dashboard.
+try { if (localStorage.getItem("jogaBooks_licensed") === "true") location.replace("./app.html"); } catch (e) {}
+
+var codeInput = document.getElementById("accessCode");
+var errEl = document.getElementById("accessError");
+var btn = document.getElementById("enterBtn");
+
+function showError(msg) { errEl.textContent = msg; errEl.style.display = "block"; }
+function hideError() { errEl.style.display = "none"; }
+
+async function tryEnter() {
+  hideError();
+  var code = codeInput.value.trim();
+  var table = t.table();
+  if (!code) { showError(table.access.empty); return; }
+  btn.disabled = true;
+  try {
+    var ok = await window.jogaBooksGate.validate(code);
+    if (ok) {
+      localStorage.setItem("jogaBooks_licensed", "true");
+      location.href = "./app.html";
+    } else {
+      showError(table.access.invalid);
+    }
+  } catch (e) {
+    showError(table.access.invalid);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+btn.addEventListener("click", tryEnter);
+codeInput.addEventListener("keydown", function (e) { if (e.key === "Enter") tryEnter(); });
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("./sw.js").catch(function () {}); });
+}
+</script>
+</body>
+</html>
