@@ -32,20 +32,33 @@ function jogaI18n(dict) {
     });
     document.documentElement.lang = lang;
     if (table.title) document.title = table.title; // v2: pestana traducida / v2: translated tab title
-    var btn = document.getElementById("langToggle");
-    if (btn) btn.textContent = lang === "es" ? "EN" : "ES";
+    // v14: dos controles (ES/EN) en vez de un boton que alterna — el botón
+    // decía el idioma al que cambiarias, no en el que estabas (confuso).
+    // Ahora los dos se ven siempre, el activo se marca con .active +
+    // aria-pressed. / v14: two controls (ES/EN) instead of one toggling
+    // button — the button used to show the language you'd switch TO, not
+    // the one you were in (confusing). Now both are always visible, the
+    // active one marked with .active + aria-pressed.
+    var langEs = document.getElementById("langEs"), langEn = document.getElementById("langEn");
+    if (langEs && langEn) {
+      langEs.classList.toggle("active", lang === "es");
+      langEs.setAttribute("aria-pressed", lang === "es" ? "true" : "false");
+      langEn.classList.toggle("active", lang === "en");
+      langEn.setAttribute("aria-pressed", lang === "en" ? "true" : "false");
+    }
     document.dispatchEvent(new CustomEvent("jogaLangChange", { detail: { lang: lang, table: table } }));
   }
 
-  function toggle() {
-    var next = currentLang() === "es" ? "en" : "es";
-    try { localStorage.setItem("jogaBooks_lang", next); } catch (e) {}
-    apply(next);
+  function setLang(lang) {
+    if (lang !== "es" && lang !== "en") return;
+    try { localStorage.setItem("jogaBooks_lang", lang); } catch (e) {}
+    apply(lang);
   }
 
-  var btn = document.getElementById("langToggle");
-  if (btn) btn.addEventListener("click", toggle);
+  var langEs = document.getElementById("langEs"), langEn = document.getElementById("langEn");
+  if (langEs) langEs.addEventListener("click", function () { setLang("es"); });
+  if (langEn) langEn.addEventListener("click", function () { setLang("en"); });
   apply(currentLang());
 
-  return { apply: apply, toggle: toggle, lang: currentLang, table: function () { return dict[currentLang()] || dict.es; } };
+  return { apply: apply, toggle: setLang, lang: currentLang, table: function () { return dict[currentLang()] || dict.es; } };
 }

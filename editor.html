@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Joga Books — Editor</title>
-<meta name="theme-color" content="#4F8EF7">
+<meta name="theme-color" content="#b8924a">
 <link rel="manifest" href="./assets/manifest.json">
 <link rel="stylesheet" href="./assets/styles.css">
 <style>
@@ -13,20 +13,24 @@
   @media (min-width:768px){ .editor-layout > #editorMain{margin-left:0;margin-right:0} } /* v2 (M3): .container trae margin:0 auto, que en grid no se estira (352/720px = 51% vacio) */
   #sidebar{display:flex;gap:8px;overflow-x:auto;padding:12px 16px}
   @media (min-width:768px){ #sidebar{display:block;overflow:visible;padding:16px 0} }
-  .chap-item{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:13px;white-space:nowrap;color:var(--color-muted)}
-  .chap-item.active{background:var(--color-bg-card);color:var(--color-text)}
+  .chap-item{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid transparent;font-size:13px;white-space:nowrap;color:var(--muted)}
+  .chap-item.active{background:var(--accent-soft);color:var(--text);border-color:var(--accent-text)} /* v13 (tarea 3): antes background:var(--surface) sobre un fondo casi identico, 1.01:1 (invisible) — resto directo del diseno oscuro. Ahora fondo tintado + borde en --accent-text (4.80:1 contra la pagina, pasa el 3:1 no-textual de WCAG 1.4.11), mismo lenguaje "seleccion dorada" que ya usan las tarjetas del wizard */
   @media (min-width:768px){ .chap-item{white-space:normal;margin-bottom:4px} }
   .toggle-row{display:flex;gap:8px;margin:12px 0}
-  .toggle-btn{flex:1;padding:14px 8px;border-radius:8px;border:1px solid var(--color-border);background:var(--color-bg-card);color:var(--color-muted);font-size:13px;font-weight:700} /* v2: alto ~44px tactil, antes 33px (m5) */
-  .toggle-btn.on{border-color:var(--color-primary);color:var(--color-primary)}
-  .back-link{text-decoration:none;color:inherit;font-size:14px;display:inline-block;padding:10px 0} /* v2 (m5): alto tactil, antes 78x24 */
+  .toggle-btn{flex:1;padding:14px 8px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:13px;font-weight:700} /* v11: pildora ("Forma"); alto ~44px tactil sin cambio */
+  .toggle-btn.on{border-color:var(--accent);color:var(--accent-text)}
+  .toggle-btn:disabled{opacity:.45;cursor:not-allowed} /* v3 (N4): igual que .btn-ghost:disabled — antes "Humanizado" deshabilitado se veia igual que no-seleccionado */
+  .back-link{text-decoration:none;color:inherit;font-size:14px;display:inline-block;padding:11px 0} /* v4 (R1): 10px daba 43.8 (0.2 corto), 11px cierra el hueco */
 </style>
 </head>
 <body>
 <header class="header">
   <a href="./app.html" class="back-link" data-i18n="back"></a>
   <div id="bookProgress" class="label"></div>
-  <button class="lang-toggle" id="langToggle" aria-label="Cambiar idioma / Change language">EN</button>
+  <div class="lang-switch">
+    <button class="lang-btn" id="langEs" aria-label="Cambiar a español / Switch to Spanish">ES</button>
+    <button class="lang-btn" id="langEn" aria-label="Cambiar a inglés / Switch to English">EN</button>
+  </div>
 </header>
 <div class="editor-layout">
   <nav id="sidebar"></nav>
@@ -45,13 +49,17 @@ var i18n = {
     humanize: "✨ Humanizar texto", humanizing: "Humanizando...", viewOriginal: "Original", viewHuman: "Humanizado",
     save: "Guardar capítulo", saved: "Capítulo guardado.", prev: "← Cap anterior", next: "Cap siguiente →",
     genErr: "No se pudo generar el capítulo. Intenta de nuevo.", humErr: "No se pudo humanizar. Intenta de nuevo.",
-    pickTone: "Elige un tono para humanizar." },
+    pickTone: "Elige un tono para humanizar.",
+    limiteDiario: "Llegaste a tu límite de hoy. Vuelve mañana.",
+    limiteMensual: "El servicio alcanzó su límite del mes. Vuelve el día 1." },
   en: { title: "Joga Books — Editor", back: "← My books", generate: "✨ Generate with AI", writing: "Writing chapter...",
     humanizer: "HUMANIZER", tones: { profesional: "Professional", conversacional: "Conversational", motivacional: "Motivational" },
     humanize: "✨ Humanize text", humanizing: "Humanizing...", viewOriginal: "Original", viewHuman: "Humanized",
     save: "Save chapter", saved: "Chapter saved.", prev: "← Previous chapter", next: "Next chapter →",
     genErr: "Could not generate the chapter. Try again.", humErr: "Could not humanize. Try again.",
-    pickTone: "Pick a tone to humanize." }
+    pickTone: "Pick a tone to humanize.",
+    limiteDiario: "You've reached today's limit. Come back tomorrow.",
+    limiteMensual: "The service reached its monthly limit. Come back on the 1st." }
 };
 var t = jogaI18n(i18n);
 try { if (localStorage.getItem("jogaBooks_licensed") !== "true") location.replace("./index.html"); } catch (e) {}
@@ -125,7 +133,7 @@ function wireMain(cap, cd, prevCap, nextCap) {
       book.capitulos[cap.num] = { original: r.contenido || "", humanizado: "", tono: "" };
       recomputeProgress(); book.fechaEdicion = jbToday(); jbUpsertBook(book);
       renderAll();
-    } catch (e) { jbToast(table.genErr, "error"); genBtn.disabled = false; genBtn.textContent = table.generate; }
+    } catch (e) { jbToast(jbLimitMessage(e, table) || table.genErr, "error"); genBtn.disabled = false; genBtn.textContent = table.generate; } // v16 (tarea 3): limite_diario/limite_mensual muestran su propio texto
   });
   var vo = document.getElementById("viewOrig"), vh = document.getElementById("viewHuman");
   if (vo) vo.addEventListener("click", function () { E.view = "original"; renderMain(); });
@@ -143,7 +151,7 @@ function wireMain(cap, cd, prevCap, nextCap) {
       book.capitulos[cap.num].humanizado = r.contenido || ""; book.capitulos[cap.num].tono = E.tone;
       book.fechaEdicion = jbToday(); jbUpsertBook(book);
       E.view = "humanizado"; renderMain();
-    } catch (e) { jbToast(table.humErr, "error"); humBtn.disabled = false; humBtn.textContent = table.humanize; }
+    } catch (e) { jbToast(jbLimitMessage(e, table) || table.humErr, "error"); humBtn.disabled = false; humBtn.textContent = table.humanize; } // v16 (tarea 3): idem genBtn
   });
   var saveBtn = document.getElementById("saveBtn");
   if (saveBtn) saveBtn.addEventListener("click", function () {

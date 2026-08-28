@@ -1,32 +1,56 @@
 /* worker.js — Joga Books, Cloudflare Worker
    4 endpoints con los 4 prompts EXACTOS del brief (BRIEF.md). ANTHROPIC_API_KEY
-   se lee como secreto de Cloudflare (wrangler secret put ANTHROPIC_API_KEY),
-   nunca hardcodeada aqui. CORS abierto para que GitHub Pages pueda llamarlo.
-   Este archivo se escribe pero NO se despliega en esta tarea (ver
-   plan-mvp-25ago.md, tarea 8).
+   se lee como secreto de Cloudflare, nunca hardcodeada aqui.
+   v16 (plan-mvp-25ago-v16.md): lista blanca de CORS (antes "*") + limites
+   diario/mensual por KV (antes ninguno). La lista blanca es una capa
+   liviana: Origin se falsifica con un curl, medido en el hermano
+   (../joga-intelligence-repo/.joga/handoff/plan-worker-21ago.md) — la
+   defensa real de gasto son los contadores de abajo, no esto.
    4 endpoints with the 4 EXACT prompts from BRIEF.md. ANTHROPIC_API_KEY is
-   read as a Cloudflare secret (wrangler secret put ANTHROPIC_API_KEY), never
-   hardcoded here. Open CORS so GitHub Pages can call it. This file is
-   written but NOT deployed in this task (see the plan, task 8). */
+   read as a Cloudflare secret, never hardcoded here.
+   v16 (plan-mvp-25ago-v16.md): allowlisted CORS (was "*") + KV-backed
+   daily/monthly limits (was none). The allowlist is a light layer: Origin
+   is spoofed with one curl, measured on the sibling
+   (../joga-intelligence-repo/.joga/handoff/plan-worker-21ago.md) — the
+   real spend defense is the counters below, not this. */
 "use strict";
 
-// Sin modelo pedido por José/Kimo MD para este archivo: se usa el modelo
-// Claude actual recomendado por defecto. Cambiar solo aqui si hace falta.
-// No model was requested by José/Kimo MD for this file: defaults to the
-// current recommended Claude model. Change only here if needed.
+// Modelo: Opus, a proposito — Jose lo eligio sabiendo que cuesta mas (v16), no se cambia.
+// Model: Opus, on purpose — José chose it knowing it costs more (v16), unchanged.
 var ANTHROPIC_MODEL = "claude-opus-5";
 var ANTHROPIC_VERSION = "2023-06-01";
 
-var CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type"
-};
+// v16 candado de dominio (tarea 2) — solo detiene uso casual, ver header. / v16 domain lock (task 2) — stops casual use only, see header.
+var ORIGENES_PERMITIDOS = [
+  "https://joga4live.github.io" // GitHub Pages real, confirmado con curl -I / real GitHub Pages, confirmed with curl -I
+];
 
-function json(data, status) {
+function esOrigenPermitido(origen) {
+  if (ORIGENES_PERMITIDOS.indexOf(origen) !== -1) return true;
+  return /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origen); // solo pruebas locales / local testing only
+}
+
+function cors(origen) {
+  var permitido = esOrigenPermitido(origen) ? origen : ORIGENES_PERMITIDOS[0];
+  return {
+    "Access-Control-Allow-Origin": permitido,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Max-Age": "86400"
+  };
+}
+
+// v16 limites de gasto (tarea 1) — mismo patron probado en produccion en
+// joga-ia-worker.js (Joga Intelligence), lineas ~111-135 y ~177-178.
+// v16 spend limits (task 1) — same pattern proven in production in
+// joga-ia-worker.js (Joga Intelligence), lines ~111-135 and ~177-178.
+var LIMITE_DIARIO = 55;    // llamadas/IP/dia, ~2 libros/persona/dia / calls/IP/day, ~2 books/person/day
+var LIMITE_MENSUAL = 1000; // llamadas/mes, ~38 libros ~$46, techo ~$50 de Jose / calls/month, ~38 books ~$46, José's ~$50 ceiling
+
+function json(data, status, origen) {
   return new Response(JSON.stringify(data), {
     status: status || 200,
-    headers: Object.assign({ "Content-Type": "application/json" }, CORS_HEADERS)
+    headers: Object.assign({ "Content-Type": "application/json" }, cors(origen))
   });
 }
 
@@ -121,21 +145,48 @@ var HANDLERS = {
 
 export default {
   async fetch(request, env) {
-    if (request.method === "OPTIONS") return new Response(null, { headers: CORS_HEADERS });
-    if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
+    var origen = request.headers.get("Origin") || "";
+
+    if (request.method === "OPTIONS") return new Response(null, { headers: cors(origen) });
+    if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, origen);
+
+    if (!esOrigenPermitido(origen)) return json({ error: "origen_no_permitido" }, 403, origen); // tarea 2, antes de tocar Anthropic / task 2, before touching Anthropic
 
     var url = new URL(request.url);
     var handler = HANDLERS[url.pathname];
-    if (!handler) return json({ error: "not_found" }, 404);
-    if (!env.ANTHROPIC_API_KEY) return json({ error: "missing_api_key" }, 500); // nunca hardcodear / never hardcode
+    if (!handler) return json({ error: "not_found" }, 404, origen);
+    if (!env.ANTHROPIC_API_KEY) return json({ error: "missing_api_key" }, 500, origen); // nunca hardcodear / never hardcode
 
     var body;
-    try { body = await request.json(); } catch (e) { return json({ error: "invalid_json" }, 400); }
+    try { body = await request.json(); } catch (e) { return json({ error: "invalid_json" }, 400, origen); }
 
+    // Tarea 1: contador compartido por los 4 endpoints (un libro son ~26
+    // llamadas repartidas entre ellos, todas cuentan igual).
+    // Task 1: one counter shared by all 4 endpoints (a book is ~26 calls
+    // spread across them, all counted the same).
+    var ip = request.headers.get("CF-Connecting-IP") || "sin-ip"; // Cloudflare la pone siempre, no X-Forwarded-For / Cloudflare always sets this, not X-Forwarded-For
+    var hoy = new Date().toISOString().slice(0, 10);
+    var mes = hoy.slice(0, 7);
+    var llaveDia = "d:" + hoy + ":" + ip;
+    var llaveMes = "m:" + mes;
+
+    var usadasHoy = parseInt((await env.JOGA_BOOKS_KV.get(llaveDia)) || "0", 10);
+    if (usadasHoy >= LIMITE_DIARIO) return json({ error: "limite_diario" }, 429, origen);
+
+    var usadasMes = parseInt((await env.JOGA_BOOKS_KV.get(llaveMes)) || "0", 10);
+    if (usadasMes >= LIMITE_MENSUAL) return json({ error: "limite_mensual" }, 429, origen);
+
+    var resultado;
     try {
-      return json(await handler(env, body));
+      resultado = await handler(env, body);
     } catch (e) {
-      return json({ error: "generation_failed", detail: String((e && e.message) || e) }, 502);
+      return json({ error: "generation_failed", detail: String((e && e.message) || e) }, 502, origen);
     }
+
+    // Solo se cuenta si Anthropic respondio bien de verdad / only counted on a real success from Anthropic
+    await env.JOGA_BOOKS_KV.put(llaveDia, String(usadasHoy + 1), { expirationTtl: 172800 });
+    await env.JOGA_BOOKS_KV.put(llaveMes, String(usadasMes + 1), { expirationTtl: 3456000 });
+
+    return json(resultado, 200, origen);
   }
 };

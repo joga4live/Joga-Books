@@ -31,23 +31,27 @@ var WIZARD_I18N = {
   es: { title:"Joga Books — Nuevo libro", steps:["Nicho","Audiencia","Título","Outline","Listo"],
     s1:{ title:"¿Sobre qué eres experto?", own:"Mi nicho es:", ownPh:"Escribe tu nicho...", next:"Continuar →" },
     s2:{ title:"¿Para quién es tu libro?", back:"← Atrás", next:"Continuar →" },
-    s3:{ title:"Generando opciones de título...", errTitle:"No se pudo generar", pick:"Elegir",
+    s3:{ title:"Generando opciones de título...", doneTitle:"Elige tu título", errTitle:"No se pudo generar", pick:"Elegir",
       own:"O escribe tu propio título", ownPh:"Escribe tu propio título", back:"← Atrás", next:"Continuar →",
       err:"No se pudo generar títulos. Intenta de nuevo.", retry:"Reintentar" },
-    s4:{ title:"Generando tu libro...", errTitle:"No se pudo generar", back:"← Atrás", next:"Crear mi libro →",
+    s4:{ title:"Generando tu libro...", doneTitle:"Revisa tu outline", errTitle:"No se pudo generar", back:"← Atrás", next:"Crear mi libro →",
       err:"No se pudo generar el outline. Intenta de nuevo.", retry:"Reintentar" },
     s5:{ title:"¡Tu libro está listo para escribirse!", chaps:"capítulos", langLabel:"Idioma:",
-      toggle:"Ver outline completo ▼", start:"🚀 Empezar a escribir" } },
+      toggle:"Ver outline completo ▼", start:"🚀 Empezar a escribir" },
+    limiteDiario:"Llegaste a tu límite de hoy. Vuelve mañana.",
+    limiteMensual:"El servicio alcanzó su límite del mes. Vuelve el día 1." },
   en: { title:"Joga Books — New Book", steps:["Niche","Audience","Title","Outline","Done"],
     s1:{ title:"What are you an expert in?", own:"My niche is:", ownPh:"Type your niche...", next:"Continue →" },
     s2:{ title:"Who is your book for?", back:"← Back", next:"Continue →" },
-    s3:{ title:"Generating title options...", errTitle:"Could not generate", pick:"Choose",
+    s3:{ title:"Generating title options...", doneTitle:"Choose your title", errTitle:"Could not generate", pick:"Choose",
       own:"Or write your own title", ownPh:"Write your own title", back:"← Back", next:"Continue →",
       err:"Could not generate titles. Try again.", retry:"Retry" },
-    s4:{ title:"Building your book...", errTitle:"Could not generate", back:"← Back", next:"Create my book →",
+    s4:{ title:"Building your book...", doneTitle:"Review your outline", errTitle:"Could not generate", back:"← Back", next:"Create my book →",
       err:"Could not generate the outline. Try again.", retry:"Retry" },
     s5:{ title:"Your book is ready to write!", chaps:"chapters", langLabel:"Language:",
-      toggle:"See full outline ▼", start:"🚀 Start writing" } }
+      toggle:"See full outline ▼", start:"🚀 Start writing" },
+    limiteDiario:"You've reached today's limit. Come back tomorrow.",
+    limiteMensual:"The service reached its monthly limit. Come back on the 1st." }
 };
 // v2 (m9): el resumen del paso 5 antes mostraba un string fijo del idioma de
 // la UI ("Idioma: Español"); ahora se arma con W.idioma (el idioma real que

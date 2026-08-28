@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Joga Books — Nuevo libro</title>
-<meta name="theme-color" content="#4F8EF7">
+<meta name="theme-color" content="#b8924a">
 <link rel="manifest" href="./assets/manifest.json">
 <link rel="stylesheet" href="./assets/styles.css">
 <link rel="stylesheet" href="./assets/wizard.css">
 </head>
 <body>
-<header class="header"><a href="./app.html" class="logo" style="text-decoration:none">📚 Joga Books</a><button class="lang-toggle" id="langToggle" aria-label="Cambiar idioma / Change language">EN</button></header>
+<header class="header"><a href="./app.html" class="logo" style="text-decoration:none">📚 Joga Books</a><div class="lang-switch"><button class="lang-btn" id="langEs" aria-label="Cambiar a español / Switch to Spanish">ES</button><button class="lang-btn" id="langEn" aria-label="Cambiar a inglés / Switch to English">EN</button></div></header>
 <div class="steps" id="stepsBar"></div>
 <main class="container" id="stepArea"></main>
 <div id="toast" role="status" aria-live="polite"></div>
@@ -23,7 +23,7 @@
 var t = jogaI18n(WIZARD_I18N);
 try { if (localStorage.getItem("jogaBooks_licensed") !== "true") location.replace("./index.html"); } catch (e) {}
 
-var W = { step: 1, idioma: t.lang(), nicheIdx: -1, nichoCustom: "", nicho: "", audiencia: null, titulos: [], titulo: "", outline: [] };
+var W = { step: 1, idioma: t.lang(), nicheIdx: -1, nichoCustom: "", nicho: "", audienceIdx: -1, audiencia: "", titulos: [], titulo: "", outline: [] };
 
 function bar() {
   var table = t.table();
@@ -35,36 +35,43 @@ function bar() {
   document.getElementById("stepsBar").innerHTML = html;
 }
 
-function choiceGrid(items, isSelected, onPick) {
-  var wrap = document.createElement("div");
-  wrap.className = "grid-4";
+// v3 (N3): un pintor para nichos+audiencias (antes 2 bloques casi iguales), repone el foco tras redibujar (focusIdx) / v3 (N3): one painter for niches+audiences (was 2 near-identical blocks), restores focus after redraw (focusIdx)
+function pintarGrid(container, items, isSelected, onPick, focusIdx) {
+  container.innerHTML = "";
   items.forEach(function (item, idx) {
+    var picked = isSelected(idx);
     var b = document.createElement("button");
-    b.className = "niche-btn" + (isSelected(idx) ? " selected" : "");
-    b.setAttribute("aria-pressed", isSelected(idx) ? "true" : "false");
-    b.innerHTML = '<span class="em">' + item.emoji + "</span>" + jbEsc(item.label);
+    b.type = "button";
+    b.className = item.cls + (picked ? " selected" : "");
+    b.setAttribute("aria-pressed", picked ? "true" : "false");
+    b.innerHTML = item.html;
     b.addEventListener("click", function () { onPick(idx); });
-    wrap.appendChild(b);
+    container.appendChild(b);
   });
-  return wrap;
+  if (focusIdx >= 0 && container.children[focusIdx]) container.children[focusIdx].focus();
 }
 
 function step1() {
   var table = t.table(), lang = t.lang();
+  var prevGrid = document.getElementById("nicheGrid");
+  var focusIdx = prevGrid ? Array.prototype.indexOf.call(prevGrid.children, document.activeElement) : -1;
   var area = document.getElementById("stepArea");
-  area.innerHTML = '<h2 class="section-title">' + table.s1.title + '</h2><div id="nicheGrid" style="margin-top:14px"></div>' +
+  area.innerHTML = '<h2 class="section-title">' + table.s1.title + '</h2><div id="nicheGrid" class="grid-4" style="margin-top:14px"></div>' +
     '<p class="label" style="margin-top:16px">' + table.s1.own + '</p>' +
     '<input class="input" id="ownNiche" placeholder="' + table.s1.ownPh + '" style="margin-top:6px">' +
     '<button class="btn btn-primary btn-block" style="margin-top:18px" id="s1next" disabled>' + table.s1.next + "</button>";
-  var items = NICHES.map(function (n) { return { emoji: n.emoji, label: n[lang] }; });
-  // v2 (m1): seleccion por indice, no por texto, asi cambiar de idioma no la pierde / v2 (m1): index-based, not text-based, so switching language doesn't lose it
-  var grid = choiceGrid(items, function (idx) { return W.nicheIdx === idx; }, function (idx) {
+  var items = NICHES.map(function (n) { return { cls: "niche-btn", html: '<span class="em">' + n.emoji + "</span>" + jbEsc(n[lang]) }; });
+  pintarGrid(document.getElementById("nicheGrid"), items, function (idx) { return W.nicheIdx === idx; }, function (idx) {
     W.nicheIdx = idx; W.nichoCustom = ""; document.getElementById("ownNiche").value = ""; step1();
-  });
-  document.getElementById("nicheGrid").appendChild(grid);
+  }, focusIdx);
   var own = document.getElementById("ownNiche");
   own.value = W.nicheIdx === -1 ? W.nichoCustom : "";
-  own.addEventListener("input", function () { W.nichoCustom = own.value.trim(); W.nicheIdx = -1; document.getElementById("s1next").disabled = !W.nichoCustom; });
+  own.addEventListener("input", function () { // v4 (R3): limpia la tarjeta marcada in situ, sin repintar el grid (no robarle foco/cursor al input) / v4 (R3): clears the marked card in situ, no grid repaint (don't steal the input's focus/cursor)
+    W.nichoCustom = own.value.trim(); W.nicheIdx = -1;
+    var sel = document.querySelector("#nicheGrid .selected");
+    if (sel) { sel.classList.remove("selected"); sel.setAttribute("aria-pressed", "false"); }
+    document.getElementById("s1next").disabled = !W.nichoCustom;
+  });
   document.getElementById("s1next").disabled = !(W.nicheIdx >= 0 || W.nichoCustom);
   document.getElementById("s1next").addEventListener("click", function () {
     W.idioma = lang; W.nicho = W.nicheIdx >= 0 ? NICHES[W.nicheIdx][lang] : W.nichoCustom; W.step = 2; render();
@@ -73,26 +80,25 @@ function step1() {
 
 function step2() {
   var table = t.table(), lang = t.lang();
+  var prevGrid = document.getElementById("audGrid");
+  var focusIdx = prevGrid ? Array.prototype.indexOf.call(prevGrid.children, document.activeElement) : -1;
   var area = document.getElementById("stepArea");
   area.innerHTML = '<h2 class="section-title">' + table.s2.title + '</h2><div class="grid-2" id="audGrid" style="margin-top:14px"></div>' +
     '<div style="display:flex;gap:10px;margin-top:18px"><button class="btn btn-ghost" id="s2back">' + table.s2.back +
     '</button><button class="btn btn-primary" style="flex:1" id="s2next" disabled>' + table.s2.next + "</button></div>";
-  var grid = document.getElementById("audGrid");
-  // v2 (C1): <div> con click no era foco-navegable; ahora <button> (foco+Enter/Espacio gratis), .aud-btn en wizard.css mantiene el look / v2 (C1): a clickable <div> wasn't keyboard-focusable; now a <button>, .aud-btn in wizard.css keeps the same look
-  AUDIENCES.forEach(function (a, idx) {
-    var picked = W.audiencia === a[lang][0];
-    var card = document.createElement("button");
-    card.type = "button";
-    card.className = "card card-selectable aud-btn" + (picked ? " selected" : "");
-    card.setAttribute("aria-pressed", picked ? "true" : "false");
-    card.innerHTML = '<div style="font-size:22px">' + a.emoji + '</div><div style="font-weight:700;margin-top:6px">' + jbEsc(a[lang][0]) +
-      '</div><p class="muted" style="font-size:12px;margin-top:4px">' + jbEsc(a[lang][1]) + "</p>";
-    card.addEventListener("click", function () { W.audiencia = a[lang][0]; step2(); });
-    grid.appendChild(card);
+  var items = AUDIENCES.map(function (a) {
+    // v10 (defecto 2): titulo sin font-size propio heredaba los 16px del body (ronda 9) y "Emprendedores"/"Profesionales" desbordaban la tarjeta a 320px / v10 (defect 2): title had no own font-size, inherited body's 16px (round 9), "Emprendedores"/"Profesionales" overflowed the card at 320px
+    return { cls: "card card-selectable aud-btn", html: '<div style="font-size:22px">' + a.emoji + '</div><div style="font-size:13px;font-weight:700;margin-top:6px">' + jbEsc(a[lang][0]) + '</div><p class="muted" style="font-size:12px;margin-top:4px">' + jbEsc(a[lang][1]) + "</p>" };
   });
-  document.getElementById("s2next").disabled = !W.audiencia;
+  // v4 (R2): indice, no texto, como el nicho (m1) — cambiar de idioma ya no desmarca la tarjeta / v4 (R2): index, not text, like the niche (m1) — switching language no longer unmarks the card
+  pintarGrid(document.getElementById("audGrid"), items, function (idx) { return W.audienceIdx === idx; }, function (idx) {
+    W.audienceIdx = idx; step2();
+  }, focusIdx);
+  document.getElementById("s2next").disabled = W.audienceIdx < 0;
   document.getElementById("s2back").addEventListener("click", function () { W.step = 1; render(); });
-  document.getElementById("s2next").addEventListener("click", function () { W.step = 3; render(); });
+  document.getElementById("s2next").addEventListener("click", function () {
+    W.audiencia = AUDIENCES[W.audienceIdx][W.idioma][0]; W.step = 3; render(); // v6 (C1): usaba "lang" (idioma vivo de la UI en el paso 2) en vez de W.idioma (el que se congelo en el paso 1 y de verdad se guarda) — mismo criterio que ya usa W.nicho / v6 (C1): used "lang" (live UI language in step 2) instead of W.idioma (the one frozen in step 1 that's actually saved) — same rule W.nicho already follows
+  });
 }
 
 function skeleton(n) { var h = ""; for (var i = 0; i < n; i++) h += '<div class="skeleton"></div>'; return h; }
@@ -114,8 +120,9 @@ async function step3() {
   if (!W.titulos.length) {
     try { var r = await jbCallWorker("/titulos", { nicho: W.nicho, audiencia: W.audiencia, idioma: W.idioma }); W.titulos = r.titulos || []; }
     catch (e) {
-      jbToast(table.s3.err, "error");
-      stepError("s3body", table.s3.errTitle, table.s3.err, table.s3.retry, table.s3.back, step3, function () { W.step = 2; render(); });
+      var msg3 = jbLimitMessage(e, table) || table.s3.err; // v16 (tarea 3): limite_diario/limite_mensual muestran su propio texto, no el error generico
+      jbToast(msg3, "error");
+      stepError("s3body", table.s3.errTitle, msg3, table.s3.retry, table.s3.back, step3, function () { W.step = 2; render(); });
       return;
     }
   }
@@ -123,15 +130,20 @@ async function step3() {
 }
 function renderTitles() {
   var table = t.table();
+  document.getElementById("stepTitle").textContent = table.s3.doneTitle; // v3 (N5): antes se quedaba en "Generando..." aun con exito / v3 (N5): used to stay on "Generating..." even on success
   var body = document.getElementById("s3body");
+  // v5 (R4): mismo patron de pintarGrid (N3) — guarda que tarjeta tenia el foco (el boton "Elegir" recien pulsado) antes de destruirla con innerHTML, y se lo devuelve a la equivalente / v5 (R4): same pintarGrid pattern (N3) — save which card had focus (the "Choose" button just clicked) before innerHTML destroys it, restore it on the equivalent
+  var activeCard = document.activeElement.closest("#s3body > .card");
+  var focusIdx = activeCard ? Array.prototype.indexOf.call(body.children, activeCard) : -1;
   body.innerHTML = "";
-  W.titulos.forEach(function (title) {
+  W.titulos.forEach(function (title, idx) {
     var card = document.createElement("div");
     card.className = "card";
     card.style.marginBottom = "10px";
     card.innerHTML = '<p>' + jbEsc(title) + '</p><button class="btn btn-primary btn-sm" style="margin-top:8px">' + table.s3.pick + "</button>";
     card.querySelector("button").addEventListener("click", function () { W.titulo = title; renderTitles(); });
     body.appendChild(card);
+    if (idx === focusIdx) card.querySelector("button").focus();
   });
   var ownWrap = document.createElement("div");
   ownWrap.innerHTML = '<p class="label" style="margin-top:10px">' + table.s3.own + '</p><input class="input" id="ownTitle" placeholder="' + table.s3.ownPh + '" style="margin-top:6px">' +
@@ -152,8 +164,9 @@ async function step4() {
   if (!W.outline.length) {
     try { var r = await jbCallWorker("/outline", { titulo: W.titulo, nicho: W.nicho, audiencia: W.audiencia, idioma: W.idioma }); W.outline = r.capitulos || []; }
     catch (e) {
-      jbToast(table.s4.err, "error");
-      stepError("s4body", table.s4.errTitle, table.s4.err, table.s4.retry, table.s4.back, step4, function () { W.step = 3; render(); });
+      var msg4 = jbLimitMessage(e, table) || table.s4.err; // v16 (tarea 3): idem s3
+      jbToast(msg4, "error");
+      stepError("s4body", table.s4.errTitle, msg4, table.s4.retry, table.s4.back, step4, function () { W.step = 3; render(); });
       return;
     }
   }
@@ -162,6 +175,7 @@ async function step4() {
 var dragIdx = null;
 function renderOutline() {
   var table = t.table();
+  document.getElementById("stepTitle").textContent = table.s4.doneTitle; // v3 (N5): idem paso 4 / v3 (N5): same fix, step 4
   var body = document.getElementById("s4body");
   body.innerHTML = "";
   W.outline.forEach(function (cap, idx) {
@@ -200,7 +214,7 @@ function step5() {
     '<div class="card card-tint" style="margin-top:14px"><div class="section-title">📚 ' + jbEsc(W.titulo) + '</div>' +
     '<p class="muted" style="margin-top:6px">' + jbEsc(W.nicho) + " · " + jbEsc(W.audiencia) + '</p>' +
     '<p class="muted">' + W.outline.length + ' ' + table.s5.chaps + " · " + langLine + '</p>' +
-    '<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--color-primary)">' + table.s5.toggle + '</summary>' +
+    '<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--accent-text)">' + table.s5.toggle + '</summary>' +
     '<ul style="margin-top:8px;padding-left:20px;line-height:1.9">' + list + '</ul></details></div>' +
     '<button class="btn btn-primary btn-block" style="margin-top:18px" id="s5start">' + table.s5.start + "</button>";
   document.getElementById("s5start").addEventListener("click", function () {

@@ -34,12 +34,20 @@ function jbToday() { return new Date().toISOString().slice(0, 10); }
 
 // Escapa texto (titulos, nombres de capitulo) antes de meterlo en innerHTML —
 // parte viene de la IA via el Worker, no confiar en el contenido a ciegas.
+// v3 (N2): innerHTML escapa <, > y & pero NO comillas — wizard.html mete este
+// resultado dentro de un atributo value="...", asi que una comilla sin
+// escapar truncaba el valor y, peor, permitia inyectar un atributo/evento
+// ejecutable (ej. " onfocus="..."). &quot;/&#39; se ven igual como texto.
 // Escapes text (titles, chapter names) before innerHTML — some of it comes
 // from the AI via the Worker, never trust it blindly.
+// v3 (N2): innerHTML escapes <, > and & but NOT quotes — wizard.html puts
+// this result inside a value="..." attribute, so an unescaped quote both
+// truncated the value and allowed injecting a live attribute/event handler
+// (e.g. " onfocus="..."). &quot;/&#39; render identically as plain text.
 function jbEsc(s) {
   var d = document.createElement("div");
   d.textContent = s == null ? "" : String(s);
-  return d.innerHTML;
+  return d.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
 function jbToast(msg, type) {
@@ -53,14 +61,47 @@ function jbToast(msg, type) {
 
 // Llama a un endpoint del Worker. Nunca lanza silenciosamente: quien llama
 // debe envolver en try/catch y mostrar jbToast en el error.
+// v16: si el Worker corta por limite de gasto (tarea 1 del plan v16),
+// devuelve {error:"limite_diario"|"limite_mensual"} — antes ese cuerpo se
+// descartaba y todo caia en el mismo "worker_429" generico. Ahora se lee
+// el JSON del error y se usa como mensaje del Error lanzado, para que
+// quien llama pueda distinguir un limite de un fallo real (ver
+// jbLimitMessage). Si el cuerpo no trae "error" (u otro codigo HTTP sin
+// cuerpo legible), se cae al "worker_<status>" de siempre.
 // Calls a Worker endpoint. Never fails silently: the caller must wrap in
 // try/catch and show jbToast on error.
+// v16: if the Worker cuts off for a spend limit (task 1 of plan v16), it
+// returns {error:"limite_diario"|"limite_mensual"} — that body used to be
+// discarded and everything fell into the same generic "worker_429". Now
+// the error JSON is read and used as the thrown Error's message, so
+// callers can tell a limit apart from a real failure (see
+// jbLimitMessage). If the body carries no "error" (or another HTTP code
+// with no readable body), it falls back to the usual "worker_<status>".
 async function jbCallWorker(path, body) {
   var res = await fetch(WORKER_URL + path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)
   });
-  if (!res.ok) throw new Error("worker_" + res.status);
+  if (!res.ok) {
+    var codigo = "worker_" + res.status;
+    try { var datos = await res.json(); if (datos && datos.error) codigo = datos.error; } catch (e) {}
+    throw new Error(codigo);
+  }
   return res.json();
+}
+
+// v16 (tarea 3): traduce el codigo de error del Worker a un mensaje que el
+// usuario entienda como "no es un error de la app, se resuelve esperando"
+// — en vez del toast generico de siempre. Devuelve null para cualquier
+// otro fallo, y quien llama sigue usando su mensaje generico de siempre.
+// v16 (task 3): translates the Worker's error code into a message the
+// user reads as "not an app error, it resolves by waiting" — instead of
+// the usual generic toast. Returns null for any other failure, and the
+// caller keeps using its usual generic message.
+function jbLimitMessage(e, table) {
+  var codigo = e && e.message;
+  if (codigo === "limite_diario") return table.limiteDiario;
+  if (codigo === "limite_mensual") return table.limiteMensual;
+  return null;
 }

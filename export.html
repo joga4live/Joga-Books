@@ -4,22 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Joga Books — Exportar</title>
-<meta name="theme-color" content="#4F8EF7">
+<meta name="theme-color" content="#b8924a">
 <link rel="manifest" href="./assets/manifest.json">
 <link rel="stylesheet" href="./assets/styles.css">
 <style>
   #toc li{margin-bottom:6px}
-  #toc a{color:var(--color-light);text-decoration:none;font-size:14px;display:inline-block;padding:14px 0} /* v2 (m5): alto tactil, antes ~17px */
+  #toc a{color:var(--accent-text);text-decoration:none;font-size:14px;display:inline-block;padding:14px 0} /* v2 (m5): alto tactil, antes ~17px */
   .chapter-block{margin-top:24px}
-  .chapter-block h3{color:var(--color-gold);font-size:16px}
+  .chapter-block h3{color:var(--accent-text);font-size:16px}
   .chapter-block p{white-space:pre-wrap;margin-top:8px}
-  .back-link{text-decoration:none;color:inherit;font-size:14px;display:inline-block;padding:10px 0} /* v2 (m5): alto tactil, antes 78x24 */
+  .back-link{text-decoration:none;color:inherit;font-size:14px;display:inline-block;padding:11px 0} /* v4 (R1): 10px daba 43.8 (0.2 corto), 11px cierra el hueco */
 </style>
 </head>
 <body>
 <header class="header">
   <a href="./app.html" class="back-link" data-i18n="back"></a>
-  <button class="lang-toggle" id="langToggle" aria-label="Cambiar idioma / Change language">EN</button>
+  <div class="lang-switch">
+    <button class="lang-btn" id="langEs" aria-label="Cambiar a español / Switch to Spanish">ES</button>
+    <button class="lang-btn" id="langEn" aria-label="Cambiar a inglés / Switch to English">EN</button>
+  </div>
 </header>
 <main class="container">
   <h1 class="hero-title" id="bookTitle" style="font-size:24px"></h1>
