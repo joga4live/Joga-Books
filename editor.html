@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Joga Books — Editor</title>
+<meta name="theme-color" content="#b8924a">
+<link rel="manifest" href="./assets/manifest.json">
+<link rel="stylesheet" href="./assets/styles.css">
+<style>
+  .editor-layout{display:block}
+  @media (min-width:768px){ .editor-layout{display:grid;grid-template-columns:220px 1fr;gap:20px;max-width:960px;margin:0 auto} }
+  @media (min-width:768px){ .editor-layout > #editorMain{margin-left:0;margin-right:0} } /* v2 (M3): .container trae margin:0 auto, que en grid no se estira (352/720px = 51% vacio) */
+  #sidebar{display:flex;gap:8px;overflow-x:auto;padding:12px 16px}
+  @media (min-width:768px){ #sidebar{display:block;overflow:visible;padding:16px 0} }
+  .chap-item{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid transparent;font-size:13px;white-space:nowrap;color:var(--muted)}
+  .chap-item.active{background:var(--accent-soft);color:var(--text);border-color:var(--accent-text)} /* v13 (tarea 3): antes background:var(--surface) sobre un fondo casi identico, 1.01:1 (invisible) — resto directo del diseno oscuro. Ahora fondo tintado + borde en --accent-text (4.80:1 contra la pagina, pasa el 3:1 no-textual de WCAG 1.4.11), mismo lenguaje "seleccion dorada" que ya usan las tarjetas del wizard */
+  @media (min-width:768px){ .chap-item{white-space:normal;margin-bottom:4px} }
+  .toggle-row{display:flex;gap:8px;margin:12px 0}
+  .toggle-btn{flex:1;padding:14px 8px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:13px;font-weight:700} /* v11: pildora ("Forma"); alto ~44px tactil sin cambio */
+  .toggle-btn.on{border-color:var(--accent);color:var(--accent-text)}
+  .toggle-btn:disabled{opacity:.45;cursor:not-allowed} /* v3 (N4): igual que .btn-ghost:disabled — antes "Humanizado" deshabilitado se veia igual que no-seleccionado */
+  .back-link{text-decoration:none;color:inherit;font-size:14px;display:inline-block;padding:11px 0} /* v4 (R1): 10px daba 43.8 (0.2 corto), 11px cierra el hueco */
+</style>
+</head>
+<body>
+<header class="header">
+  <a href="./app.html" class="back-link" data-i18n="back"></a>
+  <div id="bookProgress" class="label"></div>
+  <div class="lang-switch">
+    <button class="lang-btn" id="langEs" aria-label="Cambiar a español / Switch to Spanish">ES</button>
+    <button class="lang-btn" id="langEn" aria-label="Cambiar a inglés / Switch to English">EN</button>
+  </div>
+</header>
+<div class="editor-layout">
+  <nav id="sidebar"></nav>
+  <main class="container" id="editorMain" style="max-width:none"></main>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="./assets/i18n.js"></script>
+<script src="./assets/common.js"></script>
+<script>
+"use strict";
+(function () { // v2 (m3): IIFE + return si no hay libro, asi location.replace() detiene el script (antes seguia y tronaba con TypeError)
+var i18n = {
+  es: { title: "Joga Books — Editor", back: "← Mis libros", generate: "✨ Generar con IA", writing: "Escribiendo capítulo...",
+    humanizer: "HUMANIZADOR", tones: { profesional: "Profesional", conversacional: "Conversacional", motivacional: "Motivacional" },
+    humanize: "✨ Humanizar texto", humanizing: "Humanizando...", viewOriginal: "Original", viewHuman: "Humanizado",
+    save: "Guardar capítulo", saved: "Capítulo guardado.", prev: "← Cap anterior", next: "Cap siguiente →",
+    genErr: "No se pudo generar el capítulo. Intenta de nuevo.", humErr: "No se pudo humanizar. Intenta de nuevo.",
+    pickTone: "Elige un tono para humanizar.",
+    limiteDiario: "Llegaste a tu límite de hoy. Vuelve mañana.",
+    limiteMensual: "El servicio alcanzó su límite del mes. Vuelve el día 1." },
+  en: { title: "Joga Books — Editor", back: "← My books", generate: "✨ Generate with AI", writing: "Writing chapter...",
+    humanizer: "HUMANIZER", tones: { profesional: "Professional", conversacional: "Conversational", motivacional: "Motivational" },
+    humanize: "✨ Humanize text", humanizing: "Humanizing...", viewOriginal: "Original", viewHuman: "Humanized",
+    save: "Save chapter", saved: "Chapter saved.", prev: "← Previous chapter", next: "Next chapter →",
+    genErr: "Could not generate the chapter. Try again.", humErr: "Could not humanize. Try again.",
+    pickTone: "Pick a tone to humanize.",
+    limiteDiario: "You've reached today's limit. Come back tomorrow.",
+    limiteMensual: "The service reached its monthly limit. Come back on the 1st." }
+};
+var t = jogaI18n(i18n);
+try { if (localStorage.getItem("jogaBooks_licensed") !== "true") location.replace("./index.html"); } catch (e) {}
+
+var bookId = new URLSearchParams(location.search).get("id");
+var book = jbGetBook(bookId);
+if (!book) { location.replace("./app.html"); return; }
+
+var E = { current: book.outline[0] ? book.outline[0].num : 1, view: "original", tone: "" };
+
+function capData(num) { return book.capitulos[num] || { original: "", humanizado: "", tono: "" }; }
+
+function recomputeProgress() {
+  var caps = book.outline.map(function (c) { return capData(c.num); });
+  book.progreso = caps.filter(function (c) { return c.original; }).length;
+}
+
+function renderSidebar() {
+  var wrap = document.getElementById("sidebar");
+  wrap.innerHTML = "";
+  book.outline.forEach(function (cap) {
+    var cd = capData(cap.num);
+    var icon = "○";
+    if (cap.num === E.current) icon = "▶";
+    else if (cd.humanizado) icon = "✨";
+    else if (cd.original) icon = "✅";
+    var item = document.createElement("div");
+    item.className = "chap-item" + (cap.num === E.current ? " active" : "");
+    item.innerHTML = "<span>" + icon + "</span><span>" + cap.num + ". " + jbEsc(cap.nombre) + "</span>";
+    item.addEventListener("click", function () { E.current = cap.num; E.view = "original"; E.tone = ""; renderAll(); });
+    wrap.appendChild(item);
+  });
+}
+
+function renderMain() {
+  var table = t.table();
+  var cap = book.outline.find(function (c) { return c.num === E.current; });
+  var cd = capData(cap.num);
+  var main = document.getElementById("editorMain");
+  var body = "";
+  if (!cd.original) {
+    body = '<button class="btn btn-primary btn-block" id="genBtn">' + table.generate + "</button>";
+  } else {
+    body =
+      '<div class="toggle-row"><button class="toggle-btn' + (E.view === "original" ? " on" : "") + '" id="viewOrig">' + table.viewOriginal + '</button>' +
+      '<button class="toggle-btn' + (E.view === "humanizado" ? " on" : "") + '" id="viewHuman" ' + (cd.humanizado ? "" : "disabled") + '>' + table.viewHuman + "</button></div>" +
+      '<textarea class="input" id="chapText">' + jbEsc(E.view === "humanizado" ? cd.humanizado : cd.original) + "</textarea>" +
+      '<div class="card" style="margin-top:16px"><p class="label">' + table.humanizer + '</p>' +
+      '<div class="grid-2" style="margin-top:10px"><button class="tone-btn' + (E.tone === "profesional" ? " on-profesional" : "") + '" data-tone="profesional" aria-pressed="' + (E.tone === "profesional") + '">' + table.tones.profesional + '</button>' +
+      '<button class="tone-btn' + (E.tone === "conversacional" ? " on-conversacional" : "") + '" data-tone="conversacional" aria-pressed="' + (E.tone === "conversacional") + '">' + table.tones.conversacional + '</button>' +
+      '<button class="tone-btn' + (E.tone === "motivacional" ? " on-motivacional" : "") + '" data-tone="motivacional" aria-pressed="' + (E.tone === "motivacional") + '" style="grid-column:1/-1">' + table.tones.motivacional + "</button></div>" +
+      '<button class="btn btn-primary btn-block" style="margin-top:12px" id="humBtn">' + table.humanize + "</button></div>" +
+      '<button class="btn btn-primary btn-block" style="margin-top:16px" id="saveBtn">' + table.save + "</button>";
+  }
+  var idx = book.outline.findIndex(function (c) { return c.num === E.current; });
+  var prevCap = book.outline[idx - 1], nextCap = book.outline[idx + 1];
+  body += '<div style="display:flex;gap:10px;margin-top:20px">' +
+    '<button class="btn btn-ghost" id="prevBtn" ' + (prevCap ? "" : "disabled") + '>' + table.prev + '</button>' +
+    '<button class="btn btn-ghost" style="flex:1" id="nextBtn" ' + (nextCap ? "" : "disabled") + '>' + table.next + "</button></div>";
+  main.innerHTML = '<h2 class="section-title">' + (cap.num + ". " + jbEsc(cap.nombre)) + "</h2>" + '<div style="margin-top:14px">' + body + "</div>";
+  wireMain(cap, cd, prevCap, nextCap);
+}
+
+function wireMain(cap, cd, prevCap, nextCap) {
+  var table = t.table();
+  var genBtn = document.getElementById("genBtn");
+  if (genBtn) genBtn.addEventListener("click", async function () {
+    genBtn.disabled = true; genBtn.textContent = table.writing;
+    try {
+      var r = await jbCallWorker("/capitulo", { titulo_libro: book.titulo, nombre_capitulo: cap.nombre, num: cap.num, nicho: book.nicho, audiencia: book.audiencia, idioma: book.idioma });
+      book.capitulos[cap.num] = { original: r.contenido || "", humanizado: "", tono: "" };
+      recomputeProgress(); book.fechaEdicion = jbToday(); jbUpsertBook(book);
+      renderAll();
+    } catch (e) { jbToast(jbLimitMessage(e, table) || table.genErr, "error"); genBtn.disabled = false; genBtn.textContent = table.generate; } // v16 (tarea 3): limite_diario/limite_mensual muestran su propio texto
+  });
+  var vo = document.getElementById("viewOrig"), vh = document.getElementById("viewHuman");
+  if (vo) vo.addEventListener("click", function () { E.view = "original"; renderMain(); });
+  if (vh) vh.addEventListener("click", function () { E.view = "humanizado"; renderMain(); });
+  document.querySelectorAll(".tone-btn").forEach(function (b) {
+    b.addEventListener("click", function () { E.tone = b.getAttribute("data-tone"); renderMain(); });
+  });
+  var humBtn = document.getElementById("humBtn");
+  if (humBtn) humBtn.addEventListener("click", async function () {
+    if (!E.tone) { jbToast(table.pickTone, "error"); return; }
+    var textNow = document.getElementById("chapText").value;
+    humBtn.disabled = true; humBtn.textContent = table.humanizing;
+    try {
+      var r = await jbCallWorker("/humanizar", { texto: textNow, tono: E.tone, idioma: book.idioma });
+      book.capitulos[cap.num].humanizado = r.contenido || ""; book.capitulos[cap.num].tono = E.tone;
+      book.fechaEdicion = jbToday(); jbUpsertBook(book);
+      E.view = "humanizado"; renderMain();
+    } catch (e) { jbToast(jbLimitMessage(e, table) || table.humErr, "error"); humBtn.disabled = false; humBtn.textContent = table.humanize; } // v16 (tarea 3): idem genBtn
+  });
+  var saveBtn = document.getElementById("saveBtn");
+  if (saveBtn) saveBtn.addEventListener("click", function () {
+    var val = document.getElementById("chapText").value;
+    if (E.view === "humanizado") book.capitulos[cap.num].humanizado = val; else book.capitulos[cap.num].original = val;
+    recomputeProgress(); book.fechaEdicion = jbToday(); jbUpsertBook(book);
+    jbToast(table.saved, "success"); renderAll();
+  });
+  var prevBtn = document.getElementById("prevBtn"), nextBtn = document.getElementById("nextBtn");
+  if (prevBtn) prevBtn.addEventListener("click", function () { if (prevCap) { E.current = prevCap.num; E.view = "original"; E.tone = ""; renderAll(); } });
+  if (nextBtn) nextBtn.addEventListener("click", function () { if (nextCap) { E.current = nextCap.num; E.view = "original"; E.tone = ""; renderAll(); } });
+}
+
+function renderAll() {
+  document.getElementById("bookProgress").textContent = book.progreso + "/" + book.total;
+  renderSidebar();
+  renderMain();
+}
+document.addEventListener("jogaLangChange", renderAll);
+renderAll();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("./sw.js").catch(function () {}); });
+}
+})();
+</script>
+</body>
+</html>

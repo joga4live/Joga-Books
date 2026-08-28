@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Joga Books</title>
+<meta name="theme-color" content="#b8924a">
+<link rel="manifest" href="./assets/manifest.json">
+<link rel="stylesheet" href="./assets/styles.css">
+<style>
+  /* v7: logo de marca + iconos animados, solo se usan en index.html / v7: brand logo + animated icons, used only on index.html */
+  .badge { display: inline-block; border: 1px solid var(--border); border-radius: 999px; padding: 9px 18px; font-size: 11px; font-weight: 700; letter-spacing: 1.4px; color: var(--accent-text); text-transform: uppercase; background: var(--surface); margin-bottom: 20px; } /* v11 */
+  .logo-hero { display: block; width: 230px; max-width: 100%; height: auto; margin: 0 auto 16px; mix-blend-mode: multiply; } /* v11: ya no es cuadrado (900x545); multiply para que el fondo casi blanco del jpg desaparezca contra el degrade de la pagina */
+  .icon-wrap { position: relative; width: 52px; height: 52px; margin: 0 auto; } /* v12: era display:block con margin:0, se pegaba a la izquierda pese al text-align:center de la tarjeta */
+  .icon-poster, .icon-clip { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 14px; transition: opacity .3s; } /* v11: 6px->14px */
+  .icon-clip { opacity: 0; mix-blend-mode: multiply; } /* v11: screen->multiply — el nuevo asset tiene fondo casi blanco, no negro; con screen se lava a blanco y el icono desaparece */
+  .icon-clip.is-playing { opacity: 1; }
+  .icon-poster.is-hidden { opacity: 0; }
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="logo">📚 Joga Books</div>
+  <div class="lang-switch">
+    <button class="lang-btn" id="langEs" aria-label="Cambiar a español / Switch to Spanish">ES</button>
+    <button class="lang-btn" id="langEn" aria-label="Cambiar a inglés / Switch to English">EN</button>
+  </div>
+</header>
+
+<main class="container">
+  <section style="padding-top:24px">
+    <span class="badge" data-i18n="hero.badge"></span>
+    <img class="logo-hero" src="./assets/logo-hero.jpg" alt="" width="900" height="545">
+    <h1 class="hero-title" data-i18n="hero.title"></h1>
+    <p class="muted" style="margin-top:12px" data-i18n="hero.subtitle"></p>
+  </section>
+
+  <!-- v2 (m4, aprobado por José): eran class="label" (11px, etiqueta) — son contenido de venta, no etiquetas; ahora 15px con class="muted" -->
+  <!-- v7: emojis reemplazados por iconos animados de Higgsfield (aprobado por José) — ver startIcon() abajo / v7: emoji replaced with Higgsfield animated icons (José-approved) — see startIcon() below -->
+  <section class="grid-2" style="margin-top:24px">
+    <div class="card" style="text-align:center">
+      <div class="icon-wrap" aria-hidden="true"><img class="icon-poster" src="./assets/icon-outline-poster.jpg" alt="" width="240" height="240"><video class="icon-clip" src="./assets/icon-outline.mp4" muted playsinline preload="auto" width="240" height="240"></video></div>
+      <p class="muted" style="margin-top:8px" data-i18n="benefits.b1"></p>
+    </div>
+    <div class="card" style="text-align:center">
+      <div class="icon-wrap" aria-hidden="true"><img class="icon-poster" src="./assets/icon-chapters-poster.jpg" alt="" width="240" height="240"><video class="icon-clip" src="./assets/icon-chapters.mp4" muted playsinline preload="auto" width="240" height="240"></video></div>
+      <p class="muted" style="margin-top:8px" data-i18n="benefits.b2"></p>
+    </div>
+    <div class="card" style="grid-column:1/-1;text-align:center">
+      <div class="icon-wrap" aria-hidden="true"><img class="icon-poster" src="./assets/icon-humanizer-poster.jpg" alt="" width="240" height="240"><video class="icon-clip" src="./assets/icon-humanizer.mp4" muted playsinline preload="auto" width="240" height="240"></video></div>
+      <p class="muted" style="margin-top:8px" data-i18n="benefits.b3"></p>
+    </div>
+  </section>
+
+  <section class="card card-tint" style="margin-top:24px">
+    <label class="label" for="accessCode" data-i18n="access.label"></label>
+    <input class="input" id="accessCode" type="text" style="margin-top:8px" data-i18n-placeholder="access.placeholder" autocomplete="off">
+    <p class="error-text" id="accessError" style="margin-top:8px;display:none"></p>
+    <button class="btn btn-primary btn-block" id="enterBtn" style="margin-top:14px" data-i18n="access.button"></button>
+  </section>
+
+  <footer class="footer" data-i18n="footer.text"></footer>
+</main>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="./assets/i18n.js"></script>
+<script src="./gate.js"></script>
+<script>
+"use strict";
+var i18n = {
+  es: {
+    title: "Joga Books",
+    hero: { badge: "Escritura premium con IA",
+      title: "El libro que ya está en ti.",
+      subtitle: "Tú pones la experiencia. Joga Books la convierte en capítulos: outline, escritura y humanizado." },
+    benefits: { b1: "Outline completo en segundos", b2: "Cada capítulo escrito por IA", b3: "Humanizador integrado — suena a ti" },
+    access: { label: "Código de acceso", placeholder: "Ingresa tu código de acceso", button: "Comenzar mi libro",
+      invalid: "Código inválido. Verifica e intenta de nuevo.", empty: "Ingresa un código." },
+    footer: { text: "Joga Books · parte de Joga Intelligence" }
+  },
+  en: {
+    title: "Joga Books",
+    hero: { badge: "Premium AI writing",
+      title: "The book already within you.",
+      subtitle: "You bring the expertise. Joga Books turns it into chapters: outline, writing, and humanizing." },
+    benefits: { b1: "Full outline in seconds", b2: "Every chapter written by AI", b3: "Built-in humanizer — sounds like you" },
+    access: { label: "Access code", placeholder: "Enter your access code", button: "Start my book",
+      invalid: "Invalid code. Check it and try again.", empty: "Enter a code." },
+    footer: { text: "Joga Books · part of Joga Intelligence" }
+  }
+};
+var t = jogaI18n(i18n);
+
+// Ya con licencia: saltar directo al dashboard. / Already licensed: skip straight to the dashboard.
+try { if (localStorage.getItem("jogaBooks_licensed") === "true") location.replace("./app.html"); } catch (e) {}
+
+var codeInput = document.getElementById("accessCode");
+var errEl = document.getElementById("accessError");
+var btn = document.getElementById("enterBtn");
+
+function showError(msg) { errEl.textContent = msg; errEl.style.display = "block"; }
+function hideError() { errEl.style.display = "none"; }
+
+async function tryEnter() {
+  hideError();
+  var code = codeInput.value.trim();
+  var table = t.table();
+  if (!code) { showError(table.access.empty); return; }
+  btn.disabled = true;
+  try {
+    var ok = await window.jogaBooksGate.validate(code);
+    if (ok) {
+      localStorage.setItem("jogaBooks_licensed", "true");
+      location.href = "./app.html";
+    } else {
+      showError(table.access.invalid);
+    }
+  } catch (e) {
+    showError(table.access.invalid);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+btn.addEventListener("click", tryEnter);
+codeInput.addEventListener("keydown", function (e) { if (e.key === "Enter") tryEnter(); });
+
+// v7: autoplay solo no siempre dispara — se pide play() cuando el video ya
+// tiene datos (canplay/loadeddata) y se chequea readyState al registrar por
+// si el evento ya paso antes de que el listener existiera. Si play() falla,
+// se queda el poster (nunca un hueco vacio).
+// v7: autoplay alone doesn't always fire — play() is requested once the
+// video actually has data (canplay/loadeddata), and readyState is checked
+// at registration in case the event already fired before the listener
+// existed. If play() fails, the poster stays put (never an empty gap).
+function startIcon(clip) {
+  var poster = clip.previousElementSibling;
+  function ready() {
+    if (clip.classList.contains("is-playing")) return;
+    var p = clip.play();
+    if (p && p.then) p.then(function () { clip.classList.add("is-playing"); poster.classList.add("is-hidden"); }).catch(function () {});
+  }
+  clip.addEventListener("canplay", ready);
+  clip.addEventListener("loadeddata", ready);
+  if (clip.readyState >= 3) ready();
+  // v8 (critico 1): el atributo loop nativo no sobrevive el rebobinado — readyState
+  // cae de 4 a 1 por unos ms, Chrome pausa el video y loop no lo vuelve a arrancar.
+  // Se quito loop del <video> y se reinicia a mano en "ended", esperando a que el
+  // elemento este listo otra vez (igual criterio que el arranque inicial).
+  // v8 (critical 1): native loop doesn't survive the rewind — readyState drops from
+  // 4 to 1 for a few ms, Chrome pauses the video, and loop never restarts it. Removed
+  // loop from the <video> and restart it by hand on "ended", waiting for the element
+  // to be ready again (same criterion as the initial start).
+  clip.addEventListener("ended", function () {
+    clip.currentTime = 0;
+    if (clip.readyState >= 3) clip.play().catch(function () {});
+    else clip.addEventListener("canplay", function () { clip.play().catch(function () {}); }, { once: true });
+  });
+}
+document.querySelectorAll(".icon-clip").forEach(startIcon);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("./sw.js").catch(function () {}); });
+}
+</script>
+</body>
+</html>

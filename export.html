@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Joga Books — Exportar</title>
+<meta name="theme-color" content="#b8924a">
+<link rel="manifest" href="./assets/manifest.json">
+<link rel="stylesheet" href="./assets/styles.css">
+<style>
+  #toc li{margin-bottom:6px}
+  #toc a{color:var(--accent-text);text-decoration:none;font-size:14px;display:inline-block;padding:14px 0} /* v2 (m5): alto tactil, antes ~17px */
+  .chapter-block{margin-top:24px}
+  .chapter-block h3{color:var(--accent-text);font-size:16px}
+  .chapter-block p{white-space:pre-wrap;margin-top:8px}
+  .back-link{text-decoration:none;color:inherit;font-size:14px;display:inline-block;padding:11px 0} /* v4 (R1): 10px daba 43.8 (0.2 corto), 11px cierra el hueco */
+</style>
+</head>
+<body>
+<header class="header">
+  <a href="./app.html" class="back-link" data-i18n="back"></a>
+  <div class="lang-switch">
+    <button class="lang-btn" id="langEs" aria-label="Cambiar a español / Switch to Spanish">ES</button>
+    <button class="lang-btn" id="langEn" aria-label="Cambiar a inglés / Switch to English">EN</button>
+  </div>
+</header>
+<main class="container">
+  <h1 class="hero-title" id="bookTitle" style="font-size:24px"></h1>
+  <p class="muted" id="bookSubtitle" style="margin-top:6px"></p>
+  <p class="label" style="margin-top:10px" id="bookMeta"></p>
+
+  <div class="card" style="margin-top:20px">
+    <p class="label" data-i18n="toc"></p>
+    <ol id="toc" style="margin-top:10px;padding-left:20px"></ol>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;margin-top:20px">
+    <button class="btn btn-primary" id="copyBtn" data-i18n="copyBtn"></button>
+    <button class="btn btn-ghost" id="downloadBtn" data-i18n="downloadBtn"></button>
+    <button class="btn btn-ghost" id="shareBtn" data-i18n="shareBtn"></button>
+  </div>
+
+  <!-- V2: exportar a PDF con jsPDF desde CDN (no implementado en MVP).
+       V2: export to PDF with jsPDF from CDN (not implemented in MVP).
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
+
+  <div id="fullText"></div>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="./assets/i18n.js"></script>
+<script src="./assets/common.js"></script>
+<script>
+"use strict";
+(function () { // v2 (m3): IIFE + return si no hay libro, asi location.replace() detiene el script (antes seguia y tronaba con TypeError)
+var i18n = {
+  es: { title: "Joga Books — Exportar", back: "← Mis libros", toc: "Tabla de contenido", copyBtn: "📋 Copiar todo el texto",
+    downloadBtn: "📄 Descargar como .txt", shareBtn: "🔗 Compartir outline",
+    copied: "Texto copiado.", copyErr: "No se pudo copiar.", shareErr: "No se pudo compartir.",
+    empty: "Este capítulo aún no tiene contenido." },
+  en: { title: "Joga Books — Export", back: "← My books", toc: "Table of contents", copyBtn: "📋 Copy all text",
+    downloadBtn: "📄 Download as .txt", shareBtn: "🔗 Share outline",
+    copied: "Text copied.", copyErr: "Could not copy.", shareErr: "Could not share.",
+    empty: "This chapter has no content yet." }
+};
+var t = jogaI18n(i18n);
+try { if (localStorage.getItem("jogaBooks_licensed") !== "true") location.replace("./index.html"); } catch (e) {}
+
+var bookId = new URLSearchParams(location.search).get("id");
+var book = jbGetBook(bookId);
+if (!book) { location.replace("./app.html"); return; }
+
+function chapterText(cap) {
+  var cd = book.capitulos[cap.num] || {};
+  return cd.humanizado || cd.original || "";
+}
+
+function fullPlainText() {
+  var table = t.table();
+  var parts = [book.titulo];
+  book.outline.forEach(function (cap) {
+    parts.push("\n\n" + cap.num + ". " + cap.nombre + "\n" + (chapterText(cap) || table.empty));
+  });
+  return parts.join("");
+}
+
+function outlinePlainText() {
+  return book.titulo + "\n" + book.outline.map(function (c) { return c.num + ". " + c.nombre; }).join("\n");
+}
+
+function render() {
+  var table = t.table(), lang = t.lang();
+  document.getElementById("bookTitle").textContent = book.titulo;
+  document.getElementById("bookSubtitle").textContent = book.subtitulo || "";
+  document.getElementById("bookMeta").textContent = book.nicho + " · " + book.audiencia + " · " + book.outline.length + (lang === "es" ? " capítulos" : " chapters");
+  document.getElementById("toc").innerHTML = book.outline.map(function (c) {
+    return '<li><a href="#cap' + c.num + '">' + c.num + ". " + jbEsc(c.nombre) + "</a></li>";
+  }).join("");
+  document.getElementById("fullText").innerHTML = book.outline.map(function (c) {
+    var text = chapterText(c) || table.empty;
+    return '<div class="chapter-block" id="cap' + c.num + '"><h3>' + c.num + ". " + jbEsc(c.nombre) + "</h3><p>" + jbEsc(text) + "</p></div>";
+  }).join("");
+}
+document.addEventListener("jogaLangChange", render);
+render();
+
+document.getElementById("copyBtn").addEventListener("click", async function () {
+  var table = t.table();
+  try {
+    if (navigator.clipboard) await navigator.clipboard.writeText(fullPlainText());
+    else { var ta = document.createElement("textarea"); ta.value = fullPlainText(); document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); }
+    jbToast(table.copied, "success");
+  } catch (e) { jbToast(table.copyErr, "error"); }
+});
+
+document.getElementById("downloadBtn").addEventListener("click", function () {
+  var blob = new Blob([fullPlainText()], { type: "text/plain;charset=utf-8" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = (book.titulo || "joga-book").replace(/[^a-z0-9]+/gi, "-") + ".txt";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+});
+
+document.getElementById("shareBtn").addEventListener("click", async function () {
+  var table = t.table();
+  var text = outlinePlainText();
+  try {
+    if (navigator.share) await navigator.share({ title: book.titulo, text: text });
+    else if (navigator.clipboard) { await navigator.clipboard.writeText(text); jbToast(table.copied, "success"); }
+  } catch (e) { if (e.name !== "AbortError") jbToast(table.shareErr, "error"); }
+});
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("./sw.js").catch(function () {}); });
+}
+})();
+</script>
+</body>
+</html>

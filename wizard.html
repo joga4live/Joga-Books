@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Joga Books — Nuevo libro</title>
+<meta name="theme-color" content="#b8924a">
+<link rel="manifest" href="./assets/manifest.json">
+<link rel="stylesheet" href="./assets/styles.css">
+<link rel="stylesheet" href="./assets/wizard.css">
+</head>
+<body>
+<header class="header"><a href="./app.html" class="logo" style="text-decoration:none">📚 Joga Books</a><div class="lang-switch"><button class="lang-btn" id="langEs" aria-label="Cambiar a español / Switch to Spanish">ES</button><button class="lang-btn" id="langEn" aria-label="Cambiar a inglés / Switch to English">EN</button></div></header>
+<div class="steps" id="stepsBar"></div>
+<main class="container" id="stepArea"></main>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="./assets/i18n.js"></script>
+<script src="./assets/common.js"></script>
+<script src="./assets/wizard-data.js"></script>
+<script>
+"use strict";
+var t = jogaI18n(WIZARD_I18N);
+try { if (localStorage.getItem("jogaBooks_licensed") !== "true") location.replace("./index.html"); } catch (e) {}
+
+var W = { step: 1, idioma: t.lang(), nicheIdx: -1, nichoCustom: "", nicho: "", audienceIdx: -1, audiencia: "", titulos: [], titulo: "", outline: [] };
+
+function bar() {
+  var table = t.table();
+  var html = "";
+  for (var i = 1; i <= 5; i++) {
+    var cls = i < W.step ? "done" : (i === W.step ? "active" : "");
+    html += '<div class="step ' + cls + '"><div class="step-dot">' + (i < W.step ? "✓" : i) + '</div><div class="step-label">' + table.steps[i - 1] + "</div></div>";
+  }
+  document.getElementById("stepsBar").innerHTML = html;
+}
+
+// v3 (N3): un pintor para nichos+audiencias (antes 2 bloques casi iguales), repone el foco tras redibujar (focusIdx) / v3 (N3): one painter for niches+audiences (was 2 near-identical blocks), restores focus after redraw (focusIdx)
+function pintarGrid(container, items, isSelected, onPick, focusIdx) {
+  container.innerHTML = "";
+  items.forEach(function (item, idx) {
+    var picked = isSelected(idx);
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = item.cls + (picked ? " selected" : "");
+    b.setAttribute("aria-pressed", picked ? "true" : "false");
+    b.innerHTML = item.html;
+    b.addEventListener("click", function () { onPick(idx); });
+    container.appendChild(b);
+  });
+  if (focusIdx >= 0 && container.children[focusIdx]) container.children[focusIdx].focus();
+}
+
+function step1() {
+  var table = t.table(), lang = t.lang();
+  var prevGrid = document.getElementById("nicheGrid");
+  var focusIdx = prevGrid ? Array.prototype.indexOf.call(prevGrid.children, document.activeElement) : -1;
+  var area = document.getElementById("stepArea");
+  area.innerHTML = '<h2 class="section-title">' + table.s1.title + '</h2><div id="nicheGrid" class="grid-4" style="margin-top:14px"></div>' +
+    '<p class="label" style="margin-top:16px">' + table.s1.own + '</p>' +
+    '<input class="input" id="ownNiche" placeholder="' + table.s1.ownPh + '" style="margin-top:6px">' +
+    '<button class="btn btn-primary btn-block" style="margin-top:18px" id="s1next" disabled>' + table.s1.next + "</button>";
+  var items = NICHES.map(function (n) { return { cls: "niche-btn", html: '<span class="em">' + n.emoji + "</span>" + jbEsc(n[lang]) }; });
+  pintarGrid(document.getElementById("nicheGrid"), items, function (idx) { return W.nicheIdx === idx; }, function (idx) {
+    W.nicheIdx = idx; W.nichoCustom = ""; document.getElementById("ownNiche").value = ""; step1();
+  }, focusIdx);
+  var own = document.getElementById("ownNiche");
+  own.value = W.nicheIdx === -1 ? W.nichoCustom : "";
+  own.addEventListener("input", function () { // v4 (R3): limpia la tarjeta marcada in situ, sin repintar el grid (no robarle foco/cursor al input) / v4 (R3): clears the marked card in situ, no grid repaint (don't steal the input's focus/cursor)
+    W.nichoCustom = own.value.trim(); W.nicheIdx = -1;
+    var sel = document.querySelector("#nicheGrid .selected");
+    if (sel) { sel.classList.remove("selected"); sel.setAttribute("aria-pressed", "false"); }
+    document.getElementById("s1next").disabled = !W.nichoCustom;
+  });
+  document.getElementById("s1next").disabled = !(W.nicheIdx >= 0 || W.nichoCustom);
+  document.getElementById("s1next").addEventListener("click", function () {
+    W.idioma = lang; W.nicho = W.nicheIdx >= 0 ? NICHES[W.nicheIdx][lang] : W.nichoCustom; W.step = 2; render();
+  });
+}
+
+function step2() {
+  var table = t.table(), lang = t.lang();
+  var prevGrid = document.getElementById("audGrid");
+  var focusIdx = prevGrid ? Array.prototype.indexOf.call(prevGrid.children, document.activeElement) : -1;
+  var area = document.getElementById("stepArea");
+  area.innerHTML = '<h2 class="section-title">' + table.s2.title + '</h2><div class="grid-2" id="audGrid" style="margin-top:14px"></div>' +
+    '<div style="display:flex;gap:10px;margin-top:18px"><button class="btn btn-ghost" id="s2back">' + table.s2.back +
+    '</button><button class="btn btn-primary" style="flex:1" id="s2next" disabled>' + table.s2.next + "</button></div>";
+  var items = AUDIENCES.map(function (a) {
+    // v10 (defecto 2): titulo sin font-size propio heredaba los 16px del body (ronda 9) y "Emprendedores"/"Profesionales" desbordaban la tarjeta a 320px / v10 (defect 2): title had no own font-size, inherited body's 16px (round 9), "Emprendedores"/"Profesionales" overflowed the card at 320px
+    return { cls: "card card-selectable aud-btn", html: '<div style="font-size:22px">' + a.emoji + '</div><div style="font-size:13px;font-weight:700;margin-top:6px">' + jbEsc(a[lang][0]) + '</div><p class="muted" style="font-size:12px;margin-top:4px">' + jbEsc(a[lang][1]) + "</p>" };
+  });
+  // v4 (R2): indice, no texto, como el nicho (m1) — cambiar de idioma ya no desmarca la tarjeta / v4 (R2): index, not text, like the niche (m1) — switching language no longer unmarks the card
+  pintarGrid(document.getElementById("audGrid"), items, function (idx) { return W.audienceIdx === idx; }, function (idx) {
+    W.audienceIdx = idx; step2();
+  }, focusIdx);
+  document.getElementById("s2next").disabled = W.audienceIdx < 0;
+  document.getElementById("s2back").addEventListener("click", function () { W.step = 1; render(); });
+  document.getElementById("s2next").addEventListener("click", function () {
+    W.audiencia = AUDIENCES[W.audienceIdx][W.idioma][0]; W.step = 3; render(); // v6 (C1): usaba "lang" (idioma vivo de la UI en el paso 2) en vez de W.idioma (el que se congelo en el paso 1 y de verdad se guarda) — mismo criterio que ya usa W.nicho / v6 (C1): used "lang" (live UI language in step 2) instead of W.idioma (the one frozen in step 1 that's actually saved) — same rule W.nicho already follows
+  });
+}
+
+function skeleton(n) { var h = ""; for (var i = 0; i < n; i++) h += '<div class="skeleton"></div>'; return h; }
+
+// v2 (M2/m11): une renderTitleError+renderOutlineError, agrega el "Atras" que faltaba (M2) y cambia el <h2> de "Generando..." a error (m11) / v2 (M2/m11): merges renderTitleError+renderOutlineError, adds the missing "Back" (M2), swaps the <h2> from "Generating..." to an error state (m11)
+function stepError(bodyId, errTitle, errMsg, retryLabel, backLabel, onRetry, onBack) {
+  document.getElementById("stepTitle").textContent = errTitle;
+  document.getElementById(bodyId).innerHTML = '<p class="error-text">' + errMsg + '</p>' +
+    '<div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-ghost" id="errBack">' + backLabel +
+    '</button><button class="btn btn-primary" style="flex:1" id="errRetry">' + retryLabel + "</button></div>";
+  document.getElementById("errBack").addEventListener("click", onBack);
+  document.getElementById("errRetry").addEventListener("click", onRetry);
+}
+
+async function step3() {
+  var table = t.table(), lang = t.lang();
+  var area = document.getElementById("stepArea");
+  area.innerHTML = '<h2 class="section-title" id="stepTitle">' + table.s3.title + '</h2><div id="s3body" style="margin-top:14px">' + skeleton(3) + "</div>";
+  if (!W.titulos.length) {
+    try { var r = await jbCallWorker("/titulos", { nicho: W.nicho, audiencia: W.audiencia, idioma: W.idioma }); W.titulos = r.titulos || []; }
+    catch (e) {
+      var msg3 = jbLimitMessage(e, table) || table.s3.err; // v16 (tarea 3): limite_diario/limite_mensual muestran su propio texto, no el error generico
+      jbToast(msg3, "error");
+      stepError("s3body", table.s3.errTitle, msg3, table.s3.retry, table.s3.back, step3, function () { W.step = 2; render(); });
+      return;
+    }
+  }
+  renderTitles();
+}
+function renderTitles() {
+  var table = t.table();
+  document.getElementById("stepTitle").textContent = table.s3.doneTitle; // v3 (N5): antes se quedaba en "Generando..." aun con exito / v3 (N5): used to stay on "Generating..." even on success
+  var body = document.getElementById("s3body");
+  // v5 (R4): mismo patron de pintarGrid (N3) — guarda que tarjeta tenia el foco (el boton "Elegir" recien pulsado) antes de destruirla con innerHTML, y se lo devuelve a la equivalente / v5 (R4): same pintarGrid pattern (N3) — save which card had focus (the "Choose" button just clicked) before innerHTML destroys it, restore it on the equivalent
+  var activeCard = document.activeElement.closest("#s3body > .card");
+  var focusIdx = activeCard ? Array.prototype.indexOf.call(body.children, activeCard) : -1;
+  body.innerHTML = "";
+  W.titulos.forEach(function (title, idx) {
+    var card = document.createElement("div");
+    card.className = "card";
+    card.style.marginBottom = "10px";
+    card.innerHTML = '<p>' + jbEsc(title) + '</p><button class="btn btn-primary btn-sm" style="margin-top:8px">' + table.s3.pick + "</button>";
+    card.querySelector("button").addEventListener("click", function () { W.titulo = title; renderTitles(); });
+    body.appendChild(card);
+    if (idx === focusIdx) card.querySelector("button").focus();
+  });
+  var ownWrap = document.createElement("div");
+  ownWrap.innerHTML = '<p class="label" style="margin-top:10px">' + table.s3.own + '</p><input class="input" id="ownTitle" placeholder="' + table.s3.ownPh + '" style="margin-top:6px">' +
+    '<div style="display:flex;gap:10px;margin-top:18px"><button class="btn btn-ghost" id="s3back">' + table.s3.back +
+    '</button><button class="btn btn-primary" style="flex:1" id="s3next" ' + (W.titulo ? "" : "disabled") + '>' + table.s3.next + "</button></div>";
+  body.appendChild(ownWrap);
+  var own = document.getElementById("ownTitle");
+  own.value = W.titulos.indexOf(W.titulo) === -1 ? W.titulo : "";
+  own.addEventListener("input", function () { W.titulo = own.value.trim(); document.getElementById("s3next").disabled = !W.titulo; });
+  document.getElementById("s3back").addEventListener("click", function () { W.step = 2; render(); });
+  document.getElementById("s3next").addEventListener("click", function () { W.step = 4; render(); });
+}
+
+async function step4() {
+  var table = t.table();
+  var area = document.getElementById("stepArea");
+  area.innerHTML = '<h2 class="section-title" id="stepTitle">' + table.s4.title + '</h2><div id="s4body" style="margin-top:14px">' + skeleton(6) + "</div>";
+  if (!W.outline.length) {
+    try { var r = await jbCallWorker("/outline", { titulo: W.titulo, nicho: W.nicho, audiencia: W.audiencia, idioma: W.idioma }); W.outline = r.capitulos || []; }
+    catch (e) {
+      var msg4 = jbLimitMessage(e, table) || table.s4.err; // v16 (tarea 3): idem s3
+      jbToast(msg4, "error");
+      stepError("s4body", table.s4.errTitle, msg4, table.s4.retry, table.s4.back, step4, function () { W.step = 3; render(); });
+      return;
+    }
+  }
+  renderOutline();
+}
+var dragIdx = null;
+function renderOutline() {
+  var table = t.table();
+  document.getElementById("stepTitle").textContent = table.s4.doneTitle; // v3 (N5): idem paso 4 / v3 (N5): same fix, step 4
+  var body = document.getElementById("s4body");
+  body.innerHTML = "";
+  W.outline.forEach(function (cap, idx) {
+    var row = document.createElement("div");
+    row.className = "chap-row";
+    row.draggable = true;
+    // v2 (m10): descripcion generada por la IA, antes se guardaba y no se mostraba en ningun lado / v2 (m10): AI-generated description, used to be saved and shown nowhere
+    row.innerHTML = '<span class="chap-num">' + (idx + 1) + '</span><div style="flex:1;min-width:0"><input class="chap-name" value="' + jbEsc(cap.nombre) + '">' +
+      (cap.descripcion ? '<p class="chap-desc">' + jbEsc(cap.descripcion) + '</p>' : '') + '</div>';
+    row.querySelector("input").addEventListener("input", function (e) { cap.nombre = e.target.value; });
+    row.addEventListener("dragstart", function () { dragIdx = idx; });
+    row.addEventListener("dragover", function (e) { e.preventDefault(); });
+    row.addEventListener("drop", function () {
+      if (dragIdx === null || dragIdx === idx) return;
+      var moved = W.outline.splice(dragIdx, 1)[0];
+      W.outline.splice(idx, 0, moved);
+      dragIdx = null; renderOutline();
+    });
+    body.appendChild(row);
+  });
+  var nav = document.createElement("div");
+  nav.style.cssText = "display:flex;gap:10px;margin-top:18px";
+  nav.innerHTML = '<button class="btn btn-ghost" id="s4back">' + table.s4.back + '</button><button class="btn btn-primary" style="flex:1" id="s4next">' + table.s4.next + "</button>";
+  body.appendChild(nav);
+  document.getElementById("s4back").addEventListener("click", function () { W.step = 3; render(); });
+  document.getElementById("s4next").addEventListener("click", function () { W.step = 5; render(); });
+}
+
+function step5() {
+  var table = t.table(), lang = t.lang();
+  var area = document.getElementById("stepArea");
+  var list = W.outline.map(function (c, i) { return "<li>" + (i + 1) + ". " + jbEsc(c.nombre) + "</li>"; }).join("");
+  // v2 (m9): antes un string fijo de la UI podia mentir sobre W.idioma si el toggle cambiaba entre paso 1 y 5 / v2 (m9): a fixed UI string used to lie about W.idioma if the toggle changed between step 1 and 5
+  var langLine = table.s5.langLabel + " " + LANG_NAMES[W.idioma][lang];
+  area.innerHTML = '<h2 class="section-title">' + table.s5.title + '</h2>' +
+    '<div class="card card-tint" style="margin-top:14px"><div class="section-title">📚 ' + jbEsc(W.titulo) + '</div>' +
+    '<p class="muted" style="margin-top:6px">' + jbEsc(W.nicho) + " · " + jbEsc(W.audiencia) + '</p>' +
+    '<p class="muted">' + W.outline.length + ' ' + table.s5.chaps + " · " + langLine + '</p>' +
+    '<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--accent-text)">' + table.s5.toggle + '</summary>' +
+    '<ul style="margin-top:8px;padding-left:20px;line-height:1.9">' + list + '</ul></details></div>' +
+    '<button class="btn btn-primary btn-block" style="margin-top:18px" id="s5start">' + table.s5.start + "</button>";
+  document.getElementById("s5start").addEventListener("click", function () {
+    var caps = {};
+    var book = {
+      id: "book_" + Date.now(), titulo: W.titulo, subtitulo: "", nicho: W.nicho, audiencia: W.audiencia,
+      idioma: W.idioma, progreso: 0, total: W.outline.length, fechaCreacion: jbToday(), fechaEdicion: jbToday(),
+      outline: W.outline.map(function (c, i) { return { num: i + 1, nombre: c.nombre, descripcion: c.descripcion || "" }; }),
+      capitulos: caps
+    };
+    jbUpsertBook(book);
+    location.href = "./editor.html?id=" + book.id;
+  });
+}
+
+function render() {
+  bar();
+  if (W.step === 1) step1();
+  else if (W.step === 2) step2();
+  else if (W.step === 3) step3();
+  else if (W.step === 4) step4();
+  else step5();
+}
+document.addEventListener("jogaLangChange", render);
+render();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("./sw.js").catch(function () {}); });
+}
+</script>
+</body>
+</html>

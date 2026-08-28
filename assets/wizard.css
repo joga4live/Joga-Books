@@ -1,0 +1,24 @@
+/* assets/wizard.css — Joga Books
+   Estilos exclusivos de wizard.html (grid de nichos, filas de capitulo
+   arrastrables). Separado de styles.css porque nadie mas los usa; separado
+   del HTML para acercar wizard.html al limite de 200 lineas de AGENTS.md.
+   Styles used only by wizard.html (niche grid, draggable chapter rows).
+   Kept out of styles.css because no other screen uses them; kept out of the
+   HTML to bring wizard.html closer to AGENTS.md's 200-line cap.
+   v11: nombres de variable actualizados a la paleta clara/dorada — ver
+   assets/styles.css. / v11: variable names updated to the light/gold
+   palette — see assets/styles.css. */
+.niche-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 10px; padding: 10px 6px; text-align: center; font-size: 12px; }
+.niche-btn.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.niche-btn .em { font-size: 20px; display: block; margin-bottom: 4px; }
+/* v2 (C1): las 4 tarjetas de audiencia pasaron de <div> a <button> para foco
+   de teclado; esta clase les quita el centrado/ancho de boton por defecto
+   para que se sigan viendo igual que antes. / v2 (C1): the 4 audience cards
+   moved from <div> to <button> for keyboard focus; this class strips the
+   default button centering/width so they still look the same as before. */
+.aud-btn { text-align: left; width: 100%; font: inherit; display: block; color: var(--text); } /* v3 (N1): un <button> recibe color:buttontext del navegador (no hereda) */
+.chap-row { display: flex; align-items: flex-start; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px; margin-bottom: 8px; cursor: grab; }
+.chap-num { color: var(--muted); font-weight: 700; width: 22px; padding-top: 2px; }
+.chap-name { width: 100%; background: transparent; border: none; color: var(--text); font-size: 14px; }
+.chap-name:focus { outline: none; }
+.chap-desc { color: var(--muted); font-size: 12px; line-height: 1.4; margin: 2px 0 0; } /* v2 (m10): descripcion del capitulo, antes se generaba y no se mostraba en ningun lado */

@@ -1,0 +1,178 @@
+/* assets/styles.css — Joga Books
+   Hoja de estilo compartida por las 5 pantallas (index/app/wizard/editor/export).
+   Shared stylesheet used by all 5 screens. Un solo lugar para colores y tipografia
+   asi ninguna pantalla los reinventa. / One place for colors and type so no screen
+   reinvents them. Mobile-first: reglas base = telefono, @media min-width = escritorio.
+   Ver AGENTS.md / BRIEF.md para el sistema de color y tipografia exactos —
+   AVISO (v11): esos dos archivos quedaron desactualizados con la paleta oscura
+   vieja tras este cambio; ver implementacion-mvp-25ago-v11.md. / NOTICE (v11):
+   those two files are now stale with the old dark palette; see the v11 handoff. */
+
+/* v11: identidad Joga Intelligence — Playfair Display (titulos) + Inter (cuerpo).
+   Reemplaza a Manrope (ronda 9), que ya no se usa. / v11: Joga Intelligence
+   identity — Playfair Display (titles) + Inter (body). Replaces Manrope
+   (round 9), no longer used. */
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('./fonts/playfair.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('./fonts/inter.woff2') format('woff2');
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* v11: paleta clara/dorada, copiada exacta del :root de joga-intelligence-repo/index.html
+     (nombres nuevos porque los viejos --color-bg-deep/--color-primary/etc. mentirian
+     apuntando a blanco/dorado). / v11: light/gold palette, copied exact from
+     joga-intelligence-repo/index.html's :root (renamed because the old
+     --color-bg-deep/--color-primary/etc. names would lie pointing at white/gold now). */
+  --bg: #ffffff;
+  --bg-2: #efe3cf;
+  --surface: #ffffff;
+  --surface-2: #fef9f1;
+  --text: #000000;
+  --muted: #6f655d;
+  --accent: #b8924a;
+  --accent-text: #8b6d35; /* v13 (tarea 1): era #8d6f37 (copiado exacto de Joga Intelligence), fallaba 4.49:1 sobre --surface-2 (min 4.5) en 3 lugares reales; ahora 4.62:1 crema / 4.84:1 blanco */
+  --accent-hover: #90723a; /* v13 (tarea 2): separado de --accent-text — como texto quiere oscurecerse (arriba), como fondo del hover con texto negro encima quiere aclararse; un mismo token no podia servir a los dos. Texto negro da 4.65:1, y se nota distinto de --accent (7.25:1) */
+  --accent-soft: rgba(184,146,74,.14);
+  --border: rgba(180,141,85,.35);
+  --shadow: 0 24px 60px rgba(31,25,22,.08);
+  /* Funcionales de Joga Books (no vienen de Joga Intelligence) — re-decididos
+     para fondo claro, con contraste medido, no trasladados a ciegas (v11).
+     Joga Books functional colors (not part of Joga Intelligence's palette) —
+     re-decided for a light background, measured, not copied blindly. */
+  --color-success: #22C55E; /* sin cambio: solo se usa como fondo con SU PROPIO texto oscuro (9.22:1), nunca suelto como texto */
+  --color-error: #B91C1C;   /* era #EF4444 (3.76:1 como texto, fallaba AA); ahora 6.47:1 sobre blanco */
+  --color-profesional: #2563EB;    /* era #60A5FA (2.54:1); ahora 5.17:1 sobre blanco, 4.93:1 sobre surface-2 */
+  --color-conversacional: #047857; /* era #34D399 (1.92:1); ahora 5.48:1 sobre blanco, 5.23:1 sobre surface-2 */
+  --color-motivacional: #C2410C;   /* era #F97316 (2.80:1); ahora 5.18:1 sobre blanco, 4.94:1 sobre surface-2 */
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: linear-gradient(180deg, #fff, var(--surface-2) 60%, #fff);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+}
+h1, h2, h3, p, ul { margin: 0; }
+a { color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; }
+
+.container { max-width: 480px; margin: 0 auto; padding: 20px 16px 40px; }
+@media (min-width: 768px) { .container { max-width: 720px; } }
+
+.hero-title { font-family: 'Playfair Display', Georgia, serif; font-size: 44px; font-weight: 700; line-height: 1.1; letter-spacing: -0.5px; }
+.section-title { font-family: 'Playfair Display', Georgia, serif; font-size: 19px; font-weight: 700; }
+.label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.4px; color: var(--accent-text); } /* v11: era 600/1px/--color-muted, ahora 700/1.4px/--accent-text (identidad Joga Intelligence) */
+.muted { color: var(--muted); }
+
+/* v15: app.html no cabia a 320px (medido: 361px de contenido natural vs
+   320 de viewport, faltaban 41px) — el logo y el boton "+ Nuevo libro" se
+   partian a la mitad. En vez de encoger tipografia/padding (arriesga los
+   44px tactiles o el texto), se deja que el encabezado pase a una segunda
+   fila ordenada cuando no cabe en una: flex-wrap solo actua si hace falta,
+   nada se achica en las 5 pantallas donde ya cabia en una fila.
+   v15: app.html didn't fit at 320px (measured: 361px of natural content
+   vs 320 viewport, 41px short) — the logo and the "+ New book" button
+   were breaking mid-phrase. Instead of shrinking type/padding (risks the
+   44px tap targets or the text), the header is allowed to wrap to an
+   orderly second row only when it doesn't fit — nothing shrinks on the
+   4 screens that already fit on one row. */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px; border-bottom: 1px solid var(--border);
+  flex-wrap: wrap; row-gap: 8px;
+}
+.logo { font-weight: 900; font-size: 18px; letter-spacing: -0.3px; color: var(--accent-text); flex-shrink: 0; } /* v15: nunca se achica ni envuelve su propio texto, si no cabe se va entera a la fila 2 */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 14px 20px; min-height: 44px; border-radius: 999px; border: none; /* v11: 10px->999px (pildora, "Forma" del plan); min-height se conserva sin tocar */
+  font-size: 15px; font-weight: 700; text-decoration: none;
+}
+.btn-primary { background: var(--accent); color: var(--text); } /* v11: el plan pedia texto blanco (2.90:1, falla AA); el sitio real usa texto oscuro sobre el mismo dorado (6.00:1) — se siguio ese patron real, con var(--text) da 7.25:1. Ver reporte. */
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+.btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:disabled { opacity: .45; cursor: not-allowed; }
+.btn-block { width: 100%; }
+.btn-sm { padding: 15px 14px; font-size: 13px; border-radius: 999px; }
+
+/* v14: el boton unico que alternaba se leia al reves (mostraba el idioma
+   al que cambiarias, no el activo) — reemplazado por dos pildoras, una por
+   idioma, con el activo resaltado (patron del sitio joga4live.github.io).
+   v14: the single toggling button read backwards (showed the language
+   you'd switch TO, not the active one) — replaced by two pills, one per
+   language, with the active one highlighted (joga4live.github.io's own
+   pattern). */
+.lang-switch { display: flex; gap: 6px; flex-shrink: 0; }
+.lang-btn {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--accent-text); border-radius: 999px; padding: 15px 10px; font-size: 12px; font-weight: 700;
+}
+.lang-btn.active { background: var(--accent); color: var(--text); border-color: var(--accent); } /* mismo par que ya pasa 7.25:1 en .btn-primary, no se inventa uno nuevo */
+
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 16px; box-shadow: var(--shadow); /* v11: 14px->20px, +box-shadow ("Forma" del plan) */
+}
+.card-tint { background: var(--surface-2); }
+.card-selectable { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.card-selectable.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+
+.input, textarea.input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); border-radius: 999px; padding: 12px 14px; font-size: 15px;
+}
+.input:focus, textarea.input:focus { outline: none; border-color: var(--accent); }
+textarea.input { resize: vertical; min-height: 140px; line-height: 1.7; border-radius: 20px; } /* v11: la pildora completa no tiene sentido en una caja multilinea alta, se queda en el radio de tarjeta */
+
+.error-text { color: var(--color-error); font-size: 13px; }
+
+/* Toast — errores del Worker se muestran aqui, nunca solo en console.log */
+#toast {
+  position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 999;
+  padding: 12px 16px; border-radius: 10px; font-size: 14px; font-weight: 600;
+  background: var(--color-error); color: #fff; display: none; /* v11: rojo mas oscuro que antes (--color-error), blanco vuelve a pasar: 6.47:1 */
+}
+#toast.show { display: block; }
+#toast.success { background: var(--color-success); color: var(--text); } /* v11: el texto base ahora es blanco (para el rojo); el verde necesita texto oscuro: 9.22:1 */
+
+/* Barra de progreso wizard / wizard progress bar */
+.steps { display: flex; justify-content: space-between; padding: 16px; gap: 4px; }
+.step { flex: 1; text-align: center; }
+.step-dot { width: 22px; height: 22px; margin: 0 auto 6px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); }
+.step.done .step-dot { background: var(--color-success); border-color: var(--color-success); color: var(--text); }
+.step.active .step-dot { border-color: var(--accent); color: var(--accent-text); }
+.step-label { font-size: 10px; color: var(--muted); }
+
+/* Progreso de libro / book progress */
+.progress-bar { background: var(--border); border-radius: 6px; height: 8px; overflow: hidden; }
+.progress-fill { background: var(--accent); height: 100%; }
+
+/* Skeleton loader */
+.skeleton { background: linear-gradient(90deg, var(--surface-2) 25%, var(--border) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: sk 1.4s infinite; border-radius: 10px; height: 64px; margin-bottom: 10px; }
+@keyframes sk { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+.grid-2 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
+.grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+@media (min-width: 600px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } }
+
+.tone-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 14px 10px; font-size: 13px; font-weight: 700; }
+.tone-btn.on-profesional { border-color: var(--color-profesional); color: var(--color-profesional); }
+.tone-btn.on-conversacional { border-color: var(--color-conversacional); color: var(--color-conversacional); }
+.tone-btn.on-motivacional { border-color: var(--color-motivacional); color: var(--color-motivacional); }
+
+.footer { text-align: center; padding: 24px 16px; color: var(--muted); font-size: 12px; }
