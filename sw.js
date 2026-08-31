@@ -9,7 +9,7 @@
    Regla de version / version rule: joga-books-v1 -> v2 -> v3 ... (AGENTS.md #3)
 */
 "use strict";
-var CACHE_NAME = "joga-books-v16"; // v16: jbCallWorker distingue limite_diario/limite_mensual del Worker (common.js, wizard.html, editor.html) — worker.js no se sirve, no cuenta aqui / v16: jbCallWorker now tells limite_diario/limite_mensual apart from the Worker (common.js, wizard.html, editor.html) — worker.js is never served, doesn't belong here
+var CACHE_NAME = "joga-books-v18"; // v18: worker.js tapa 3 agujeros de gasto (no se sirve, no cuenta aqui) + editor.html/common.js suman el mensaje de texto_demasiado_largo / v18: worker.js closes 3 spend holes (never served, doesn't belong here) + editor.html/common.js add the texto_demasiado_largo message
 
 // Archivos core: si alguno falta, el install debe fallar (bug real).
 // Core files: if any is missing, install should fail (a real bug).
@@ -21,7 +21,7 @@ var CORE_FILES = [
   "./assets/icon-outline.mp4", "./assets/icon-outline-poster.jpg",
   "./assets/icon-chapters.mp4", "./assets/icon-chapters-poster.jpg",
   "./assets/icon-humanizer.mp4", "./assets/icon-humanizer-poster.jpg",
-  "./assets/fonts/playfair.woff2", "./assets/fonts/inter.woff2"
+  "./assets/playfair.woff2", "./assets/inter.woff2"
 ];
 
 // icon-192.png/icon-512.png TODAVIA NO EXISTEN en assets/ (gap conocido, ver

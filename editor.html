@@ -51,7 +51,8 @@ var i18n = {
     genErr: "No se pudo generar el capítulo. Intenta de nuevo.", humErr: "No se pudo humanizar. Intenta de nuevo.",
     pickTone: "Elige un tono para humanizar.",
     limiteDiario: "Llegaste a tu límite de hoy. Vuelve mañana.",
-    limiteMensual: "El servicio alcanzó su límite del mes. Vuelve el día 1." },
+    limiteMensual: "El servicio alcanzó su límite del mes. Vuelve el día 1.",
+    textoLargo: "El texto es demasiado largo para humanizar. Acórtalo e intenta de nuevo." },
   en: { title: "Joga Books — Editor", back: "← My books", generate: "✨ Generate with AI", writing: "Writing chapter...",
     humanizer: "HUMANIZER", tones: { profesional: "Professional", conversacional: "Conversational", motivacional: "Motivational" },
     humanize: "✨ Humanize text", humanizing: "Humanizing...", viewOriginal: "Original", viewHuman: "Humanized",
@@ -59,7 +60,8 @@ var i18n = {
     genErr: "Could not generate the chapter. Try again.", humErr: "Could not humanize. Try again.",
     pickTone: "Pick a tone to humanize.",
     limiteDiario: "You've reached today's limit. Come back tomorrow.",
-    limiteMensual: "The service reached its monthly limit. Come back on the 1st." }
+    limiteMensual: "The service reached its monthly limit. Come back on the 1st.",
+    textoLargo: "The text is too long to humanize. Shorten it and try again." }
 };
 var t = jogaI18n(i18n);
 try { if (localStorage.getItem("jogaBooks_licensed") !== "true") location.replace("./index.html"); } catch (e) {}

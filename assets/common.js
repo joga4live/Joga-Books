@@ -92,16 +92,23 @@ async function jbCallWorker(path, body) {
 }
 
 // v16 (tarea 3): traduce el codigo de error del Worker a un mensaje que el
-// usuario entienda como "no es un error de la app, se resuelve esperando"
-// — en vez del toast generico de siempre. Devuelve null para cualquier
-// otro fallo, y quien llama sigue usando su mensaje generico de siempre.
+// usuario entienda como "no es un error de la app" en vez del toast
+// generico de siempre. Devuelve null para cualquier otro fallo, y quien
+// llama sigue usando su mensaje generico de siempre.
+// v18 (C3): +texto_demasiado_largo — sin esto, alguien que pega un texto
+// gigante en /humanizar se queda pegado en el mismo error generico para
+// siempre, sin enterarse de que el problema es el largo del texto.
 // v16 (task 3): translates the Worker's error code into a message the
-// user reads as "not an app error, it resolves by waiting" — instead of
-// the usual generic toast. Returns null for any other failure, and the
-// caller keeps using its usual generic message.
+// user reads as "not an app error" instead of the usual generic toast.
+// Returns null for any other failure, and the caller keeps using its
+// usual generic message.
+// v18 (C3): +texto_demasiado_largo — without this, someone who pastes a
+// giant text into /humanizar stays stuck on the same generic error
+// forever, with no clue the problem is text length.
 function jbLimitMessage(e, table) {
   var codigo = e && e.message;
   if (codigo === "limite_diario") return table.limiteDiario;
   if (codigo === "limite_mensual") return table.limiteMensual;
+  if (codigo === "texto_demasiado_largo") return table.textoLargo;
   return null;
 }

@@ -14,14 +14,14 @@
    (round 9), no longer used. */
 @font-face {
   font-family: 'Playfair Display';
-  src: url('./fonts/playfair.woff2') format('woff2');
+  src: url('./playfair.woff2') format('woff2');
   font-weight: 400 900;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Inter';
-  src: url('./fonts/inter.woff2') format('woff2');
+  src: url('./inter.woff2') format('woff2');
   font-weight: 300 800;
   font-style: normal;
   font-display: swap;
