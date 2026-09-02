@@ -103,7 +103,12 @@ async function jbCallWorker(path, body, esReintento) {
   if (reloj) clearTimeout(reloj);
   if (!res.ok) {
     var codigo = "worker_" + res.status;
-    try { var datos = await res.json(); if (datos && datos.error) codigo = datos.error; } catch (e2) {}
+    // v26.2: el Worker manda DOS datos: "error" (etiqueta, casi siempre "generation_failed") y "detail", que dice QUE fallo de verdad (truncated_max_tokens, anthropic_529, empty_response...). Hasta ahora solo se leia el primero, asi que TODO acababa en el mensaje generico y ni el cliente ni nosotros sabiamos nada. El detalle existia y se tiraba a la basura. / v26.2: the Worker sends TWO fields: "error" (a label, almost always "generation_failed") and "detail", which says what actually failed (truncated_max_tokens, anthropic_529, empty_response...). Only the first was read, so EVERYTHING ended up as the generic message and neither the customer nor we knew anything. The detail existed and was thrown away.
+    try {
+      var datos = await res.json();
+      if (datos && datos.error) codigo = datos.error;
+      if (datos && datos.detail && codigo === "generation_failed") codigo = String(datos.detail);
+    } catch (e2) {}
     throw new Error(codigo);
   }
   // v26: el parseo tambien puede fallar (respuesta cortada a medias). Sin esto salia el mensaje generico y parecia culpa del modelo. / v26: parsing can fail too (a response cut in half). Without this it surfaced as the generic message and looked like the model's fault.
@@ -133,5 +138,15 @@ function jbLimitMessage(e, table) {
   if (codigo === "tiempo_agotado") return table.tiempoAgotado; // v26
   if (codigo === "sin_conexion") return table.sinConexion; // v26
   if (codigo === "respuesta_incompleta") return table.respuestaIncompleta; // v26
+  // v26.2: los detalles reales del Worker, traducidos / v26.2: the Worker's real details, translated
+  if (codigo === "truncated_max_tokens") return table.capituloLargo;
+  if (codigo === "empty_response") return table.respuestaVacia;
+  if (codigo.indexOf("anthropic_5") === 0 || codigo === "anthropic_429") return table.iaSaturada;
   return null;
+}
+
+// v26.2: para lo que NO sabemos traducir, se ensena el codigo tecnico entre parentesis. Feo, pero es la unica forma de que Jose pueda decirnos que paso de verdad en vez de "no se pudo generar". Se quita cuando sepamos que errores salen. / v26.2: for what we cannot translate, the technical code is shown in brackets. Ugly, but the only way for José to tell us what actually happened instead of "could not generate". To be removed once we know which errors show up.
+function jbCodigoTecnico(e) {
+  var codigo = e && e.message;
+  return codigo ? " (" + codigo + ")" : "";
 }

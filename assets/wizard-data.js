@@ -53,6 +53,7 @@ var WIZARD_I18N = {
     s5:{ title:"¡Tu libro está listo para escribirse!", chaps:"capítulos", langLabel:"Idioma:",
       toggle:"Ver outline completo ▼", start:"Empezar a escribir" },
     sizes:{ corto:"Corto", mediano:"Mediano", largo:"Largo" }, // v23
+    capituloLargo:"El capítulo salió más largo de lo que cabe y se cortó. Vuelve a intentarlo.", respuestaVacia:"La IA devolvió una respuesta vacía. Intenta de nuevo.", iaSaturada:"El servicio de IA está saturado ahora mismo. Espera un momento e intenta de nuevo.", 
     tiempoAgotado:"Tardó demasiado y se cortó. Vuelve a intentarlo.", sinConexion:"Se perdió la conexión con el servicio. Revisa tu internet e intenta de nuevo.", respuestaIncompleta:"La respuesta llegó incompleta. Intenta de nuevo.", 
     limiteDiario:"Llegaste a tu límite de hoy. Vuelve mañana.",
     limiteMensual:"El servicio alcanzó su límite del mes. Vuelve el día 1." },
@@ -68,6 +69,7 @@ var WIZARD_I18N = {
     s5:{ title:"Your book is ready to write!", chaps:"chapters", langLabel:"Language:",
       toggle:"See full outline ▼", start:"Start writing" },
     sizes:{ corto:"Short", mediano:"Medium", largo:"Long" }, // v23
+    capituloLargo:"The chapter came out longer than fits and was cut off. Try again.", respuestaVacia:"The AI returned an empty response. Try again.", iaSaturada:"The AI service is overloaded right now. Wait a moment and try again.", 
     tiempoAgotado:"It took too long and was cut off. Try again.", sinConexion:"Lost connection to the service. Check your internet and try again.", respuestaIncompleta:"The response arrived incomplete. Try again.", 
     limiteDiario:"You've reached today's limit. Come back tomorrow.",
     limiteMensual:"The service reached its monthly limit. Come back on the 1st." }

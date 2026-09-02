@@ -52,6 +52,7 @@ var i18n = {
     save: "Guardar capítulo", saved: "Capítulo guardado.", prev: "← Cap anterior", next: "Cap siguiente →",
     genErr: "No se pudo generar el capítulo. Intenta de nuevo.", humErr: "No se pudo humanizar. Intenta de nuevo.",
     pickTone: "Elige un tono para humanizar.",
+    capituloLargo: "El capítulo salió más largo de lo que cabe y se cortó. Vuelve a intentarlo.", respuestaVacia: "La IA devolvió una respuesta vacía. Intenta de nuevo.", iaSaturada: "El servicio de IA está saturado ahora mismo. Espera un momento e intenta de nuevo.", 
     tiempoAgotado: "Tardó demasiado y se cortó. Vuelve a intentarlo.", sinConexion: "Se perdió la conexión con el servicio. Revisa tu internet e intenta de nuevo.", respuestaIncompleta: "La respuesta llegó incompleta. Intenta de nuevo.", 
     limiteDiario: "Llegaste a tu límite de hoy. Vuelve mañana.",
     limiteMensual: "El servicio alcanzó su límite del mes. Vuelve el día 1.",
@@ -62,6 +63,7 @@ var i18n = {
     save: "Save chapter", saved: "Chapter saved.", prev: "← Previous chapter", next: "Next chapter →",
     genErr: "Could not generate the chapter. Try again.", humErr: "Could not humanize. Try again.",
     pickTone: "Pick a tone to humanize.",
+    capituloLargo: "The chapter came out longer than fits and was cut off. Try again.", respuestaVacia: "The AI returned an empty response. Try again.", iaSaturada: "The AI service is overloaded right now. Wait a moment and try again.", 
     tiempoAgotado: "It took too long and was cut off. Try again.", sinConexion: "Lost connection to the service. Check your internet and try again.", respuestaIncompleta: "The response arrived incomplete. Try again.", 
     limiteDiario: "You've reached today's limit. Come back tomorrow.",
     limiteMensual: "The service reached its monthly limit. Come back on the 1st.",
@@ -139,7 +141,7 @@ function wireMain(cap, cd, prevCap, nextCap) {
       book.capitulos[cap.num] = { original: r.contenido || "", humanizado: "", tono: "" };
       recomputeProgress(); book.fechaEdicion = jbToday(); jbUpsertBook(book);
       renderAll();
-    } catch (e) { jbToast(jbLimitMessage(e, table) || table.genErr, "error"); genBtn.disabled = false; genBtn.textContent = table.generate; } // v16 (tarea 3): limite_diario/limite_mensual muestran su propio texto
+    } catch (e) { jbToast(jbLimitMessage(e, table) || (table.genErr + jbCodigoTecnico(e)), "error"); genBtn.disabled = false; genBtn.textContent = table.generate; } // v16 (tarea 3): limite_diario/limite_mensual muestran su propio texto
   });
   var vo = document.getElementById("viewOrig"), vh = document.getElementById("viewHuman");
   if (vo) vo.addEventListener("click", function () { E.view = "original"; renderMain(); });
@@ -157,7 +159,7 @@ function wireMain(cap, cd, prevCap, nextCap) {
       book.capitulos[cap.num].humanizado = r.contenido || ""; book.capitulos[cap.num].tono = E.tone;
       book.fechaEdicion = jbToday(); jbUpsertBook(book);
       E.view = "humanizado"; renderMain();
-    } catch (e) { jbToast(jbLimitMessage(e, table) || table.humErr, "error"); humBtn.disabled = false; humBtn.textContent = table.humanize; } // v16 (tarea 3): idem genBtn
+    } catch (e) { jbToast(jbLimitMessage(e, table) || (table.humErr + jbCodigoTecnico(e)), "error"); humBtn.disabled = false; humBtn.textContent = table.humanize; } // v16 (tarea 3): idem genBtn
   });
   var saveBtn = document.getElementById("saveBtn");
   if (saveBtn) saveBtn.addEventListener("click", function () {

@@ -123,7 +123,7 @@ async function step3() {
   if (!W.titulos.length) {
     try { var r = await jbCallWorker("/titulos", { nicho: W.nicho, audiencia: W.audiencia, idioma: W.idioma }); W.titulos = r.titulos || []; }
     catch (e) {
-      var msg3 = jbLimitMessage(e, table) || table.s3.err; // v16 (tarea 3): limite_diario/limite_mensual muestran su propio texto, no el error generico
+      var msg3 = jbLimitMessage(e, table) || (table.s3.err + jbCodigoTecnico(e)); // v26.2 // v16 (tarea 3): limite_diario/limite_mensual muestran su propio texto, no el error generico
       jbToast(msg3, "error");
       stepError("s3body", table.s3.errTitle, msg3, table.s3.retry, table.s3.back, step3, function () { W.step = 2; render(); });
       return;
@@ -221,7 +221,7 @@ async function generarOutline() {
   catch (e) {
     if (miTurno !== W.outlineTurno) return; // v25 (Nico v24.3, defensa en profundidad): turno viejo fallando, se tira sin tocar pantalla ni la bandera del turno nuevo. / v25 (Nico v24.3, defence in depth): stale turn failing, discarded without touching the screen or the new turn flag.
     W.outlineEnVuelo = false; // v25: turno vigente fallo — se apaga la bandera para que "Reintentar" pueda lanzar otra llamada. / v25: current turn failed — flag turns off so "Retry" can launch another call.
-    var msg4 = jbLimitMessage(e, table) || table.s4.err; // v16 (tarea 3): idem s3
+    var msg4 = jbLimitMessage(e, table) || (table.s4.err + jbCodigoTecnico(e)); // v26.2 // v16 (tarea 3): idem s3
     jbToast(msg4, "error");
     // v23: "Atras" desde un error de outline vuelve al selector de tamano (el
     // paso justo anterior), no al titulo — deshace solo la eleccion de tamano.
