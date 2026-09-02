@@ -81,6 +81,7 @@ function jbToast(msg, type) {
 var JB_ESPERA_MAX = 100000; // 100 s: mas del doble de los ~45 s medidos, para no cortar una llamada que iba a llegar / 100 s: over twice the ~45 s measured, so a call that was going to land is not cut short
 
 async function jbCallWorker(path, body, esReintento) {
+  var t0 = Date.now(); // v26.1: para saber si el fallo fue rapido o tardio / v26.1: to tell a fast failure from a late one
   var ctrl = typeof AbortController === "function" ? new AbortController() : null;
   var reloj = ctrl ? setTimeout(function () { ctrl.abort(); }, JB_ESPERA_MAX) : null;
   var res;
@@ -95,8 +96,8 @@ async function jbCallWorker(path, body, esReintento) {
     if (reloj) clearTimeout(reloj);
     // Se agoto el tiempo: NO se reintenta. Reintentar sumaria otros 100 s de espera y el modelo probablemente ya cobro. / Timed out: NO retry. Retrying would add another 100 s and the model has probably already been billed.
     if (e && e.name === "AbortError") throw new Error("tiempo_agotado");
-    // Fallo de red de verdad (suele ser inmediato): UN solo reintento. Es el caso que dejaba a Jose sin capitulo tras esperar 45 s. / Genuine network failure (usually immediate): ONE retry only. This is the case that left José with no chapter after waiting 45 s.
-    if (!esReintento) return jbCallWorker(path, body, true);
+    // v26.1 (Nico v26 MEDIO 1): el reintento SOLO si el fallo fue RAPIDO. Nico midio que un fallo TARDIO ya pago: worker.js enciende la facturacion en cuanto Anthropic responde 2xx y cuenta el uso incluso por el catch, asi que reintentar cobra dos veces Y sube dos el contador diario. Con 70 llamadas al dia y ~60 por libro largo, 11 reintentos dejan al cliente sin poder terminar el libro que ya pago. Umbral 3 s: la llamada mas rapida medida es /titulos a 5,6 s y un capitulo tarda ~45 s, asi que por debajo de 3 s no se genero nada. Decision de Jose: que avise, no que cobre dos veces. / v26.1 (Nico v26 MEDIUM 1): retry ONLY if the failure was FAST. Nico measured that a LATE failure has already been billed: worker.js turns billing on as soon as Anthropic answers 2xx and counts usage even through the catch, so retrying pays twice AND bumps the daily counter twice. At 70 calls a day and ~60 per long book, 11 retries leave the customer unable to finish the book they already paid for. 3 s threshold: the fastest measured call is /titulos at 5.6 s and a chapter takes ~45 s, so under 3 s nothing was generated. José's call: warn rather than double-charge.
+    if (!esReintento && Date.now() - t0 < 3000) return jbCallWorker(path, body, true);
     throw new Error("sin_conexion");
   }
   if (reloj) clearTimeout(reloj);
