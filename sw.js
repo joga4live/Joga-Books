@@ -9,7 +9,7 @@
    Regla de version / version rule: joga-books-v1 -> v2 -> v3 ... (AGENTS.md #3)
 */
 "use strict";
-var CACHE_NAME = "joga-books-v18"; // v18: worker.js tapa 3 agujeros de gasto (no se sirve, no cuenta aqui) + editor.html/common.js suman el mensaje de texto_demasiado_largo / v18: worker.js closes 3 spend holes (never served, doesn't belong here) + editor.html/common.js add the texto_demasiado_largo message
+var CACHE_NAME = "joga-books-v21"; // v21: arreglos de la ronda 24 (pantalla rota al volver atras, carrera de /outline, boton que mentia), tipografia sin emojis en nichos y audiencias, y el logo de Jose en las 3 cabeceras + pantalla vacia + favicon + iconos de app. Sigue en v21 y no v22 porque lo publicado es v18: el nombre ya es nuevo. / v21: round-24 fixes (dead screen on back, /outline race, lying button), emoji-free typography in niches and audiences, and José's logo in the 3 headers + empty state + favicon + app icons. Stays v21 rather than v22 because what is live is v18: the name is already new.
 
 // Archivos core: si alguno falta, el install debe fallar (bug real).
 // Core files: if any is missing, install should fail (a real bug).
@@ -17,6 +17,7 @@ var CORE_FILES = [
   "./", "./index.html", "./app.html", "./wizard.html", "./editor.html", "./export.html",
   "./gate.js", "./assets/styles.css", "./assets/i18n.js", "./assets/common.js", "./assets/manifest.json",
   "./assets/wizard.css", "./assets/wizard-data.js",
+  "./assets/logo-mark.png", "./assets/favicon-32.png", // v24: el logo de Jose sustituye al emoji en las 3 cabeceras; sin cachear, la cabecera sale sin marca sin conexion / v24: José's logo replaces the emoji in the 3 headers; uncached, the header shows no mark offline
   "./assets/logo-hero.jpg",
   "./assets/icon-outline.mp4", "./assets/icon-outline-poster.jpg",
   "./assets/icon-chapters.mp4", "./assets/icon-chapters-poster.jpg",
@@ -24,13 +25,15 @@ var CORE_FILES = [
   "./assets/playfair.woff2", "./assets/inter.woff2"
 ];
 
-// icon-192.png/icon-512.png TODAVIA NO EXISTEN en assets/ (gap conocido, ver
-// implementacion-mvp-25ago.md). Se cachean aparte y por separado, con su
-// propio try/catch, para que su ausencia NUNCA tumbe el install completo.
-// icon-192.png/icon-512.png DO NOT EXIST YET in assets/ (known gap, see the
-// implementation handoff). Cached separately, each with its own try/catch,
-// so their absence never breaks the whole install.
-var OPTIONAL_FILES = ["./assets/icon-192.png", "./assets/icon-512.png"];
+// v24: icon-192/icon-512 YA EXISTEN (generados del logo de Jose; el manifiesto
+// llevaba desde el principio pidiendo dos archivos que no estaban). Siguen aqui
+// y no en CORE_FILES porque son pesados y solo hacen falta al instalar la app,
+// y el try/catch por separado sigue protegiendo el install pase lo que pase.
+// v24: icon-192/icon-512 NOW EXIST (generated from José's logo; the manifest had
+// been pointing at two missing files all along). They stay here rather than in
+// CORE_FILES because they are heavy and only needed when installing the app, and
+// the separate try/catch still protects the install whatever happens.
+var OPTIONAL_FILES = ["./assets/icon-192.png", "./assets/icon-512.png", "./assets/apple-touch-icon.png", "./assets/logo-lockup.png"];
 
 self.addEventListener("install", function (event) {
   event.waitUntil((async function () {

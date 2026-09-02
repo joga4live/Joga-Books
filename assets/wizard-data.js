@@ -10,22 +10,35 @@
    / See documented decision in the implementation handoff. */
 "use strict";
 var NICHES = [
-  {emoji:"💰",es:"Dinero",en:"Money"},{emoji:"🏥",es:"Salud",en:"Health"},
-  {emoji:"⏰",es:"Productividad",en:"Productivity"},{emoji:"❤️",es:"Relaciones",en:"Relationships"},
-  {emoji:"💪",es:"Fitness",en:"Fitness"},{emoji:"🚀",es:"Emprendimiento",en:"Entrepreneurship"},
-  {emoji:"📱",es:"Marketing",en:"Marketing"},{emoji:"👑",es:"Liderazgo",en:"Leadership"},
-  {emoji:"🙏",es:"Espiritualidad",en:"Spirituality"},{emoji:"👨‍👩‍👧",es:"Familia",en:"Family"},
-  {emoji:"🥗",es:"Nutrición",en:"Nutrition"},{emoji:"🧠",es:"Desarrollo personal",en:"Personal development"},
-  {emoji:"🏠",es:"Bienes raíces",en:"Real estate"},{emoji:"📈",es:"Inversiones",en:"Investing"},
-  {emoji:"🎯",es:"Hábitos",en:"Habits"},{emoji:"💼",es:"Ventas",en:"Sales"},
-  {emoji:"💭",es:"Mindset",en:"Mindset"},{emoji:"📲",es:"Redes sociales",en:"Social media"},
-  {emoji:"🎓",es:"Coaching",en:"Coaching"},{emoji:"📚",es:"Educación",en:"Education"}
+  {es:"Dinero",en:"Money"},{es:"Salud",en:"Health"},
+  {es:"Productividad",en:"Productivity"},{es:"Relaciones",en:"Relationships"},
+  {es:"Fitness",en:"Fitness"},{es:"Emprendimiento",en:"Entrepreneurship"},
+  {es:"Marketing",en:"Marketing"},{es:"Liderazgo",en:"Leadership"},
+  {es:"Espiritualidad",en:"Spirituality"},{es:"Familia",en:"Family"},
+  {es:"Nutrición",en:"Nutrition"},{es:"Desarrollo personal",en:"Personal development"},
+  {es:"Bienes raíces",en:"Real estate"},{es:"Inversiones",en:"Investing"},
+  {es:"Hábitos",en:"Habits"},{es:"Ventas",en:"Sales"},
+  {es:"Mindset",en:"Mindset"},{es:"Redes sociales",en:"Social media"},
+  {es:"Coaching",en:"Coaching"},{es:"Educación",en:"Education"}
 ];
 var AUDIENCES = [
-  {emoji:"👶",es:["Principiantes","Personas que empiezan desde cero"],en:["Beginners","People starting from scratch"]},
-  {emoji:"🚀",es:["Emprendedores","Dueños de negocio y fundadores"],en:["Entrepreneurs","Business owners and founders"]},
-  {emoji:"💼",es:["Profesionales","Expertos que quieren compartir su método"],en:["Professionals","Experts who want to share their method"]},
-  {emoji:"🌍",es:["Público general","Cualquier persona interesada"],en:["General public","Anyone interested"]}
+  {es:["Principiantes","Personas que empiezan desde cero"],en:["Beginners","People starting from scratch"]},
+  {es:["Emprendedores","Dueños de negocio y fundadores"],en:["Entrepreneurs","Business owners and founders"]},
+  {es:["Profesionales","Expertos que quieren compartir su método"],en:["Professionals","Experts who want to share their method"]},
+  {es:["Público general","Cualquier persona interesada"],en:["General public","Anyone interested"]}
+];
+// v23 (plan-mvp-25ago-v23.md): 3 tamanos de libro que Jose aprobo (capitulo real
+// medido en ~4 paginas). "id" es el identificador interno que viaja al Worker
+// como num_capitulos (validado ahi contra esta misma lista, ver worker.js);
+// "capitulos"/"paginas" son los numeros que se muestran en el paso de outline.
+// v23: 3 book sizes José approved (a real chapter measured at ~4 pages). "id"
+// is the internal identifier sent to the Worker as num_capitulos (validated
+// there against this same list, see worker.js); "capitulos"/"paginas" are the
+// numbers shown in the outline step.
+var SIZES = [
+  {id:"corto",capitulos:12,paginas:50},
+  {id:"mediano",capitulos:20,paginas:80},
+  {id:"largo",capitulos:29,paginas:120}
 ];
 var WIZARD_I18N = {
   es: { title:"Joga Books — Nuevo libro", steps:["Nicho","Audiencia","Título","Outline","Listo"],
@@ -35,9 +48,11 @@ var WIZARD_I18N = {
       own:"O escribe tu propio título", ownPh:"Escribe tu propio título", back:"← Atrás", next:"Continuar →",
       err:"No se pudo generar títulos. Intenta de nuevo.", retry:"Reintentar" },
     s4:{ title:"Generando tu libro...", doneTitle:"Revisa tu outline", errTitle:"No se pudo generar", back:"← Atrás", next:"Crear mi libro →",
-      err:"No se pudo generar el outline. Intenta de nuevo.", retry:"Reintentar" },
+      err:"No se pudo generar el outline. Intenta de nuevo.", retry:"Reintentar",
+      sizeTitle:"¿De qué tamaño será tu libro?", pages:"páginas", sizeNext:"Continuar →" }, // v23: paso de tamano, dentro del paso 4 (ver wizard.html) / v23: size step, folded into step 4 (see wizard.html)
     s5:{ title:"¡Tu libro está listo para escribirse!", chaps:"capítulos", langLabel:"Idioma:",
-      toggle:"Ver outline completo ▼", start:"🚀 Empezar a escribir" },
+      toggle:"Ver outline completo ▼", start:"Empezar a escribir" },
+    sizes:{ corto:"Corto", mediano:"Mediano", largo:"Largo" }, // v23
     limiteDiario:"Llegaste a tu límite de hoy. Vuelve mañana.",
     limiteMensual:"El servicio alcanzó su límite del mes. Vuelve el día 1." },
   en: { title:"Joga Books — New Book", steps:["Niche","Audience","Title","Outline","Done"],
@@ -47,9 +62,11 @@ var WIZARD_I18N = {
       own:"Or write your own title", ownPh:"Write your own title", back:"← Back", next:"Continue →",
       err:"Could not generate titles. Try again.", retry:"Retry" },
     s4:{ title:"Building your book...", doneTitle:"Review your outline", errTitle:"Could not generate", back:"← Back", next:"Create my book →",
-      err:"Could not generate the outline. Try again.", retry:"Retry" },
+      err:"Could not generate the outline. Try again.", retry:"Retry",
+      sizeTitle:"How big should your book be?", pages:"pages", sizeNext:"Continue →" }, // v23
     s5:{ title:"Your book is ready to write!", chaps:"chapters", langLabel:"Language:",
-      toggle:"See full outline ▼", start:"🚀 Start writing" },
+      toggle:"See full outline ▼", start:"Start writing" },
+    sizes:{ corto:"Short", mediano:"Medium", largo:"Long" }, // v23
     limiteDiario:"You've reached today's limit. Come back tomorrow.",
     limiteMensual:"The service reached its monthly limit. Come back on the 1st." }
 };

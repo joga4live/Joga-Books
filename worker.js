@@ -30,8 +30,8 @@ function cors(origen) {
 
 // v16 limites de gasto, patron de joga-ia-worker.js. v18 (C2): KV no es atomico (Nico: 26 peticiones paralelas = 1 sola contada). Verifique contra la doc de Cloudflare que el binding de Rate Limiting y Durable Objects (atomicos) exigen wrangler, no el dashboard — Jose solo despliega por dashboard, ninguno es viable sin pedirle un paso nuevo y fragil. Se queda en KV con la carrera aceptada; LIMITE_MENSUAL bajado es el margen real, NO un tope firme de dinero.
 // v16 spend limits, pattern from joga-ia-worker.js. v18 (C2): KV isn't atomic (Nico: 26 parallel requests = 1 counted). Verified against Cloudflare's docs that the Rate Limiting binding and Durable Objects (atomic) both require wrangler, not the dashboard — José only deploys via dashboard, neither is viable without asking him for a new, fragile step. Staying on KV with the race accepted; the lowered LIMITE_MENSUAL is the real margin, NOT a firm dollar cap.
-var LIMITE_DIARIO = 55;   // llamadas/IP/dia / calls/IP/day
-var LIMITE_MENSUAL = 400; // v18: bajado de 1000, margen para C2 e I2 / v18: lowered from 1000, margin for C2 and I2
+var LIMITE_DIARIO = 70;   // llamadas/IP/dia. v23: 55->70, un libro largo (29 caps, 60 llamadas) ya cabe completo en un dia / calls/IP/day. v23: 55->70, a long book (29 chapters, 60 calls) now fits in one day
+var LIMITE_MENSUAL = 900; // v18: bajado de 1000 a 400, margen para C2 e I2. v23: 400->900, aprobado por Jose — a 400 el tope mordia mucho antes que su presupuesto ($20 de $50/mes); 900 se acerca sin pasarse. Sigue siendo cuentakilometros, no freno de gasto (ese es el tope de la consola de Anthropic) / v18: lowered from 1000 to 400, margin for C2 and I2. v23: 400->900, José-approved — at 400 the call cap bit well before his budget ($20 of $50/mo); 900 gets close without going over. Still an odometer, not a spend cap (that's the Anthropic console's limit)
 
 function json(data, status, origen) {
   return new Response(JSON.stringify(data), {
@@ -101,7 +101,8 @@ var PROMPTS = {
       "Responde SOLO con un JSON array de 5 strings.";
   },
   outline: function (b) {
-    return "Genera un indice profesional de exactamente 12 capitulos\n" +
+    // v24 (Nico v23 CRITICO 1): se interpola Number(), no el crudo. La whitelist de abajo valida Number(b.num_capitulos), pero num_capitulos NO esta en limpiarCuerpo() y Number() ignora los espacios de los extremos: " ".repeat(500000)+"12" pasaba la whitelist y entraba ENTERO al prompt (500 031 caracteres, ~$5 en una sola llamada contada como una). Number() aqui lo deja en 31 caracteres. Cierra tambien "0x1D"->29 y "2.0e1"->20, que pasaban la whitelist y le pedian al modelo un numero ilegible. / v24 (Nico v23 CRITICAL 1): interpolate Number(), not the raw value. The whitelist below validates Number(b.num_capitulos), but num_capitulos is NOT in limpiarCuerpo() and Number() ignores surrounding whitespace: " ".repeat(500000)+"12" passed the whitelist and went WHOLE into the prompt (500,031 chars, ~$5 in a single call counted as one). Number() here cuts it to 31 chars. Also closes "0x1D"->29 and "2.0e1"->20, which passed the whitelist and asked the model for an unreadable number.
+    return "Genera un indice profesional de exactamente " + Number(b.num_capitulos) + " capitulos\n" +
       'para el libro "' + b.titulo + '" sobre ' + b.nicho + " dirigido a " + b.audiencia + ".\n" +
       "Idioma: " + b.idioma + ".\n" +
       "Progresion logica: del problema a la solucion, de basico a avanzado.\n" +
@@ -145,7 +146,7 @@ var HANDLERS = {
   "/humanizar": async function (env, body, f) { return { contenido: (await askClaude(env, PROMPTS.humanizar(body), 4500, f)).trim() }; } // v2 (M4): idem
 };
 
-var CAMPOS_REQUERIDOS = { "/titulos": ["nicho", "audiencia", "idioma"], "/outline": ["titulo", "nicho", "audiencia", "idioma"], "/capitulo": ["num", "nombre_capitulo", "titulo_libro", "nicho", "audiencia", "idioma"], "/humanizar": ["tono", "idioma", "texto"] }; // v20 (tarea 3): campos que arma el prompt de cada endpoint (ver PROMPTS) — sin ellos no hay nada que preguntarle a la IA, cortar antes de gastar / fields each endpoint's prompt needs (see PROMPTS) — without them there's nothing to ask the AI, cut before spending
+var CAMPOS_REQUERIDOS = { "/titulos": ["nicho", "audiencia", "idioma"], "/outline": ["titulo", "nicho", "audiencia", "idioma", "num_capitulos"], "/capitulo": ["num", "nombre_capitulo", "titulo_libro", "nicho", "audiencia", "idioma"], "/humanizar": ["tono", "idioma", "texto"] }; // v20 (tarea 3): campos que arma el prompt de cada endpoint (ver PROMPTS) — sin ellos no hay nada que preguntarle a la IA, cortar antes de gastar / fields each endpoint's prompt needs (see PROMPTS) — without them there's nothing to ask the AI, cut before spending
 
 export default {
   async fetch(request, env) {
@@ -166,6 +167,7 @@ export default {
     try { body = await request.json(); } catch (e) { return json({ error: "invalid_json" }, 400, origen); }
     try { if (!limpiarCuerpo(body)) return json({ error: "texto_demasiado_largo" }, 400, origen); } catch (e) { return json({ error: "texto_demasiado_largo" }, 400, origen); } // v18 (C3) + v20 (tarea 1, Nico v19 CRITICO1): String() dentro de limpiarCuerpo puede lanzar ({"toString":"x"}, array muy anidado) y corria ANTES del try/catch de abajo — sin este catch salia sin Response y sin CORS / String() inside limpiarCuerpo can throw and ran BEFORE the try/catch below — without this catch it exited with no Response and no CORS
     if ((CAMPOS_REQUERIDOS[url.pathname] || []).some(function (k) { return body[k] == null || body[k] === ""; })) return json({ error: "campos_faltantes" }, 400, origen); // v20 (tarea 3): cuerpo vacio/incompleto no debe llegar a Anthropic / empty/incomplete body shouldn't reach Anthropic
+    if (url.pathname === "/outline" && [12, 20, 29].indexOf(Number(body.num_capitulos)) === -1) return json({ error: "num_capitulos_invalido" }, 400, origen); // v23 (tarea 2): num_capitulos es entrada del cliente y cada capitulo cuesta dinero — whitelist server-side, no un numero arbitrario / v23 (task 2): num_capitulos is client input and each chapter costs money — server-side whitelist, not an arbitrary number
     // Tarea 1 (v16): contador compartido por los 4 endpoints (un libro son ~26 llamadas repartidas entre ellos). / Task 1 (v16): one counter shared by all 4 endpoints (a book is ~26 calls spread across them).
     var ip = request.headers.get("CF-Connecting-IP") || "sin-ip"; // Cloudflare la pone siempre, no X-Forwarded-For / Cloudflare always sets this, not X-Forwarded-For
     var hoy = new Date().toISOString().slice(0, 10);

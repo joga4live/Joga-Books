@@ -6,11 +6,13 @@
 <title>Joga Books — Mis libros</title>
 <meta name="theme-color" content="#b8924a">
 <link rel="manifest" href="./assets/manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png"> <!-- v24: la pestana no tenia icono / v24: the tab had no icon -->
+<link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
 <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
 <header class="header">
-  <div class="logo">📚 Joga Books</div>
+  <div class="logo"><img src="./assets/logo-mark.png" alt="" width="41" height="26"> Joga Books</div>
   <div style="display:flex;gap:8px;margin-left:auto"> <!-- v15: margin-left:auto lo mantiene pegado a la derecha aunque el .header lo baje a una fila 2 propia a 320px -->
     <button class="btn btn-primary btn-sm" id="newBookBtn" data-i18n="new"></button>
     <div class="lang-switch">
@@ -22,7 +24,7 @@
 
 <main class="container">
   <div id="emptyState" style="display:none;text-align:center;padding-top:48px">
-    <div style="font-size:48px">📚</div>
+    <img id="emptyLogo" data-src="./assets/logo-lockup.png" alt="Joga Books" width="150" height="158" style="display:block;margin:0 auto;max-width:60%;height:auto"> <!-- v24: aqui SI va el logo completo (libro + Joga + BOOKS): hay sitio de sobra y es el momento de marca de la app. max-width en % para que no se desborde a 320px / v24: the full lockup belongs here (book + Joga + BOOKS): there is room and this is the app's brand moment. Percentage max-width so it cannot overflow at 320px -->
     <h2 class="section-title" style="margin-top:12px" data-i18n="empty.title"></h2>
     <p class="muted" style="margin-top:8px" data-i18n="empty.subtitle"></p>
     <button class="btn btn-primary" style="margin-top:20px" id="emptyCta" data-i18n="empty.cta"></button>
@@ -67,7 +69,7 @@ function bookCard(b, lang, table) {
   div.className = "card";
   div.style.marginBottom = "12px";
   div.innerHTML =
-    '<div class="section-title">📚 ' + jbEsc(b.titulo) + '</div>' +
+    '<div class="section-title">' + jbEsc(b.titulo) + '</div>' +
     '<p class="muted" style="margin-top:6px">' + (lang === "es" ? "Nicho" : "Niche") + ': ' + jbEsc(b.nicho) + '</p>' +
     '<p class="muted">' + (lang === "es" ? "Audiencia" : "Audience") + ': ' + jbEsc(b.audiencia) + '</p>' +
     '<div class="progress-bar" style="margin-top:10px"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
@@ -87,6 +89,9 @@ function render() {
   var grid = document.getElementById("libraryGrid");
   if (!lib.length) {
     empty.style.display = "block";
+    // v25.2 (Nico v24.4 MEDIO 2): el src se pone AQUI, no en el HTML. Dentro de un bloque con display:none el navegador se bajaba los 116 KB del lockup igual — el 47% del peso de esta pantalla, pagado por todo cliente que ya tiene libros y por tanto nunca lo ve. Sigue funcionando sin conexion: logo-lockup.png esta en OPTIONAL_FILES del Service Worker. / v25.2 (Nico v24.4 MEDIUM 2): the src is set HERE, not in the HTML. Inside a display:none block the browser still downloaded the lockup's 116 KB — 47% of this screen's weight, paid by every customer who already has books and therefore never sees it. Still works offline: logo-lockup.png is in the Service Worker's OPTIONAL_FILES.
+    var logoVacio = document.getElementById("emptyLogo");
+    if (logoVacio && !logoVacio.src) logoVacio.src = logoVacio.getAttribute("data-src");
     grid.style.display = "none";
     return;
   }

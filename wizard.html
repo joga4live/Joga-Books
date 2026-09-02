@@ -6,11 +6,13 @@
 <title>Joga Books — Nuevo libro</title>
 <meta name="theme-color" content="#b8924a">
 <link rel="manifest" href="./assets/manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png"> <!-- v24: la pestana no tenia icono / v24: the tab had no icon -->
+<link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
 <link rel="stylesheet" href="./assets/styles.css">
 <link rel="stylesheet" href="./assets/wizard.css">
 </head>
 <body>
-<header class="header"><a href="./app.html" class="logo" style="text-decoration:none">📚 Joga Books</a><div class="lang-switch"><button class="lang-btn" id="langEs" aria-label="Cambiar a español / Switch to Spanish">ES</button><button class="lang-btn" id="langEn" aria-label="Cambiar a inglés / Switch to English">EN</button></div></header>
+<header class="header"><a href="./app.html" class="logo" style="text-decoration:none"><img src="./assets/logo-mark.png" alt="" width="41" height="26"> Joga Books</a><div class="lang-switch"><button class="lang-btn" id="langEs" aria-label="Cambiar a español / Switch to Spanish">ES</button><button class="lang-btn" id="langEn" aria-label="Cambiar a inglés / Switch to English">EN</button></div></header>
 <div class="steps" id="stepsBar"></div>
 <main class="container" id="stepArea"></main>
 <div id="toast" role="status" aria-live="polite"></div>
@@ -23,7 +25,7 @@
 var t = jogaI18n(WIZARD_I18N);
 try { if (localStorage.getItem("jogaBooks_licensed") !== "true") location.replace("./index.html"); } catch (e) {}
 
-var W = { step: 1, idioma: t.lang(), nicheIdx: -1, nichoCustom: "", nicho: "", audienceIdx: -1, audiencia: "", titulos: [], titulo: "", outline: [] };
+var W = { step: 1, idioma: t.lang(), nicheIdx: -1, nichoCustom: "", nicho: "", audienceIdx: -1, audiencia: "", titulos: [], titulo: "", outline: [], tamanoIdx: -1, numCapitulos: 0, outlineNum: 0, outlineTurno: 0, outlineEnVuelo: false }; // v25: outlineEnVuelo = hay una peticion de outline viva y valida; es lo que impide pedir (y pagar) dos veces. outlineTurno = identificador de llamada, defensa en profundidad que hoy no llega a dispararse. / v25: outlineEnVuelo = an outline request is alive and valid; this is what prevents asking (and paying) twice. outlineTurno = call identifier, defence in depth that today never fires. // v24 (Nico v24 CRITICO): outlineNum = el tamano PARA EL QUE se pidio el outline. No se puede usar outline.length porque nadie cuenta lo que devuelve el modelo: si pides 12 y llegan 11, cualquier comparacion contra el largo dice "cambio de tamano" y regenera (y cobra) para siempre. / v24 (Nico v24 CRITICAL): outlineNum = the size the outline was REQUESTED for. outline.length cannot be used because nobody counts what the model returns: ask for 12, get 11, and any length-based check says "size changed" and regenerates (and charges) forever. // v25 (Nico v24.3 CRITICO): outlineTurno identifica CADA llamada a generarOutline (sube en cada una); outlineEnVuelo dice si esa llamada sigue viva. Comparar tamanos (pedido !== numCapitulos) no distinguia dos peticiones DEL MISMO tamano — el turno si, porque identifica la llamada, no su resultado. / v25 (Nico v24.3 CRITICAL): outlineTurno identifies EACH call to generarOutline (increments on every one); outlineEnVuelo says whether that call is still alive. Comparing sizes (pedido !== numCapitulos) could not tell apart two requests of the SAME size — the turn number can, because it identifies the call, not its result.
 
 function bar() {
   var table = t.table();
@@ -60,7 +62,7 @@ function step1() {
     '<p class="label" style="margin-top:16px">' + table.s1.own + '</p>' +
     '<input class="input" id="ownNiche" placeholder="' + table.s1.ownPh + '" style="margin-top:6px">' +
     '<button class="btn btn-primary btn-block" style="margin-top:18px" id="s1next" disabled>' + table.s1.next + "</button>";
-  var items = NICHES.map(function (n) { return { cls: "niche-btn", html: '<span class="em">' + n.emoji + "</span>" + jbEsc(n[lang]) }; });
+  var items = NICHES.map(function (n) { return { cls: "niche-btn", html: jbEsc(n[lang]) }; }); // v24 (tipografia, decision de Jose): sin emoji, Inter 500 / 13px / .3px de letter-spacing, como Stripe o Linear. Playfair se queda en logo, titulos de pantalla y titulos de libro. / v24 (typography, José's decision): no emoji, Inter 500 / 13px / .3px letter-spacing, Stripe- or Linear-like. Playfair stays in the logo, screen titles and book titles.
   pintarGrid(document.getElementById("nicheGrid"), items, function (idx) { return W.nicheIdx === idx; }, function (idx) {
     W.nicheIdx = idx; W.nichoCustom = ""; document.getElementById("ownNiche").value = ""; step1();
   }, focusIdx);
@@ -88,7 +90,8 @@ function step2() {
     '</button><button class="btn btn-primary" style="flex:1" id="s2next" disabled>' + table.s2.next + "</button></div>";
   var items = AUDIENCES.map(function (a) {
     // v10 (defecto 2): titulo sin font-size propio heredaba los 16px del body (ronda 9) y "Emprendedores"/"Profesionales" desbordaban la tarjeta a 320px / v10 (defect 2): title had no own font-size, inherited body's 16px (round 9), "Emprendedores"/"Profesionales" overflowed the card at 320px
-    return { cls: "card card-selectable aud-btn", html: '<div style="font-size:22px">' + a.emoji + '</div><div style="font-size:13px;font-weight:700;margin-top:6px">' + jbEsc(a[lang][0]) + '</div><p class="muted" style="font-size:12px;margin-top:4px">' + jbEsc(a[lang][1]) + "</p>" };
+    return { cls: "card card-selectable aud-btn", html: '<div style="font-size:13px;font-weight:700">'  // v24: idem nichos, fuera el emoji de 22px / v24: same as niches, the 22px emoji is gone
+      + jbEsc(a[lang][0]) + '</div><p class="muted" style="font-size:12px;margin-top:4px">' + jbEsc(a[lang][1]) + "</p>" };
   });
   // v4 (R2): indice, no texto, como el nicho (m1) — cambiar de idioma ya no desmarca la tarjeta / v4 (R2): index, not text, like the niche (m1) — switching language no longer unmarks the card
   pintarGrid(document.getElementById("audGrid"), items, function (idx) { return W.audienceIdx === idx; }, function (idx) {
@@ -157,24 +160,83 @@ function renderTitles() {
   document.getElementById("s3next").addEventListener("click", function () { W.step = 4; render(); });
 }
 
-async function step4() {
+// v23 (plan-mvp-25ago-v23.md, tarea 1): el paso 4 no agrega un 6to paso a la
+// barra (el brief vende "5 pasos") — el tamano se elige AQUI, antes de pedirle
+// el outline al Worker (que ya lo necesita, ver num_capitulos abajo), y solo
+// una vez. Si ya se eligio (W.numCapitulos > 0) se salta directo a generar.
+// v23 (plan-mvp-25ago-v23.md, task 1): step 4 doesn't add a 6th step to the
+// bar (the brief sells "5 steps") — size is chosen HERE, right before asking
+// the Worker for the outline (which now needs num_capitulos, see below), and
+// only once. If already chosen (W.numCapitulos > 0) it skips straight to
+// generating.
+function step4() {
+  // v24: el tamano se mira ANTES que el outline. Al reves, "Atras" desde el outline nunca podia llegar al selector. / v24: size is checked BEFORE the outline. The other way round, "Back" from the outline could never reach the picker.
+  if (!W.numCapitulos) { renderSizePicker(); return; }
+  if (W.outline.length) { renderOutline(); return; }
+  if (W.outlineEnVuelo) { pintarEsqueleto(); return; } // v25 (Nico v24.3 CRITICO) -- ESTA ES LA GUARDA QUE CIERRA EL CRITICO. NO LA QUITES. Es la unica que se dispara de verdad: Nico midio en la v25 que 4 clics de idioma dan 1 sola llamada, y que sin ella 1 clic da 2 llamadas y la respuesta vieja borra los capitulos escritos a mano por el cliente. Las guardas por turno de generarOutline son defensa en profundidad y NO cubren este caso por si solas. Aqui ya hay una llamada viva (p.ej. el cliente toco el idioma mientras giraba el esqueleto): repinta en el idioma nuevo pero NO vuelve a pedir ni a cobrar. / v25 (Nico v24.3 CRITICAL) -- THIS IS THE GUARD THAT CLOSES THE CRITICAL. DO NOT REMOVE IT. It is the only one that actually fires: Nico measured in v25 that 4 language clicks produce 1 single call, and that without it 1 click produces 2 calls and the stale response wipes the chapter names the customer typed. The turn guards in generarOutline are defence in depth and do NOT cover this case on their own. Here a call is already alive (e.g. the customer touched the language toggle mid-spin): it repaints in the new language but does NOT ask or charge again.
+  generarOutline();
+}
+
+function renderSizePicker() {
+  var table = t.table();
+  // v24 (Nico v23 medio): el foco del teclado se perdia al marcar una tarjeta porque se pasaba -1; los pasos 1 y 2 ya lo calculaban asi desde la v3/v5. / v24 (Nico v23 medium): keyboard focus was lost when picking a card because -1 was passed; steps 1 and 2 have computed it this way since v3/v5.
+  var prevGrid = document.getElementById("sizeGrid");
+  var focusIdx = prevGrid ? Array.prototype.indexOf.call(prevGrid.children, document.activeElement) : -1;
+  var area = document.getElementById("stepArea");
+  area.innerHTML = '<h2 class="section-title">' + table.s4.sizeTitle + '</h2><div id="sizeGrid" style="margin-top:14px;display:flex;flex-direction:column;gap:10px"></div>' +
+    '<div style="display:flex;gap:10px;margin-top:18px"><button class="btn btn-ghost" id="s4sizeBack">' + table.s4.back +
+    '</button><button class="btn btn-primary" style="flex:1" id="s4sizeNext" ' + (W.tamanoIdx >= 0 ? "" : "disabled") + '>' + table.s4.sizeNext + "</button></div>"; // v24 (Nico v23 medio): decia "Crear mi libro" y solo genera el outline; ese texto es el del boton de la pantalla siguiente, que si crea. / v24 (Nico v23 medium): it said "Create my book" but only generates the outline; that label belongs to the next screen's button, which does create.
+  var items = SIZES.map(function (s) {
+    return { cls: "card card-selectable aud-btn", html: '<div style="font-size:15px;font-weight:700">' + jbEsc(table.sizes[s.id]) +
+      '</div><p class="muted" style="font-size:12px;margin-top:4px">~' + s.paginas + " " + table.s4.pages + " · " + s.capitulos + " " + table.s5.chaps + "</p>" };
+  });
+  pintarGrid(document.getElementById("sizeGrid"), items, function (idx) { return W.tamanoIdx === idx; }, function (idx) {
+    W.tamanoIdx = idx; renderSizePicker();
+  }, focusIdx);
+  document.getElementById("s4sizeBack").addEventListener("click", function () { W.step = 3; render(); });
+  document.getElementById("s4sizeNext").addEventListener("click", function () {
+    var nuevoNum = SIZES[W.tamanoIdx].capitulos;
+    if (W.outlineNum !== nuevoNum) { W.outline = []; W.outlineNum = 0; } // v24: eleccion contra eleccion. No contra W.numCapitulos (el "Atras" lo pone en 0 y siempre decia "cambio"), ni contra outline.length (si la IA devuelve 11 de 12 pedidos, regenera y cobra cada vez, y borra los nombres que el usuario escribio a mano). / v24: choice against choice. Not against W.numCapitulos (the "Back" zeroes it and it always said "changed"), nor against outline.length (if the AI returns 11 of 12 requested, it regenerates and charges every time, and wipes the chapter names the user typed by hand).
+    W.numCapitulos = nuevoNum; render();
+  });
+}
+
+function pintarEsqueleto() { // v25 (Nico v24.3 CRITICO): separado de generarOutline para poder repintar el esqueleto (p.ej. al tocar el idioma) sin relanzar la peticion. / v25 (Nico v24.3 CRITICAL): split out of generarOutline so the skeleton can be repainted (e.g. on a language tap) without relaunching the request.
   var table = t.table();
   var area = document.getElementById("stepArea");
   area.innerHTML = '<h2 class="section-title" id="stepTitle">' + table.s4.title + '</h2><div id="s4body" style="margin-top:14px">' + skeleton(6) + "</div>";
-  if (!W.outline.length) {
-    try { var r = await jbCallWorker("/outline", { titulo: W.titulo, nicho: W.nicho, audiencia: W.audiencia, idioma: W.idioma }); W.outline = r.capitulos || []; }
-    catch (e) {
-      var msg4 = jbLimitMessage(e, table) || table.s4.err; // v16 (tarea 3): idem s3
-      jbToast(msg4, "error");
-      stepError("s4body", table.s4.errTitle, msg4, table.s4.retry, table.s4.back, step4, function () { W.step = 3; render(); });
-      return;
-    }
+}
+
+async function generarOutline() {
+  pintarEsqueleto(); // v25: mismo pintado de siempre, ahora en su propia funcion para poder llamarlo sin volver a pedir. / v25: same paint as always, now in its own function so it can be invoked without asking again.
+  var table = t.table();
+  // v24.2 (Nico v24.1 CRITICO): el tamano se captura ANTES del await. Leerlo despues dejaba que una respuesta vieja que aterriza tarde pisara el outline bueno y se auto-certificara con el tamano nuevo: el usuario elegia Largo (29), se quedaba con 11 capitulos, y como outlineNum ya "coincidia" la guarda de arriba no volvia a regenerar nunca — encerrado sin salida. La carrera ya existia; el arreglo anterior la volvio permanente. / v24.2 (Nico v24.1 CRITICAL): the size is captured BEFORE the await. Reading it after let a late-landing stale response overwrite the good outline and self-certify with the new size: the user picked Long (29), got 11 chapters, and since outlineNum now "matched", the guard above never regenerated again — stuck with no way out. The race already existed; the previous fix made it permanent.
+  var pedido = W.numCapitulos;
+  var miTurno = ++W.outlineTurno; // v25 (Nico v24.3): identifica ESTA llamada por turno, no por tamano. DEFENSA EN PROFUNDIDAD, NO el mecanismo activo: Nico midio 0 disparos en 30 aterrizajes, porque la guarda de step4() (busca "NO LA QUITES") impide que lleguen a existir dos peticiones vivas a la vez. Se queda por si una ronda futura abre esa puerta. / v25 (Nico v24.3): identifies THIS call by turn, not by size. DEFENCE IN DEPTH, NOT the active mechanism: Nico measured 0 firings in 30 landings, because the step4() guard (search "DO NOT REMOVE") stops two live requests from ever coexisting. Kept in case a future round opens that door.
+  W.outlineEnVuelo = true; // v25: hay una llamada viva; step4() no debe lanzar otra mientras esto siga en true. / v25: a call is alive; step4() must not launch another while this stays true.
+  try { var r = await jbCallWorker("/outline", { titulo: W.titulo, nicho: W.nicho, audiencia: W.audiencia, idioma: W.idioma, num_capitulos: pedido });
+        if (miTurno !== W.outlineTurno) return; // v25 (Nico v24.3, defensa en profundidad -- ver linea de "DEFENSA EN PROFUNDIDAD" arriba): turno viejo, esta respuesta ya no manda, y NO se toca la bandera del turno nuevo. / v25 (Nico v24.3, defence in depth -- see the "DEFENCE IN DEPTH" line above): stale turn, this response no longer counts, and the new turn flag is left untouched.
+        W.outlineEnVuelo = false; // v25: turno vigente confirmado — se apaga la bandera para permitir la siguiente llamada. / v25: current turn confirmed — flag turns off to allow the next call.
+        W.outline = r.capitulos || []; W.outlineNum = pedido; }
+  catch (e) {
+    if (miTurno !== W.outlineTurno) return; // v25 (Nico v24.3, defensa en profundidad): turno viejo fallando, se tira sin tocar pantalla ni la bandera del turno nuevo. / v25 (Nico v24.3, defence in depth): stale turn failing, discarded without touching the screen or the new turn flag.
+    W.outlineEnVuelo = false; // v25: turno vigente fallo — se apaga la bandera para que "Reintentar" pueda lanzar otra llamada. / v25: current turn failed — flag turns off so "Retry" can launch another call.
+    var msg4 = jbLimitMessage(e, table) || table.s4.err; // v16 (tarea 3): idem s3
+    jbToast(msg4, "error");
+    // v23: "Atras" desde un error de outline vuelve al selector de tamano (el
+    // paso justo anterior), no al titulo — deshace solo la eleccion de tamano.
+    // v23: "Back" from an outline error returns to the size picker (the step
+    // right before it), not the title — undoes only the size choice.
+    stepError("s4body", table.s4.errTitle, msg4, table.s4.retry, table.s4.back, generarOutline, function () { W.numCapitulos = 0; render(); });
+    return;
   }
   renderOutline();
 }
 var dragIdx = null;
 function renderOutline() {
   var table = t.table();
+  // v24 (Nico v23 CRITICO 2): #stepTitle/#s4body solo los creaba generarOutline(). Volver "Atras" y avanzar otra vez entraba aqui con el andamiaje ya borrado por step3 -> TypeError, pantalla rota sin salida y outline ya pagado perdido. Ahora se repone si falta. / v24 (Nico v23 CRITICAL 2): #stepTitle/#s4body were only created by generarOutline(). Going "Back" then forward again landed here after step3 wiped the scaffolding -> TypeError, dead screen with no way out, and the already-paid outline lost. Now it's rebuilt if missing.
+  if (!document.getElementById("s4body")) document.getElementById("stepArea").innerHTML = '<h2 class="section-title" id="stepTitle"></h2><div id="s4body" style="margin-top:14px"></div>';
   document.getElementById("stepTitle").textContent = table.s4.doneTitle; // v3 (N5): idem paso 4 / v3 (N5): same fix, step 4
   var body = document.getElementById("s4body");
   body.innerHTML = "";
@@ -200,7 +262,7 @@ function renderOutline() {
   nav.style.cssText = "display:flex;gap:10px;margin-top:18px";
   nav.innerHTML = '<button class="btn btn-ghost" id="s4back">' + table.s4.back + '</button><button class="btn btn-primary" style="flex:1" id="s4next">' + table.s4.next + "</button>";
   body.appendChild(nav);
-  document.getElementById("s4back").addEventListener("click", function () { W.step = 3; render(); });
+  document.getElementById("s4back").addEventListener("click", function () { W.numCapitulos = 0; render(); }); // v24 (Nico v23 medio): iba a W.step=3 y saltaba el selector; como W.outline seguia lleno, step4 volvia directo al outline y el tamano ya no se podia cambiar nunca. Ahora vuelve al selector. / v24 (Nico v23 medium): it jumped to W.step=3, skipping the picker; with W.outline still full, step4 went straight back to the outline and the size could never be changed. Now it returns to the picker.
   document.getElementById("s4next").addEventListener("click", function () { W.step = 5; render(); });
 }
 
@@ -211,7 +273,7 @@ function step5() {
   // v2 (m9): antes un string fijo de la UI podia mentir sobre W.idioma si el toggle cambiaba entre paso 1 y 5 / v2 (m9): a fixed UI string used to lie about W.idioma if the toggle changed between step 1 and 5
   var langLine = table.s5.langLabel + " " + LANG_NAMES[W.idioma][lang];
   area.innerHTML = '<h2 class="section-title">' + table.s5.title + '</h2>' +
-    '<div class="card card-tint" style="margin-top:14px"><div class="section-title">📚 ' + jbEsc(W.titulo) + '</div>' +
+    '<div class="card card-tint" style="margin-top:14px"><div class="section-title">' + jbEsc(W.titulo) + '</div>' +
     '<p class="muted" style="margin-top:6px">' + jbEsc(W.nicho) + " · " + jbEsc(W.audiencia) + '</p>' +
     '<p class="muted">' + W.outline.length + ' ' + table.s5.chaps + " · " + langLine + '</p>' +
     '<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--accent-text)">' + table.s5.toggle + '</summary>' +

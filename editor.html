@@ -6,6 +6,8 @@
 <title>Joga Books — Editor</title>
 <meta name="theme-color" content="#b8924a">
 <link rel="manifest" href="./assets/manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png"> <!-- v24: la pestana no tenia icono / v24: the tab had no icon -->
+<link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
 <link rel="stylesheet" href="./assets/styles.css">
 <style>
   .editor-layout{display:block}
@@ -44,18 +46,18 @@
 "use strict";
 (function () { // v2 (m3): IIFE + return si no hay libro, asi location.replace() detiene el script (antes seguia y tronaba con TypeError)
 var i18n = {
-  es: { title: "Joga Books — Editor", back: "← Mis libros", generate: "✨ Generar con IA", writing: "Escribiendo capítulo...",
+  es: { title: "Joga Books — Editor", back: "← Mis libros", generate: "Generar con IA", writing: "Escribiendo capítulo...",
     humanizer: "HUMANIZADOR", tones: { profesional: "Profesional", conversacional: "Conversacional", motivacional: "Motivacional" },
-    humanize: "✨ Humanizar texto", humanizing: "Humanizando...", viewOriginal: "Original", viewHuman: "Humanizado",
+    humanize: "Humanizar texto", humanizing: "Humanizando...", viewOriginal: "Original", viewHuman: "Humanizado",
     save: "Guardar capítulo", saved: "Capítulo guardado.", prev: "← Cap anterior", next: "Cap siguiente →",
     genErr: "No se pudo generar el capítulo. Intenta de nuevo.", humErr: "No se pudo humanizar. Intenta de nuevo.",
     pickTone: "Elige un tono para humanizar.",
     limiteDiario: "Llegaste a tu límite de hoy. Vuelve mañana.",
     limiteMensual: "El servicio alcanzó su límite del mes. Vuelve el día 1.",
     textoLargo: "El texto es demasiado largo para humanizar. Acórtalo e intenta de nuevo." },
-  en: { title: "Joga Books — Editor", back: "← My books", generate: "✨ Generate with AI", writing: "Writing chapter...",
+  en: { title: "Joga Books — Editor", back: "← My books", generate: "Generate with AI", writing: "Writing chapter...",
     humanizer: "HUMANIZER", tones: { profesional: "Professional", conversacional: "Conversational", motivacional: "Motivational" },
-    humanize: "✨ Humanize text", humanizing: "Humanizing...", viewOriginal: "Original", viewHuman: "Humanized",
+    humanize: "Humanize text", humanizing: "Humanizing...", viewOriginal: "Original", viewHuman: "Humanized",
     save: "Save chapter", saved: "Chapter saved.", prev: "← Previous chapter", next: "Next chapter →",
     genErr: "Could not generate the chapter. Try again.", humErr: "Could not humanize. Try again.",
     pickTone: "Pick a tone to humanize.",
@@ -86,8 +88,8 @@ function renderSidebar() {
     var cd = capData(cap.num);
     var icon = "○";
     if (cap.num === E.current) icon = "▶";
-    else if (cd.humanizado) icon = "✨";
-    else if (cd.original) icon = "✅";
+    else if (cd.humanizado) icon = "◆"; // v25.2 (Nico v24.4 MEDIO 1): rombo en vez de emoji, misma familia que el circulo y el triangulo de arriba. Es INDICADOR DE ESTADO, no adorno: no se puede quitar sin sustituto. / v25.2 (Nico v24.4 MEDIUM 1): diamond instead of emoji, same family as the circle and triangle above. It is a STATE INDICATOR, not decoration: it cannot be dropped without a replacement.
+    else if (cd.original) icon = "●"; // v25.2: circulo lleno = capitulo escrito, frente al circulo vacio de pendiente. / v25.2: filled circle = chapter written, against the hollow circle for pending.
     var item = document.createElement("div");
     item.className = "chap-item" + (cap.num === E.current ? " active" : "");
     item.innerHTML = "<span>" + icon + "</span><span>" + cap.num + ". " + jbEsc(cap.nombre) + "</span>";

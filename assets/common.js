@@ -9,7 +9,7 @@
 
 // Placeholder: reemplazar por el subdominio real de Cloudflare al desplegar.
 // Placeholder: replace with the real Cloudflare subdomain on deploy.
-var WORKER_URL = "https://joga-books.TU-SUBDOMINIO.workers.dev";
+var WORKER_URL = "https://joga-books.omhotien90.workers.dev";
 
 function jbLibrary() {
   try { return JSON.parse(localStorage.getItem("jogaBooks_library") || "[]"); }

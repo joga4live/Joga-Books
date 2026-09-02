@@ -8,9 +8,10 @@
    v11: nombres de variable actualizados a la paleta clara/dorada — ver
    assets/styles.css. / v11: variable names updated to the light/gold
    palette — see assets/styles.css. */
-.niche-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 10px; padding: 10px 6px; text-align: center; font-size: 12px; }
-.niche-btn.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.niche-btn .em { font-size: 20px; display: block; margin-bottom: 4px; }
+/* v24 (tipografia, decision de Jose): sin emoji, Inter (heredada del body) peso 500, 13px, .3px de letter-spacing — como Stripe/Linear/Notion. El padding sube de 10px a 14px porque al quitar el emoji (20px + 4px de margen) el boton perdia 24px de alto y la rejilla quedaba achatada. / v24 (typography, José's decision): no emoji, Inter (inherited from body) weight 500, 13px, .3px letter-spacing — Stripe/Linear/Notion-like. Padding goes 10px -> 14px because dropping the emoji (20px + 4px margin) cost the button 24px of height and left the grid squashed. */
+.niche-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 10px; padding: 14px 8px; text-align: center; font-size: 13px; font-weight: 500; letter-spacing: .3px; }
+/* v24: el elegido se llena de dorado. --accent (#b8924a) con var(--text) negro da 7.25:1, ya medido en la v11 para .btn-primary (styles.css) — muy por encima del 4.5:1 de AA. / v24: the selected one fills with gold. --accent (#b8924a) with black var(--text) gives 7.25:1, already measured in v11 for .btn-primary (styles.css) — well above AA's 4.5:1. */
+.niche-btn.selected { border-color: var(--accent); background: var(--accent); color: var(--text); box-shadow: 0 0 0 3px var(--accent-soft); }
 /* v2 (C1): las 4 tarjetas de audiencia pasaron de <div> a <button> para foco
    de teclado; esta clase les quita el centrado/ancho de boton por defecto
    para que se sigan viendo igual que antes. / v2 (C1): the 4 audience cards

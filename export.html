@@ -6,6 +6,8 @@
 <title>Joga Books — Exportar</title>
 <meta name="theme-color" content="#b8924a">
 <link rel="manifest" href="./assets/manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png"> <!-- v24: la pestana no tenia icono / v24: the tab had no icon -->
+<link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
 <link rel="stylesheet" href="./assets/styles.css">
 <style>
   #toc li{margin-bottom:6px}
@@ -54,12 +56,12 @@
 "use strict";
 (function () { // v2 (m3): IIFE + return si no hay libro, asi location.replace() detiene el script (antes seguia y tronaba con TypeError)
 var i18n = {
-  es: { title: "Joga Books — Exportar", back: "← Mis libros", toc: "Tabla de contenido", copyBtn: "📋 Copiar todo el texto",
-    downloadBtn: "📄 Descargar como .txt", shareBtn: "🔗 Compartir outline",
+  es: { title: "Joga Books — Exportar", back: "← Mis libros", toc: "Tabla de contenido", copyBtn: "Copiar todo el texto",
+    downloadBtn: "Descargar como .txt", shareBtn: "Compartir outline",
     copied: "Texto copiado.", copyErr: "No se pudo copiar.", shareErr: "No se pudo compartir.",
     empty: "Este capítulo aún no tiene contenido." },
-  en: { title: "Joga Books — Export", back: "← My books", toc: "Table of contents", copyBtn: "📋 Copy all text",
-    downloadBtn: "📄 Download as .txt", shareBtn: "🔗 Share outline",
+  en: { title: "Joga Books — Export", back: "← My books", toc: "Table of contents", copyBtn: "Copy all text",
+    downloadBtn: "Download as .txt", shareBtn: "Share outline",
     copied: "Text copied.", copyErr: "Could not copy.", shareErr: "Could not share.",
     empty: "This chapter has no content yet." }
 };

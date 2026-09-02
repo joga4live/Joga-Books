@@ -95,7 +95,9 @@ input, textarea, select { font-family: inherit; }
   padding: 16px; border-bottom: 1px solid var(--border);
   flex-wrap: wrap; row-gap: 8px;
 }
-.logo { font-weight: 900; font-size: 18px; letter-spacing: -0.3px; color: var(--accent-text); flex-shrink: 0; } /* v15: nunca se achica ni envuelve su propio texto, si no cabe se va entera a la fila 2 */
+.logo { font-weight: 900; font-size: 18px; letter-spacing: -0.3px; color: var(--accent-text); flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; } /* v15: nunca se achica ni envuelve su propio texto, si no cabe se va entera a la fila 2. v24 (logo de Jose): inline-flex para alinear la marca con el texto */
+/* v24: la marca del libro, recortada del logo de Jose. Solo el simbolo: el lockup completo es vertical y su palabra "BOOKS" quedaria en 2px, ilegible, en una cabecera de 26px. El nombre lo sigue poniendo el texto de al lado, en letra real, que se lee mejor que dibujada. / v24: the book mark cropped from Jose's logo. Symbol only: the full stacked lockup would render its "BOOKS" at 2px, illegible, in a 26px header. The name stays as real text beside it, which reads better than drawn. */
+.logo img { height: 26px; width: auto; display: block; }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
