@@ -77,18 +77,37 @@ function jbToast(msg, type) {
 // callers can tell a limit apart from a real failure (see
 // jbLimitMessage). If the body carries no "error" (or another HTTP code
 // with no readable body), it falls back to the usual "worker_<status>".
-async function jbCallWorker(path, body) {
-  var res = await fetch(WORKER_URL + path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
+// v26 (Nico v25 MEDIO 1): un capitulo tarda ~45 s medidos (44,0 / 44,9 / 46,0 / 46,5 en cuatro pruebas contra el Worker real). Antes no habia NI tiempo limite NI reintento: cualquier hipo de red en esos 45 s dejaba la promesa colgada o la tumbaba, y el cliente solo veia "No se pudo generar", sin saber si fue la red, el tiempo o el servicio. / v26 (Nico v25 MEDIUM 1): a chapter takes ~45 s measured (44.0 / 44.9 / 46.0 / 46.5 across four runs against the real Worker). There was NEITHER a timeout NOR a retry: any network hiccup in those 45 s left the promise hanging or killed it, and the customer only saw "Could not generate", with no way to tell network from timeout from service.
+var JB_ESPERA_MAX = 100000; // 100 s: mas del doble de los ~45 s medidos, para no cortar una llamada que iba a llegar / 100 s: over twice the ~45 s measured, so a call that was going to land is not cut short
+
+async function jbCallWorker(path, body, esReintento) {
+  var ctrl = typeof AbortController === "function" ? new AbortController() : null;
+  var reloj = ctrl ? setTimeout(function () { ctrl.abort(); }, JB_ESPERA_MAX) : null;
+  var res;
+  try {
+    res = await fetch(WORKER_URL + path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: ctrl ? ctrl.signal : undefined
+    });
+  } catch (e) {
+    if (reloj) clearTimeout(reloj);
+    // Se agoto el tiempo: NO se reintenta. Reintentar sumaria otros 100 s de espera y el modelo probablemente ya cobro. / Timed out: NO retry. Retrying would add another 100 s and the model has probably already been billed.
+    if (e && e.name === "AbortError") throw new Error("tiempo_agotado");
+    // Fallo de red de verdad (suele ser inmediato): UN solo reintento. Es el caso que dejaba a Jose sin capitulo tras esperar 45 s. / Genuine network failure (usually immediate): ONE retry only. This is the case that left José with no chapter after waiting 45 s.
+    if (!esReintento) return jbCallWorker(path, body, true);
+    throw new Error("sin_conexion");
+  }
+  if (reloj) clearTimeout(reloj);
   if (!res.ok) {
     var codigo = "worker_" + res.status;
-    try { var datos = await res.json(); if (datos && datos.error) codigo = datos.error; } catch (e) {}
+    try { var datos = await res.json(); if (datos && datos.error) codigo = datos.error; } catch (e2) {}
     throw new Error(codigo);
   }
-  return res.json();
+  // v26: el parseo tambien puede fallar (respuesta cortada a medias). Sin esto salia el mensaje generico y parecia culpa del modelo. / v26: parsing can fail too (a response cut in half). Without this it surfaced as the generic message and looked like the model's fault.
+  try { return await res.json(); }
+  catch (e3) { throw new Error("respuesta_incompleta"); }
 }
 
 // v16 (tarea 3): traduce el codigo de error del Worker a un mensaje que el
@@ -110,5 +129,8 @@ function jbLimitMessage(e, table) {
   if (codigo === "limite_diario") return table.limiteDiario;
   if (codigo === "limite_mensual") return table.limiteMensual;
   if (codigo === "texto_demasiado_largo") return table.textoLargo;
+  if (codigo === "tiempo_agotado") return table.tiempoAgotado; // v26
+  if (codigo === "sin_conexion") return table.sinConexion; // v26
+  if (codigo === "respuesta_incompleta") return table.respuestaIncompleta; // v26
   return null;
 }
