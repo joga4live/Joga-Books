@@ -9,12 +9,12 @@
    Regla de version / version rule: joga-books-v1 -> v2 -> v3 ... (AGENTS.md #3)
 */
 "use strict";
-var CACHE_NAME = "joga-books-v26"; // v26: landing profesional mejorada (hero mas impactante, features cards, social proof, mejor jerarquia visual). / v26: improved professional landing (more impactful hero, feature cards, social proof, better visual hierarchy). // v25: boton "Disenar portada" en export.html (link a joga-covers). / v25: "Design cover" button in export.html (link to joga-covers).
+var CACHE_NAME = "joga-books-v27"; // v27: agregada guia Amazon KDP (amazon-kdp-guide.html + boton en export.html). / v27: added Amazon KDP guide (amazon-kdp-guide.html + button in export.html).
 
 // Archivos core: si alguno falta, el install debe fallar (bug real).
 // Core files: if any is missing, install should fail (a real bug).
 var CORE_FILES = [
-  "./", "./index.html", "./app.html", "./wizard.html", "./editor.html", "./export.html",
+  "./", "./index.html", "./app.html", "./wizard.html", "./editor.html", "./export.html", "./amazon-kdp-guide.html",
   "./gate.js", "./assets/styles.css", "./assets/i18n.js", "./assets/common.js", "./assets/manifest.json",
   "./assets/wizard.css", "./assets/wizard-data.js",
   "./assets/logo-mark.png", "./assets/favicon-32.png", // v24: el logo de Jose sustituye al emoji en las 3 cabeceras; sin cachear, la cabecera sale sin marca sin conexion / v24: José's logo replaces the emoji in the 3 headers; uncached, the header shows no mark offline

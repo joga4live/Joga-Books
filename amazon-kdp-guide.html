@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía: Publica tu Libro en Amazon KDP | Joga</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0a0908; color: #f5f0e8; line-height: 1.7; }
+    
+    .header { background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(26, 24, 21, 0.9)); padding: 60px 20px; text-align: center; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
+    .header h1 { font-family: 'Playfair Display', serif; font-size: 52px; color: #d4af37; margin-bottom: 15px; text-shadow: 0 4px 20px rgba(212, 175, 55, 0.4); }
+    .header p { font-size: 20px; color: rgba(245, 240, 232, 0.85); max-width: 700px; margin: 0 auto; }
+    
+    .lang-toggle { position: fixed; top: 20px; right: 20px; padding: 12px 24px; background: rgba(212, 175, 55, 0.2); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 8px; color: #f5f0e8; font-weight: 600; cursor: pointer; z-index: 1000; transition: all 0.3s; }
+    .lang-toggle:hover { background: rgba(212, 175, 55, 0.3); transform: translateY(-2px); }
+    
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+    
+    .intro { background: rgba(45, 42, 37, 0.5); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 12px; padding: 30px; margin-bottom: 40px; }
+    .intro h2 { font-family: 'Playfair Display', serif; font-size: 28px; color: #d4af37; margin-bottom: 15px; }
+    
+    .step { background: rgba(26, 24, 21, 0.6); border-left: 4px solid #d4af37; border-radius: 8px; padding: 30px; margin-bottom: 30px; }
+    .step-number { display: inline-block; width: 50px; height: 50px; background: linear-gradient(135deg, #d4af37, #f4e4c1); color: #1a1815; border-radius: 50%; text-align: center; line-height: 50px; font-size: 24px; font-weight: 700; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); }
+    .step h3 { font-family: 'Playfair Display', serif; font-size: 32px; color: #f5f0e8; margin-bottom: 15px; }
+    .step h4 { font-size: 20px; color: #d4af37; margin: 25px 0 10px; }
+    .step p { font-size: 17px; color: rgba(245, 240, 232, 0.9); margin-bottom: 15px; }
+    .step ul { margin: 15px 0 15px 25px; }
+    .step li { margin-bottom: 10px; color: rgba(245, 240, 232, 0.85); }
+    
+    .warning { background: rgba(212, 175, 55, 0.1); border-left: 4px solid #d4af37; padding: 20px; margin: 20px 0; border-radius: 8px; }
+    .warning strong { color: #d4af37; }
+    
+    .tip { background: rgba(100, 200, 100, 0.1); border-left: 4px solid #64c864; padding: 20px; margin: 20px 0; border-radius: 8px; }
+    .tip strong { color: #64c864; }
+    
+    .checklist { background: rgba(45, 42, 37, 0.5); padding: 25px; border-radius: 8px; margin: 20px 0; }
+    .checklist-item { padding: 12px 0; border-bottom: 1px solid rgba(212, 175, 55, 0.1); display: flex; align-items: center; }
+    .checklist-item:last-child { border-bottom: none; }
+    .checklist-item::before { content: '✓'; display: inline-block; width: 30px; height: 30px; background: rgba(212, 175, 55, 0.2); color: #d4af37; border-radius: 50%; text-align: center; line-height: 30px; margin-right: 15px; font-weight: 700; }
+    
+    .cta-box { background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(26, 24, 21, 0.8)); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 40px; text-align: center; margin: 50px 0; }
+    .cta-box h3 { font-family: 'Playfair Display', serif; font-size: 36px; color: #f5f0e8; margin-bottom: 20px; }
+    .btn { display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #d4af37, #f4e4c1); color: #1a1815; border-radius: 8px; font-size: 18px; font-weight: 700; text-decoration: none; margin: 10px; transition: all 0.3s; box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4); }
+    .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(212, 175, 55, 0.6); }
+    
+    .footer { text-align: center; padding: 40px 20px; border-top: 1px solid rgba(212, 175, 55, 0.2); margin-top: 60px; color: rgba(245, 240, 232, 0.6); }
+  </style>
+</head>
+<body>
+
+<button class="lang-toggle" id="langBtn" onclick="toggleLang()">EN</button>
+
+<div class="header">
+  <h1 id="mainTitle">Publica tu Libro en Amazon KDP</h1>
+  <p id="mainSubtitle">Guía completa paso a paso: de manuscrito terminado a libro publicado y vendiendo en Amazon</p>
+</div>
+
+<div class="container">
+
+  <div class="intro">
+    <h2 id="introTitle">¿Por qué Amazon KDP?</h2>
+    <p id="introPara1"><strong>Kindle Direct Publishing (KDP)</strong> es la plataforma de autopublicación de Amazon. Te permite publicar libros en formato digital (Kindle) y físico (paperback) sin costos iniciales, con regalías hasta del 70%.</p>
+    <p id="introPara2"><strong>Beneficios:</strong> Alcance global (Amazon en 15+ países), sin inventario, sin inversión inicial, publicación en 24-72 horas, y conservas todos los derechos de tu obra.</p>
+  </div>
+
+  <!-- PASO 1 -->
+  <div class="step">
+    <div class="step-number">1</div>
+    <h3 id="step1Title">Prepara tu Manuscrito</h3>
+    
+    <h4 id="step1Sub1">Exporta desde Joga Books</h4>
+    <p id="step1Para1">Si creaste tu libro con Joga Books, ya tienes el contenido listo. Ahora necesitas formatearlo para Amazon.</p>
+    
+    <div class="checklist">
+      <div class="checklist-item" id="check1">Descarga tu libro como .txt desde Joga Books</div>
+      <div class="checklist-item" id="check2">Copia el contenido a Microsoft Word o Google Docs</div>
+      <div class="checklist-item" id="check3">Formatea: Título de capítulos en Heading 1, texto normal en párrafo</div>
+      <div class="checklist-item" id="check4">Agrega saltos de página entre capítulos (Insert → Page Break)</div>
+      <div class="checklist-item" id="check5">Guarda como .docx (Word) o exporta como .epub</div>
+    </div>
+    
+    <div class="tip">
+      <strong id="tip1Title">💡 Tip:</strong> <span id="tip1Text">Amazon acepta .doc, .docx, .epub, .html y PDF. El formato .docx es el más fácil y compatible.</span>
+    </div>
+    
+    <h4 id="step1Sub2">Especificaciones Amazon KDP</h4>
+    <ul>
+      <li id="spec1"><strong>Formato eBook:</strong> .docx, .epub, o .mobi</li>
+      <li id="spec2"><strong>Tamaño paperback:</strong> 6" x 9" (15.24 x 22.86 cm) es el estándar para no ficción</li>
+      <li id="spec3"><strong>Márgenes:</strong> Mínimo 0.5" (1.27 cm) en todos los lados</li>
+      <li id="spec4"><strong>Fuente recomendada:</strong> Georgia, Garamond, o Times New Roman 11-12pt</li>
+    </ul>
+  </div>
+
+  <!-- PASO 2 -->
+  <div class="step">
+    <div class="step-number">2</div>
+    <h3 id="step2Title">Prepara tu Portada</h3>
+    
+    <h4 id="step2Sub1">Diseña con Joga Covers</h4>
+    <p id="step2Para1">Si usaste Joga Covers, ya descargaste tu portada en 1600×2400px (2:3 ratio). Esto funciona perfecto para eBook Kindle.</p>
+    
+    <h4 id="step2Sub2">Especificaciones de Portada</h4>
+    
+    <p id="step2Para2"><strong>eBook Kindle:</strong></p>
+    <ul>
+      <li id="ebook1">Tamaño: 1600 x 2400 px (mínimo) ← Joga Covers ya cumple ✓</li>
+      <li id="ebook2">Formato: JPG o PNG</li>
+      <li id="ebook3">Ratio: 2:3 (altura 1.5x el ancho)</li>
+      <li id="ebook4">Máximo: 50 MB</li>
+    </ul>
+    
+    <p id="step2Para3"><strong>Paperback (libro físico):</strong></p>
+    <ul>
+      <li id="paper1">Necesitas portada completa (frente + lomo + contraportada)</li>
+      <li id="paper2">Usa la calculadora de Amazon KDP Cover Calculator</li>
+      <li id="paper3">Ejemplo 6"×9", 150 páginas: ~12.5" × 9.25" total</li>
+    </ul>
+    
+    <div class="tip">
+      <strong id="tip2Title">💡 Tip:</strong> <span id="tip2Text">Empieza solo con eBook (Kindle). Es más fácil y no requiere portada completa. Puedes agregar paperback después.</span>
+    </div>
+  </div>
+
+  <!-- PASO 3 -->
+  <div class="step">
+    <div class="step-number">3</div>
+    <h3 id="step3Title">Crea tu Cuenta Amazon KDP</h3>
+    
+    <p id="step3Para1">Ve a <strong>kdp.amazon.com</strong> y haz clic en "Sign up" o "Registrarse".</p>
+    
+    <h4 id="step3Sub1">Información Requerida</h4>
+    <div class="checklist">
+      <div class="checklist-item" id="account1">Nombre completo (como autor o nombre de pluma)</div>
+      <div class="checklist-item" id="account2">Dirección física (para regalías y pagos)</div>
+      <div class="checklist-item" id="account3">Número de teléfono</div>
+      <div class="checklist-item" id="account4">Información fiscal (W-8 si estás fuera de USA)</div>
+      <div class="checklist-item" id="account5">Cuenta bancaria para recibir pagos</div>
+    </div>
+    
+    <div class="warning">
+      <strong id="warn1Title">⚠️ Importante:</strong> <span id="warn1Text">Completa el perfil fiscal (Tax Information) antes de publicar. Amazon retiene 30% de regalías si no está completado. Con formulario W-8BEN (no residentes USA), la retención baja a 0-5% según tu país.</span>
+    </div>
+  </div>
+
+  <!-- PASO 4 -->
+  <div class="step">
+    <div class="step-number">4</div>
+    <h3 id="step4Title">Publica tu Libro (eBook Kindle)</h3>
+    
+    <p id="step4Para1">En tu dashboard KDP, haz clic en <strong>"+ Kindle eBook"</strong>.</p>
+    
+    <h4 id="step4Sub1">Detalles del Libro</h4>
+    <ul>
+      <li id="detail1"><strong>Título:</strong> Exactamente como aparece en la portada</li>
+      <li id="detail2"><strong>Subtítulo (opcional):</strong> Agrega contexto o beneficio clave</li>
+      <li id="detail3"><strong>Autor:</strong> Tu nombre real o pen name</li>
+      <li id="detail4"><strong>Descripción:</strong> 2000 caracteres máx. Enfócate en beneficios, no features. Usa HTML para negritas (<strong>texto</strong>)</li>
+      <li id="detail5"><strong>Derechos de publicación:</strong> "I own the copyright" (soy dueño del copyright)</li>
+      <li id="detail6"><strong>Categorías:</strong> Máximo 2 (elige las más específicas posibles)</li>
+      <li id="detail7"><strong>Keywords:</strong> 7 palabras clave (piensa qué buscaría tu lector ideal)</li>
+    </ul>
+    
+    <div class="tip">
+      <strong id="tip3Title">💡 Tip Descripción:</strong> <span id="tip3Text">Primera línea: hook emocional. Segundo párrafo: problema que resuelves. Tercer párrafo: qué aprenderán. Último párrafo: CTA ("Compra ahora y descubre...").</span>
+    </div>
+    
+    <h4 id="step4Sub2">Contenido del Libro</h4>
+    <ul>
+      <li id="content1"><strong>Subir manuscrito:</strong> Click "Upload eBook manuscript" → selecciona tu .docx</li>
+      <li id="content2"><strong>Subir portada:</strong> Click "Upload a cover you already have" → selecciona tu PNG de Joga Covers</li>
+      <li id="content3"><strong>Preview:</strong> Haz clic en "Launch Previewer" para ver cómo se verá en Kindle</li>
+    </ul>
+    
+    <h4 id="step4Sub3">Derechos y Precio</h4>
+    <p id="step4Para2"><strong>Territorios:</strong> "Worldwide rights" (derechos mundiales) para máximo alcance.</p>
+    
+    <p id="step4Para3"><strong>Opciones de regalías:</strong></p>
+    <ul>
+      <li id="royalty1"><strong>70% regalías:</strong> Precio entre $2.99 - $9.99, entrega incluida en costo, exclusividad KDP Select</li>
+      <li id="royalty2"><strong>35% regalías:</strong> Cualquier precio, sin restricciones</li>
+    </ul>
+    
+    <div class="warning">
+      <strong id="warn2Title">⚠️ Recomendación:</strong> <span id="warn2Text">Para libros de no ficción, elige 70% y precio entre $4.99 - $9.99. Es el rango óptimo de conversión.</span>
+    </div>
+    
+    <p id="step4Para4"><strong>KDP Select (opcional):</strong> Exclusividad Amazon por 90 días. Beneficios: Kindle Unlimited (lectores pagan por página leída), promociones gratis. Desventaja: no puedes vender en otras plataformas.</p>
+  </div>
+
+  <!-- PASO 5 -->
+  <div class="step">
+    <div class="step-number">5</div>
+    <h3 id="step5Title">Revisión y Publicación</h3>
+    
+    <p id="step5Para1">Antes de hacer clic en "Publish your Kindle eBook":</p>
+    
+    <div class="checklist">
+      <div class="checklist-item" id="review1">Preview el libro completo en el Previewer</div>
+      <div class="checklist-item" id="review2">Verifica título, autor y descripción (sin typos)</div>
+      <div class="checklist-item" id="review3">Confirma precio y regalías</div>
+      <div class="checklist-item" id="review4">Revisa categorías y keywords (son críticos para descubrimiento)</div>
+      <div class="checklist-item" id="review5">Verifica información fiscal completada</div>
+    </div>
+    
+    <p id="step5Para2">Haz clic en <strong>"Publish your Kindle eBook"</strong>.</p>
+    
+    <h4 id="step5Sub1">Tiempos de Aprobación</h4>
+    <ul>
+      <li id="time1"><strong>Revisión automática:</strong> 24-72 horas</li>
+      <li id="time2"><strong>Disponible en Amazon:</strong> Generalmente dentro de 72 horas</li>
+      <li id="time3">Recibirás email cuando esté en vivo</li>
+    </ul>
+    
+    <div class="tip">
+      <strong id="tip4Title">💡 Tip:</strong> <span id="tip4Text">Mientras esperas la aprobación, prepara tu estrategia de lanzamiento: lista de email, posts en redes sociales, grupo de lectores beta para reviews iniciales.</span>
+    </div>
+  </div>
+
+  <!-- PASO 6 -->
+  <div class="step">
+    <div class="step-number">6</div>
+    <h3 id="step6Title">Post-Publicación: Primeros Pasos</h3>
+    
+    <h4 id="step6Sub1">Reviews Iniciales (Crítico)</h4>
+    <p id="step6Para1">Amazon prioriza libros con 10+ reviews. Estrategias éticas:</p>
+    <ul>
+      <li id="review21">Envía copias gratuitas a 20-30 lectores beta (amigos, familia, audiencia)</li>
+      <li id="review22">Pide review honesta (no solo 5 estrellas, honestidad es clave)</li>
+      <li id="review23">Usa tu email list si tienes una</li>
+      <li id="review24">Comparte en redes sociales con CTA: "Lee gratis primeras 48h a cambio de review"</li>
+    </ul>
+    
+    <div class="warning">
+      <strong id="warn3Title">⚠️ Prohibido:</strong> <span id="warn3Text">Comprar reviews, intercambiar reviews con otros autores, pedir solo 5 estrellas. Amazon detecta y puede banear tu cuenta.</span>
+    </div>
+    
+    <h4 id="step6Sub2">Promoción Básica</h4>
+    <ul>
+      <li id="promo1"><strong>Amazon Ads:</strong> Campañas patrocinadas desde $1/día (empieza después de 5+ reviews)</li>
+      <li id="promo2"><strong>Promoción gratuita KDP Select:</strong> 5 días gratis cada 90 días para generar tracción</li>
+      <li id="promo3"><strong>BookBub:</strong> Plataforma de deals (costoso pero efectivo con 20+ reviews)</li>
+      <li id="promo4"><strong>Tu audiencia:</strong> Email, Instagram, TikTok, LinkedIn según tu nicho</li>
+    </ul>
+    
+    <h4 id="step6Sub3">Optimización Continua</h4>
+    <ul>
+      <li id="optim1">Monitorea ventas en KDP Dashboard (actualiza cada 24h)</li>
+      <li id="optim2">Lee reviews y ajusta descripción/keywords si es necesario</li>
+      <li id="optim3">Experimenta con precio ($4.99 vs $6.99 vs $9.99)</li>
+      <li id="optim4">Considera agregar paperback 30-60 días después de eBook</li>
+    </ul>
+  </div>
+
+  <!-- CTA FINAL -->
+  <div class="cta-box">
+    <h3 id="ctaTitle">¿Listo para Publicar tu Libro?</h3>
+    <p id="ctaPara" style="font-size: 18px; margin-bottom: 30px; color: rgba(245, 240, 232, 0.85);">Crea tu libro con Joga Books, diseña la portada con Joga Covers, y publícalo en Amazon KDP.</p>
+    <a href="https://joga4live.github.io/Joga-Books/" class="btn">CREAR MI LIBRO</a>
+    <a href="https://joga4live.github.io/joga-covers/" class="btn">DISEÑAR PORTADA</a>
+    <a href="https://kdp.amazon.com" class="btn" target="_blank" style="background: linear-gradient(135deg, #1a1815, #2d2a25); border: 2px solid #d4af37; color: #f5f0e8;">AMAZON KDP</a>
+  </div>
+
+  <div class="footer">
+    <p id="footerText">Guía creada por Joga Intelligence · Código abierto · github.com/joga4live</p>
+  </div>
+
+</div>
+
+<script>
+let lang = 'es';
+
+const texts = {
+  es: {
+    mainTitle: 'Publica tu Libro en Amazon KDP',
+    mainSubtitle: 'Guía completa paso a paso: de manuscrito terminado a libro publicado y vendiendo en Amazon',
+    introTitle: '¿Por qué Amazon KDP?',
+    introPara1: '<strong>Kindle Direct Publishing (KDP)</strong> es la plataforma de autopublicación de Amazon. Te permite publicar libros en formato digital (Kindle) y físico (paperback) sin costos iniciales, con regalías hasta del 70%.',
+    introPara2: '<strong>Beneficios:</strong> Alcance global (Amazon en 15+ países), sin inventario, sin inversión inicial, publicación en 24-72 horas, y conservas todos los derechos de tu obra.',
+    step1Title: 'Prepara tu Manuscrito',
+    step1Sub1: 'Exporta desde Joga Books',
+    step1Para1: 'Si creaste tu libro con Joga Books, ya tienes el contenido listo. Ahora necesitas formatearlo para Amazon.',
+    check1: 'Descarga tu libro como .txt desde Joga Books',
+    check2: 'Copia el contenido a Microsoft Word o Google Docs',
+    check3: 'Formatea: Título de capítulos en Heading 1, texto normal en párrafo',
+    check4: 'Agrega saltos de página entre capítulos (Insert → Page Break)',
+    check5: 'Guarda como .docx (Word) o exporta como .epub',
+    tip1Title: '💡 Tip:',
+    tip1Text: 'Amazon acepta .doc, .docx, .epub, .html y PDF. El formato .docx es el más fácil y compatible.',
+    step1Sub2: 'Especificaciones Amazon KDP',
+    spec1: '<strong>Formato eBook:</strong> .docx, .epub, o .mobi',
+    spec2: '<strong>Tamaño paperback:</strong> 6" x 9" (15.24 x 22.86 cm) es el estándar para no ficción',
+    spec3: '<strong>Márgenes:</strong> Mínimo 0.5" (1.27 cm) en todos los lados',
+    spec4: '<strong>Fuente recomendada:</strong> Georgia, Garamond, o Times New Roman 11-12pt',
+    step2Title: 'Prepara tu Portada',
+    ctaTitle: '¿Listo para Publicar tu Libro?',
+    ctaPara: 'Crea tu libro con Joga Books, diseña la portada con Joga Covers, y publícalo en Amazon KDP.',
+    footerText: 'Guía creada por Joga Intelligence · Código abierto · github.com/joga4live'
+  },
+  en: {
+    mainTitle: 'Publish Your Book on Amazon KDP',
+    mainSubtitle: 'Complete step-by-step guide: from finished manuscript to published book selling on Amazon',
+    introTitle: 'Why Amazon KDP?',
+    introPara1: '<strong>Kindle Direct Publishing (KDP)</strong> is Amazon\'s self-publishing platform. It allows you to publish books in digital (Kindle) and physical (paperback) format with no upfront costs, with royalties up to 70%.',
+    introPara2: '<strong>Benefits:</strong> Global reach (Amazon in 15+ countries), no inventory, no initial investment, publication in 24-72 hours, and you keep all rights to your work.',
+    step1Title: 'Prepare Your Manuscript',
+    step1Sub1: 'Export from Joga Books',
+    step1Para1: 'If you created your book with Joga Books, you already have the content ready. Now you need to format it for Amazon.',
+    check1: 'Download your book as .txt from Joga Books',
+    check2: 'Copy the content to Microsoft Word or Google Docs',
+    check3: 'Format: Chapter titles in Heading 1, normal text in paragraph',
+    check4: 'Add page breaks between chapters (Insert → Page Break)',
+    check5: 'Save as .docx (Word) or export as .epub',
+    tip1Title: '💡 Tip:',
+    tip1Text: 'Amazon accepts .doc, .docx, .epub, .html and PDF. The .docx format is the easiest and most compatible.',
+    step1Sub2: 'Amazon KDP Specifications',
+    spec1: '<strong>eBook format:</strong> .docx, .epub, or .mobi',
+    spec2: '<strong>Paperback size:</strong> 6" x 9" (15.24 x 22.86 cm) is the standard for nonfiction',
+    spec3: '<strong>Margins:</strong> Minimum 0.5" (1.27 cm) on all sides',
+    spec4: '<strong>Recommended font:</strong> Georgia, Garamond, or Times New Roman 11-12pt',
+    step2Title: 'Prepare Your Cover',
+    ctaTitle: 'Ready to Publish Your Book?',
+    ctaPara: 'Create your book with Joga Books, design the cover with Joga Covers, and publish it on Amazon KDP.',
+    footerText: 'Guide created by Joga Intelligence · Open source · github.com/joga4live'
+  }
+};
+
+function toggleLang() {
+  lang = lang === 'es' ? 'en' : 'es';
+  document.getElementById('langBtn').textContent = lang === 'es' ? 'EN' : 'ES';
+  
+  Object.keys(texts[lang]).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.innerHTML = texts[lang][id];
+    }
+  });
+}
+</script>
+
+</body>
+</html>
