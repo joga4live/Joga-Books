@@ -40,6 +40,8 @@
     <button class="btn btn-primary" id="copyBtn" data-i18n="copyBtn"></button>
     <button class="btn btn-ghost" id="downloadBtn" data-i18n="downloadBtn"></button>
     <button class="btn btn-ghost" id="shareBtn" data-i18n="shareBtn"></button>
+    <!-- v25: boton para disenar portada en joga-covers (abre en pestana nueva) / v25: cover design button in joga-covers (opens in new tab) -->
+    <button class="btn btn-ghost" id="coverBtn" data-i18n="coverBtn"></button>
   </div>
 
   <!-- V2: exportar a PDF con jsPDF desde CDN (no implementado en MVP).
@@ -57,11 +59,11 @@
 (function () { // v2 (m3): IIFE + return si no hay libro, asi location.replace() detiene el script (antes seguia y tronaba con TypeError)
 var i18n = {
   es: { title: "Joga Books — Exportar", back: "← Mis libros", toc: "Tabla de contenido", copyBtn: "Copiar todo el texto",
-    downloadBtn: "Descargar como .txt", shareBtn: "Compartir outline",
+    downloadBtn: "Descargar como .txt", shareBtn: "Compartir outline", coverBtn: "Diseñar portada del libro",
     copied: "Texto copiado.", copyErr: "No se pudo copiar.", shareErr: "No se pudo compartir.",
     empty: "Este capítulo aún no tiene contenido." },
   en: { title: "Joga Books — Export", back: "← My books", toc: "Table of contents", copyBtn: "Copy all text",
-    downloadBtn: "Download as .txt", shareBtn: "Share outline",
+    downloadBtn: "Download as .txt", shareBtn: "Share outline", coverBtn: "Design book cover",
     copied: "Text copied.", copyErr: "Could not copy.", shareErr: "Could not share.",
     empty: "This chapter has no content yet." }
 };
@@ -131,6 +133,16 @@ document.getElementById("shareBtn").addEventListener("click", async function () 
     if (navigator.share) await navigator.share({ title: book.titulo, text: text });
     else if (navigator.clipboard) { await navigator.clipboard.writeText(text); jbToast(table.copied, "success"); }
   } catch (e) { if (e.name !== "AbortError") jbToast(table.shareErr, "error"); }
+});
+
+// v25: boton portada — abre joga-covers en pestana nueva con titulo/subtitulo precargados via URL params
+// v25: cover button — opens joga-covers in a new tab with title/subtitle prefilled via URL params
+document.getElementById("coverBtn").addEventListener("click", function () {
+  var params = new URLSearchParams();
+  if (book.titulo) params.set("title", book.titulo);
+  if (book.subtitulo) params.set("subtitle", book.subtitulo);
+  var url = "https://joga4live.github.io/joga-covers/?" + params.toString();
+  window.open(url, "_blank", "noopener,noreferrer");
 });
 
 if ("serviceWorker" in navigator) {
