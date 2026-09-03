@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+body { background: #000; color: #fff; font-family: sans-serif; padding: 50px; }
+.btn { padding: 20px 40px; background: gold; color: #000; border: none; font-size: 20px; cursor: pointer; }
+h1 { font-size: 48px; margin: 30px 0; }
+p { font-size: 24px; }
+</style>
+</head>
+<body>
+<button class="btn" onclick="toggleLang()" id="langBtn">EN</button>
+<h1 id="title" data-es="Hola Mundo" data-en="Hello World"></h1>
+<p id="subtitle" data-es="Este es un texto en español" data-en="This is a text in English"></p>
+
+<script>
+let currentLang = 'es';
+
+function updateAllText() {
+  console.log('Actualizando textos a:', currentLang);
+  document.querySelectorAll('[data-es]').forEach(el => {
+    const text = el.getAttribute('data-' + currentLang);
+    console.log('Elemento:', el.id, '-> Texto:', text);
+    if (text) {
+      el.textContent = text;
+    }
+  });
+}
+
+function toggleLang() {
+  console.log('Click en botón. Lang actual:', currentLang);
+  currentLang = currentLang === 'es' ? 'en' : 'es';
+  console.log('Nuevo lang:', currentLang);
+  document.getElementById('langBtn').textContent = currentLang === 'es' ? 'EN' : 'ES';
+  updateAllText();
+}
+
+// Inicializar
+updateAllText();
+</script>
+</body>
+</html>

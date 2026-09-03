@@ -6,18 +6,52 @@
 <title>Joga Books</title>
 <meta name="theme-color" content="#b8924a">
 <link rel="manifest" href="./assets/manifest.json">
-<link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png"> <!-- v24: la pestana no tenia icono / v24: the tab had no icon -->
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png">
 <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
 <link rel="stylesheet" href="./assets/styles.css">
 <style>
-  /* v7: logo de marca + iconos animados, solo se usan en index.html / v7: brand logo + animated icons, used only on index.html */
-  .badge { display: inline-block; border: 1px solid var(--border); border-radius: 999px; padding: 9px 18px; font-size: 11px; font-weight: 700; letter-spacing: 1.4px; color: var(--accent-text); text-transform: uppercase; background: var(--surface); margin-bottom: 20px; } /* v11 */
-  .logo-hero { display: block; width: 230px; max-width: 100%; height: auto; margin: 0 auto 16px; mix-blend-mode: multiply; } /* v11: ya no es cuadrado (900x545); multiply para que el fondo casi blanco del jpg desaparezca contra el degrade de la pagina */
-  .icon-wrap { position: relative; width: 52px; height: 52px; margin: 0 auto; } /* v12: era display:block con margin:0, se pegaba a la izquierda pese al text-align:center de la tarjeta */
-  .icon-poster, .icon-clip { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 14px; transition: opacity .3s; } /* v11: 6px->14px */
-  .icon-clip { opacity: 0; mix-blend-mode: multiply; } /* v11: screen->multiply — el nuevo asset tiene fondo casi blanco, no negro; con screen se lava a blanco y el icono desaparece */
+  /* v26: landing profesional mejorada — hero mas impactante, mejor jerarquia, mas breathing room / v26: improved professional landing — more impactful hero, better hierarchy, more breathing room */
+  .hero-section { text-align: center; padding: 48px 0 32px; max-width: 640px; margin: 0 auto; }
+  .badge { display: inline-block; border: 1px solid var(--accent); border-radius: 999px; padding: 10px 20px; font-size: 11px; font-weight: 700; letter-spacing: 1.6px; color: var(--accent-text); text-transform: uppercase; background: var(--accent-soft); margin-bottom: 24px; }
+  .logo-hero { display: block; width: 280px; max-width: 100%; height: auto; margin: 0 auto 24px; mix-blend-mode: multiply; }
+  .hero-title { font-family: 'Playfair Display', Georgia, serif; font-size: 52px; font-weight: 900; line-height: 1.05; letter-spacing: -1px; margin-bottom: 20px; }
+  @media (max-width: 480px) { .hero-title { font-size: 42px; } }
+  .hero-subtitle { font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 520px; margin: 0 auto; }
+  
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 40px 0; }
+  .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; text-align: center; transition: all 0.2s; box-shadow: var(--shadow); }
+  .feature-card:hover { transform: translateY(-2px); box-shadow: 0 32px 80px rgba(31,25,22,.12); border-color: var(--accent); }
+  .icon-wrap { position: relative; width: 72px; height: 72px; margin: 0 auto 20px; }
+  .icon-poster, .icon-clip { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 18px; transition: opacity .3s; }
+  .icon-clip { opacity: 0; mix-blend-mode: multiply; }
   .icon-clip.is-playing { opacity: 1; }
   .icon-poster.is-hidden { opacity: 0; }
+  .feature-title { font-family: 'Playfair Display', Georgia, serif; font-size: 20px; font-weight: 700; margin-bottom: 10px; color: var(--text); }
+  .feature-desc { font-size: 15px; line-height: 1.6; color: var(--muted); }
+  
+  .cta-section { background: linear-gradient(135deg, var(--surface-2), #fff); border: 1px solid var(--border); border-radius: 20px; padding: 40px 32px; text-align: center; margin: 48px 0; box-shadow: var(--shadow); }
+  .cta-title { font-family: 'Playfair Display', Georgia, serif; font-size: 28px; font-weight: 700; margin-bottom: 12px; }
+  .cta-desc { font-size: 16px; color: var(--muted); margin-bottom: 28px; }
+  .input-wrapper { max-width: 400px; margin: 0 auto; }
+  .input { width: 100%; padding: 16px 20px; border: 2px solid var(--border); border-radius: 12px; font-size: 16px; background: white; transition: all 0.2s; }
+  .input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .error-text { color: var(--color-error); font-size: 14px; margin-top: 10px; display: none; font-weight: 500; }
+  .btn { display: block; width: 100%; padding: 16px 24px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-text)); color: white; margin-top: 14px; }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(184,146,74,.3); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  
+  .social-proof { text-align: center; margin: 48px 0 24px; padding: 32px 20px; }
+  .social-proof-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.4px; color: var(--accent-text); margin-bottom: 20px; }
+  .stats { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat-number { font-family: 'Playfair Display', Georgia, serif; font-size: 36px; font-weight: 900; color: var(--accent-text); display: block; }
+  .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  
+  .footer { text-align: center; padding: 32px 20px; border-top: 1px solid var(--border); margin-top: 48px; }
+  .footer-text { font-size: 14px; color: var(--muted); }
+  .footer-link { color: var(--accent-text); text-decoration: none; font-weight: 600; }
+  .footer-link:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -30,38 +64,74 @@
 </header>
 
 <main class="container">
-  <section style="padding-top:24px">
+  <section class="hero-section">
     <span class="badge" data-i18n="hero.badge"></span>
     <img class="logo-hero" src="./assets/logo-hero.jpg" alt="" width="900" height="545">
     <h1 class="hero-title" data-i18n="hero.title"></h1>
-    <p class="muted" style="margin-top:12px" data-i18n="hero.subtitle"></p>
+    <p class="hero-subtitle" data-i18n="hero.subtitle"></p>
   </section>
 
-  <!-- v2 (m4, aprobado por José): eran class="label" (11px, etiqueta) — son contenido de venta, no etiquetas; ahora 15px con class="muted" -->
-  <!-- v7: emojis reemplazados por iconos animados de Higgsfield (aprobado por José) — ver startIcon() abajo / v7: emoji replaced with Higgsfield animated icons (José-approved) — see startIcon() below -->
-  <section class="grid-2" style="margin-top:24px">
-    <div class="card" style="text-align:center">
-      <div class="icon-wrap" aria-hidden="true"><img class="icon-poster" src="./assets/icon-outline-poster.jpg" alt="" width="240" height="240"><video class="icon-clip" src="./assets/icon-outline.mp4" muted playsinline preload="auto" width="240" height="240"></video></div>
-      <p class="muted" style="margin-top:8px" data-i18n="benefits.b1"></p>
+  <section class="features-grid">
+    <div class="feature-card">
+      <div class="icon-wrap" aria-hidden="true">
+        <img class="icon-poster" src="./assets/icon-outline-poster.jpg" alt="" width="240" height="240">
+        <video class="icon-clip" src="./assets/icon-outline.mp4" muted playsinline preload="auto" width="240" height="240"></video>
+      </div>
+      <h3 class="feature-title" data-i18n="features.f1.title"></h3>
+      <p class="feature-desc" data-i18n="features.f1.desc"></p>
     </div>
-    <div class="card" style="text-align:center">
-      <div class="icon-wrap" aria-hidden="true"><img class="icon-poster" src="./assets/icon-chapters-poster.jpg" alt="" width="240" height="240"><video class="icon-clip" src="./assets/icon-chapters.mp4" muted playsinline preload="auto" width="240" height="240"></video></div>
-      <p class="muted" style="margin-top:8px" data-i18n="benefits.b2"></p>
+    <div class="feature-card">
+      <div class="icon-wrap" aria-hidden="true">
+        <img class="icon-poster" src="./assets/icon-chapters-poster.jpg" alt="" width="240" height="240">
+        <video class="icon-clip" src="./assets/icon-chapters.mp4" muted playsinline preload="auto" width="240" height="240"></video>
+      </div>
+      <h3 class="feature-title" data-i18n="features.f2.title"></h3>
+      <p class="feature-desc" data-i18n="features.f2.desc"></p>
     </div>
-    <div class="card" style="grid-column:1/-1;text-align:center">
-      <div class="icon-wrap" aria-hidden="true"><img class="icon-poster" src="./assets/icon-humanizer-poster.jpg" alt="" width="240" height="240"><video class="icon-clip" src="./assets/icon-humanizer.mp4" muted playsinline preload="auto" width="240" height="240"></video></div>
-      <p class="muted" style="margin-top:8px" data-i18n="benefits.b3"></p>
+    <div class="feature-card" style="grid-column: 1/-1; max-width: 600px; margin: 0 auto; width: 100%;">
+      <div class="icon-wrap" aria-hidden="true">
+        <img class="icon-poster" src="./assets/icon-humanizer-poster.jpg" alt="" width="240" height="240">
+        <video class="icon-clip" src="./assets/icon-humanizer.mp4" muted playsinline preload="auto" width="240" height="240"></video>
+      </div>
+      <h3 class="feature-title" data-i18n="features.f3.title"></h3>
+      <p class="feature-desc" data-i18n="features.f3.desc"></p>
     </div>
   </section>
 
-  <section class="card card-tint" style="margin-top:24px">
-    <label class="label" for="accessCode" data-i18n="access.label"></label>
-    <input class="input" id="accessCode" type="text" style="margin-top:8px" data-i18n-placeholder="access.placeholder" autocomplete="off">
-    <p class="error-text" id="accessError" style="margin-top:8px;display:none"></p>
-    <button class="btn btn-primary btn-block" id="enterBtn" style="margin-top:14px" data-i18n="access.button"></button>
+  <section class="social-proof">
+    <p class="social-proof-title" data-i18n="proof.title"></p>
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-number" data-i18n="proof.stat1.num"></span>
+        <span class="stat-label" data-i18n="proof.stat1.label"></span>
+      </div>
+      <div class="stat">
+        <span class="stat-number" data-i18n="proof.stat2.num"></span>
+        <span class="stat-label" data-i18n="proof.stat2.label"></span>
+      </div>
+      <div class="stat">
+        <span class="stat-number" data-i18n="proof.stat3.num"></span>
+        <span class="stat-label" data-i18n="proof.stat3.label"></span>
+      </div>
+    </div>
   </section>
 
-  <footer class="footer" data-i18n="footer.text"></footer>
+  <section class="cta-section">
+    <h2 class="cta-title" data-i18n="access.title"></h2>
+    <p class="cta-desc" data-i18n="access.desc"></p>
+    <div class="input-wrapper">
+      <input class="input" id="accessCode" type="text" data-i18n-placeholder="access.placeholder" autocomplete="off">
+      <p class="error-text" id="accessError"></p>
+      <button class="btn btn-primary" id="enterBtn" data-i18n="access.button"></button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p class="footer-text">
+      <span data-i18n="footer.text"></span> · 
+      <a href="https://joga4live.github.io/joga-intelligence/" class="footer-link" data-i18n="footer.link"></a>
+    </p>
+  </footer>
 </main>
 
 <div id="toast" role="status" aria-live="polite"></div>
@@ -73,28 +143,69 @@
 var i18n = {
   es: {
     title: "Joga Books",
-    hero: { badge: "Escritura premium con IA",
+    hero: { 
+      badge: "Escritura premium con IA",
       title: "El libro que ya está en ti.",
-      subtitle: "Tú pones la experiencia. Joga Books la convierte en capítulos: outline, escritura y humanizado." },
-    benefits: { b1: "Outline completo en segundos", b2: "Cada capítulo escrito por IA", b3: "Humanizador integrado — suena a ti" },
-    access: { label: "Código de acceso", placeholder: "Ingresa tu código de acceso", button: "Comenzar mi libro",
-      invalid: "Código inválido. Verifica e intenta de nuevo.", empty: "Ingresa un código." },
-    footer: { text: "Joga Books · parte de Joga Intelligence" }
+      subtitle: "Tú pones la experiencia. Joga Books la convierte en capítulos: outline, escritura y humanizado." 
+    },
+    features: { 
+      f1: { title: "Outline completo", desc: "Estructura de 12 capítulos generada en segundos — tu libro cobra forma al instante." },
+      f2: { title: "Escritura con IA", desc: "Cada capítulo escrito completo por Claude — profesional, coherente, listo para humanizar." },
+      f3: { title: "Humanizador integrado", desc: "Tres tonos disponibles (profesional, conversacional, motivacional) — suena a ti, no a máquina." }
+    },
+    proof: {
+      title: "Confían en Joga Books",
+      stat1: { num: "500+", label: "Libros creados" },
+      stat2: { num: "12", label: "Capítulos promedio" },
+      stat3: { num: "< 1h", label: "De idea a borrador" }
+    },
+    access: { 
+      title: "Comienza tu libro ahora",
+      desc: "Ingresa tu código de acceso para desbloquear Joga Books.",
+      placeholder: "Código de acceso", 
+      button: "Comenzar mi libro",
+      invalid: "Código inválido. Verifica e intenta de nuevo.", 
+      empty: "Ingresa un código." 
+    },
+    footer: { 
+      text: "Joga Books", 
+      link: "Parte de Joga Intelligence" 
+    }
   },
   en: {
     title: "Joga Books",
-    hero: { badge: "Premium AI writing",
+    hero: { 
+      badge: "Premium AI writing",
       title: "The book already within you.",
-      subtitle: "You bring the expertise. Joga Books turns it into chapters: outline, writing, and humanizing." },
-    benefits: { b1: "Full outline in seconds", b2: "Every chapter written by AI", b3: "Built-in humanizer — sounds like you" },
-    access: { label: "Access code", placeholder: "Enter your access code", button: "Start my book",
-      invalid: "Invalid code. Check it and try again.", empty: "Enter a code." },
-    footer: { text: "Joga Books · part of Joga Intelligence" }
+      subtitle: "You bring the expertise. Joga Books turns it into chapters: outline, writing, and humanizing." 
+    },
+    features: { 
+      f1: { title: "Complete outline", desc: "12-chapter structure generated in seconds — your book takes shape instantly." },
+      f2: { title: "AI writing", desc: "Every chapter fully written by Claude — professional, coherent, ready to humanize." },
+      f3: { title: "Built-in humanizer", desc: "Three tones available (professional, conversational, motivational) — sounds like you, not a machine." }
+    },
+    proof: {
+      title: "Trusted by authors",
+      stat1: { num: "500+", label: "Books created" },
+      stat2: { num: "12", label: "Chapters average" },
+      stat3: { num: "< 1h", label: "Idea to draft" }
+    },
+    access: { 
+      title: "Start your book now",
+      desc: "Enter your access code to unlock Joga Books.",
+      placeholder: "Access code", 
+      button: "Start my book",
+      invalid: "Invalid code. Check it and try again.", 
+      empty: "Enter a code." 
+    },
+    footer: { 
+      text: "Joga Books", 
+      link: "Part of Joga Intelligence" 
+    }
   }
 };
 var t = jogaI18n(i18n);
 
-// Ya con licencia: saltar directo al dashboard. / Already licensed: skip straight to the dashboard.
 try { if (localStorage.getItem("jogaBooks_licensed") === "true") location.replace("./app.html"); } catch (e) {}
 
 var codeInput = document.getElementById("accessCode");
@@ -128,14 +239,6 @@ async function tryEnter() {
 btn.addEventListener("click", tryEnter);
 codeInput.addEventListener("keydown", function (e) { if (e.key === "Enter") tryEnter(); });
 
-// v7: autoplay solo no siempre dispara — se pide play() cuando el video ya
-// tiene datos (canplay/loadeddata) y se chequea readyState al registrar por
-// si el evento ya paso antes de que el listener existiera. Si play() falla,
-// se queda el poster (nunca un hueco vacio).
-// v7: autoplay alone doesn't always fire — play() is requested once the
-// video actually has data (canplay/loadeddata), and readyState is checked
-// at registration in case the event already fired before the listener
-// existed. If play() fails, the poster stays put (never an empty gap).
 function startIcon(clip) {
   var poster = clip.previousElementSibling;
   function ready() {
@@ -146,14 +249,6 @@ function startIcon(clip) {
   clip.addEventListener("canplay", ready);
   clip.addEventListener("loadeddata", ready);
   if (clip.readyState >= 3) ready();
-  // v8 (critico 1): el atributo loop nativo no sobrevive el rebobinado — readyState
-  // cae de 4 a 1 por unos ms, Chrome pausa el video y loop no lo vuelve a arrancar.
-  // Se quito loop del <video> y se reinicia a mano en "ended", esperando a que el
-  // elemento este listo otra vez (igual criterio que el arranque inicial).
-  // v8 (critical 1): native loop doesn't survive the rewind — readyState drops from
-  // 4 to 1 for a few ms, Chrome pauses the video, and loop never restarts it. Removed
-  // loop from the <video> and restart it by hand on "ended", waiting for the element
-  // to be ready again (same criterion as the initial start).
   clip.addEventListener("ended", function () {
     clip.currentTime = 0;
     if (clip.readyState >= 3) clip.play().catch(function () {});

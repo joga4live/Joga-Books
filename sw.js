@@ -9,12 +9,12 @@
    Regla de version / version rule: joga-books-v1 -> v2 -> v3 ... (AGENTS.md #3)
 */
 "use strict";
-var CACHE_NAME = "joga-books-v25"; // v24 (v26.3): obligatorio, lo vivo es v23. / v24 (v26.3): mandatory, live is v23. // v22 (v26): OBLIGATORIO subirlo. Hasta hoy lo publicado era v18 y v21 ya era un nombre nuevo, asi que no hacia falta; desde el despliegue de hoy lo VIVO es v21, y sin cambiar el nombre el Service Worker no se reinstala y el arreglo no le llega a nadie. Verificado contra el sitio real, no contra el commit. / v22 (v26): MANDATORY bump. Until today what was published was v18 and v21 was already a new name, so no bump was needed; since today's deploy what is LIVE is v21, and without a name change the Service Worker does not reinstall and the fix reaches nobody. Verified against the real site, not against the commit. // v21: arreglos de la ronda 24 (pantalla rota al volver atras, carrera de /outline, boton que mentia), tipografia sin emojis en nichos y audiencias, y el logo de Jose en las 3 cabeceras + pantalla vacia + favicon + iconos de app. Sigue en v21 y no v22 porque lo publicado es v18: el nombre ya es nuevo. / v21: round-24 fixes (dead screen on back, /outline race, lying button), emoji-free typography in niches and audiences, and José's logo in the 3 headers + empty state + favicon + app icons. Stays v21 rather than v22 because what is live is v18: the name is already new.
+var CACHE_NAME = "joga-books-v28"; // v27: agregada guia Amazon KDP (amazon-kdp-guide.html + boton en export.html). / v27: added Amazon KDP guide (amazon-kdp-guide.html + button in export.html).
 
 // Archivos core: si alguno falta, el install debe fallar (bug real).
 // Core files: if any is missing, install should fail (a real bug).
 var CORE_FILES = [
-  "./", "./index.html", "./app.html", "./wizard.html", "./editor.html", "./export.html",
+  "./", "./index.html", "./app.html", "./wizard.html", "./editor.html", "./export.html", "./amazon-kdp-guide.html",
   "./gate.js", "./assets/styles.css", "./assets/i18n.js", "./assets/common.js", "./assets/manifest.json",
   "./assets/wizard.css", "./assets/wizard-data.js",
   "./assets/logo-mark.png", "./assets/favicon-32.png", // v24: el logo de Jose sustituye al emoji en las 3 cabeceras; sin cachear, la cabecera sale sin marca sin conexion / v24: José's logo replaces the emoji in the 3 headers; uncached, the header shows no mark offline

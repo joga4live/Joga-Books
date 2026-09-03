@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { background: #000; color: #fff; padding: 50px; text-align: center; font-family: sans-serif; }
+button { padding: 30px 60px; background: gold; border: none; font-size: 24px; cursor: pointer; margin: 20px; }
+#status { font-size: 20px; margin-top: 30px; }
+</style>
+</head>
+<body>
+<h1>TEST DE AUDIO</h1>
+<p>Haz click en el botón para probar el audio:</p>
+<button onclick="playAudio()">▶ REPRODUCIR MÚSICA</button>
+<button onclick="stopAudio()">⏹ DETENER</button>
+<div id="status">Estado: Esperando...</div>
+
+<audio id="audio" loop>
+  <source src="https://www.bensound.com/bensound-music/bensound-creativeminds.mp3">
+</audio>
+
+<script>
+const audio = document.getElementById('audio');
+const status = document.getElementById('status');
+
+function playAudio() {
+  audio.volume = 0.5;
+  audio.play()
+    .then(() => status.textContent = '✅ Audio reproduciéndose')
+    .catch(err => status.textContent = '❌ Error: ' + err.message);
+}
+
+function stopAudio() {
+  audio.pause();
+  status.textContent = '⏹ Audio detenido';
+}
+</script>
+</body>
+</html>

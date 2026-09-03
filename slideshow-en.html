@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joga Books → Joga Covers: Video Walkthrough (English)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0908;
+      color: #f5f0e8;
+      overflow: hidden;
+    }
+    
+    .slide {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background: #0a0908;
+    }
+    
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .slide-content {
+      max-width: 90%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+    
+    .slide-header {
+      text-align: center;
+    }
+    
+    .slide-number {
+      font-size: 18px;
+      color: #d4af37;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .slide-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 56px;
+      font-weight: 700;
+      color: #f5f0e8;
+      margin-bottom: 15px;
+      text-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+    }
+    
+    .slide-subtitle {
+      font-size: 24px;
+      color: rgba(245, 240, 232, 0.8);
+      max-width: 900px;
+      line-height: 1.5;
+    }
+    
+    .slide-image {
+      max-width: 100%;
+      max-height: 60vh;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6),
+                  0 0 0 1px rgba(212, 175, 55, 0.2);
+    }
+    
+    .narration {
+      max-width: 1000px;
+      padding: 24px 32px;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+      border-left: 4px solid #d4af37;
+      border-radius: 8px;
+      font-size: 20px;
+      font-style: italic;
+      color: rgba(245, 240, 232, 0.95);
+      line-height: 1.7;
+      text-align: center;
+    }
+    
+    .progress-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #d4af37, #f4e4c1);
+      transition: width 0.3s ease;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+    }
+    
+    .controls {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      display: flex;
+      gap: 15px;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      background: rgba(212, 175, 55, 0.2);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 8px;
+      color: #f5f0e8;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+      background: rgba(212, 175, 55, 0.3);
+      border-color: rgba(212, 175, 55, 0.6);
+      transform: translateY(-2px);
+    }
+    
+    .slide-counter {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      font-size: 18px;
+      color: rgba(212, 175, 55, 0.8);
+      font-weight: 600;
+    }
+    
+    /* Intro slide */
+    .intro-slide {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(26, 24, 21, 0.9));
+    }
+    
+    .intro-slide .slide-title {
+      font-size: 72px;
+      margin-bottom: 30px;
+    }
+    
+    .intro-slide .badge {
+      display: inline-block;
+      padding: 10px 20px;
+      background: rgba(212, 175, 55, 0.2);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #d4af37;
+      margin-bottom: 40px;
+    }
+    
+    /* Outro slide */
+    .outro-slide {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(26, 24, 21, 0.95));
+    }
+    
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      margin-top: 40px;
+    }
+    
+    .btn-cta {
+      padding: 18px 36px;
+      background: linear-gradient(135deg, #d4af37, #f4e4c1);
+      color: #1a1815;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 8px 30px rgba(212, 175, 55, 0.5);
+      transition: transform 0.3s ease;
+    }
+    
+    .btn-cta:hover {
+      transform: translateY(-4px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SLIDE 0: INTRO -->
+  <div class="slide intro-slide active">
+    <div class="slide-content">
+      <div class="badge">🎬 VIDEO WALKTHROUGH</div>
+      <h1 class="slide-title">Joga Books → Joga Covers</h1>
+      <p class="slide-subtitle">Flujo completo: de libro terminado a portada profesional en 3 minutos</p>
+    </div>
+  </div>
+
+  <!-- SLIDE 1: Landing Hero -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="slide-number">ESCENA 1 · 0:00-0:15</div>
+        <h2 class="slide-title">Landing Joga Books</h2>
+        <p class="slide-subtitle">Hero profesional con badge, logo y CTA impactante</p>
+      </div>
+      <img src="screenshots/01-landing-hero.png" alt="Landing hero" class="slide-image">
+      <div class="narration">
+        "Joga Books convierte tu experiencia en un libro completo de no ficción. Outline, escritura de capítulos y humanizado — todo en menos de una hora."
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: Landing Features -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="slide-number">ESCENA 1 · 0:15-0:25</div>
+        <h2 class="slide-title">Features Premium</h2>
+        <p class="slide-subtitle">3 cards con hover effects y social proof stats</p>
+      </div>
+      <img src="screenshots/02-landing-features.png" alt="Features" class="slide-image">
+      <div class="narration">
+        "Outline inteligente, escritura con IA, y paso único de humanizado que transforma texto generado en prosa con alma humana."
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Social Proof -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="slide-number">ESCENA 1 · 0:25-0:40</div>
+        <h2 class="slide-title">Social Proof</h2>
+        <p class="slide-subtitle">500+ libros creados · 12 capítulos promedio · <1h de idea a borrador</p>
+      </div>
+      <img src="screenshots/03-landing-social-proof.png" alt="Social proof" class="slide-image">
+      <div class="narration">
+        "Después de escribir y humanizar los 12 capítulos, el usuario accede a exportar su libro terminado."
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Editor Inicial -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="slide-number">ESCENA 2 · 0:40-1:00</div>
+        <h2 class="slide-title">Editor con Datos Precargados</h2>
+        <p class="slide-subtitle">Título y subtítulo listos automáticamente — cero trabajo manual</p>
+      </div>
+      <img src="screenshots/04-editor-inicial.png" alt="Editor inicial" class="slide-image">
+      <div class="narration">
+        "El botón 'Diseñar portada' abre Joga Covers con el título y subtítulo del libro precargados. Todo listo para empezar a diseñar."
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Templates Grid -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="slide-number">ESCENA 3 · 1:00-1:20</div>
+        <h2 class="slide-title">13 Templates Profesionales</h2>
+        <p class="slide-subtitle">Editorial, Self-Help, Business, Memoir, Dark Academic...</p>
+      </div>
+      <img src="screenshots/05-templates-grid.png" alt="Templates" class="slide-image">
+      <div class="narration">
+        "Cada template aplica instantáneamente tipografía única, layout y colores diseñados para géneros de no ficción."
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Template Minimalista -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="slide-number">ESCENA 3 · 1:20-1:30</div>
+        <h2 class="slide-title">Template Minimalista</h2>
+        <p class="slide-subtitle">Clean, título arriba, sin ornamentos</p>
+      </div>
+      <img src="screenshots/06-template-minimalista.png" alt="Minimalista" class="slide-image">
+      <div class="narration">
+        "Un clic y el canvas actualiza con tipografía Inter, layout minimalista y espaciado generoso."
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: Template Dark Academic -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="slide-number">ESCENA 3 · 1:30-1:40</div>
+        <h2 class="slide-title">Template Dark Academic</h2>
+        <p class="slide-subtitle">Cinzel, ornamento ⚜, aesthetic scholarly</p>
+      </div>
+      <img src="screenshots/07-template-dark-academic.png" alt="Dark Academic" class="slide-image">
+      <div class="narration">
+        "Fraunces, Playfair Display, Cormorant, Cinzel... fuentes premium cargadas desde Google Fonts."
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Portada Self-Help -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="slide-number">ESCENA 4 · 1:40-2:00</div>
+        <h2 class="slide-title">Portada con IA</h2>
+        <p class="slide-subtitle">Imagen generada con ChatGPT: silueta con explosión de luz</p>
+      </div>
+      <img src="screenshots/08-portada-selfhelp-aplicada.png" alt="Portada Self-Help" class="slide-image">
+      <div class="narration">
+        "El usuario elige una de las 4 portadas ejemplo generadas con IA. Un clic actualiza el fondo del canvas."
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: Ajustes -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="slide-number">ESCENA 5 · 2:00-2:20</div>
+        <h2 class="slide-title">Ajustar Tipografía</h2>
+        <p class="slide-subtitle">Controles en tiempo real: tamaño, spacing, overlay, sombra</p>
+      </div>
+      <img src="screenshots/09-ajustes-aplicados.png" alt="Ajustes" class="slide-image">
+      <div class="narration">
+        "Cada slider actualiza el canvas al instante. No hay botón 'Aplicar' — diseño reactivo en vivo."
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: Modal Canva -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="slide-number">ESCENA 6 · 2:20-2:35</div>
+        <h2 class="slide-title">Exportar a Canva</h2>
+        <p class="slide-subtitle">Descarga PNG + copia título + abre Canva automáticamente</p>
+      </div>
+      <img src="screenshots/10-modal-canva.png" alt="Modal Canva" class="slide-image">
+      <div class="narration">
+        "Si quieres más control creativo, continúa en Canva. Tu diseño se preserva y puedes editarlo con herramientas profesionales."
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 11: Portada Final -->
+  <div class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="slide-number">ESCENA 7 · 2:35-3:00</div>
+        <h2 class="slide-title">Resultado Final</h2>
+        <p class="slide-subtitle">1600×2400px · 300 DPI · Print-ready PNG</p>
+      </div>
+      <img src="screenshots/11-portada-final.png" alt="Portada final" class="slide-image">
+      <div class="narration">
+        "En 3 minutos pasamos de libro sin portada a diseño profesional listo para Amazon KDP, IngramSpark o cualquier plataforma."
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12: OUTRO -->
+  <div class="slide outro-slide">
+    <div class="slide-content">
+      <h2 class="slide-title">Pruébalo Gratis</h2>
+      <p class="slide-subtitle">De tu experiencia a un libro publicado, con portada profesional incluida</p>
+      <div class="cta-buttons">
+        <a href="https://joga4live.github.io/Joga-Books/" class="btn-cta" target="_blank">🚀 Joga Books</a>
+        <a href="https://joga4live.github.io/joga-covers/" class="btn-cta" target="_blank">🎨 Joga Covers</a>
+      </div>
+      <p style="margin-top: 60px; font-size: 20px; color: rgba(212, 175, 55, 0.9);">
+        Código abierto · Sin límites · github.com/joga4live
+      </p>
+    </div>
+  </div>
+
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="slide-counter" id="counter">1 / 13</div>
+  
+  <div class="controls">
+    <button class="btn" onclick="prevSlide()">← Anterior</button>
+    <button class="btn" onclick="toggleAutoplay()" id="playBtn">⏸ Pausar</button>
+    <button class="btn" onclick="nextSlide()">Siguiente →</button>
+  </div>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let autoplayInterval;
+    let isPlaying = true;
+    const bgMusic = document.getElementById('bgMusic');
+    
+    // Duración por slide (en segundos)
+    const slideDurations = [
+      5,   // Intro
+      7,   // Landing hero
+      7,   // Features
+      6,   // Social proof
+      8,   // Editor inicial
+      7,   // Templates grid
+      6,   // Minimalista
+      6,   // Dark Academic
+      8,   // Portada Self-Help
+      8,   // Ajustes
+      7,   // Modal Canva
+      8,   // Portada final
+      10   // Outro
+    ];
+    
+    function showSlide(n) {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (n + totalSlides) % totalSlides;
+      slides[currentSlide].classList.add('active');
+      
+      // Update counter
+      document.getElementById('counter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+      
+      // Update progress bar
+      const progress = ((currentSlide + 1) / totalSlides) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+      
+      // Reset autoplay with current slide duration
+      if (isPlaying) {
+        clearInterval(autoplayInterval);
+        startAutoplay();
+      }
+    }
+    
+    function nextSlide() {
+      showSlide(currentSlide + 1);
+    }
+    
+    function prevSlide() {
+      showSlide(currentSlide - 1);
+    }
+    
+    function startAutoplay() {
+      // Start background music on first interaction
+      if (bgMusic.paused && currentSlide === 0) {
+        bgMusic.volume = 0.3;
+        bgMusic.play().catch(e => console.log('Audio autoplay blocked'));
+      }
+      
+      const duration = slideDurations[currentSlide] * 1000;
+      autoplayInterval = setInterval(() => {
+        if (currentSlide === totalSlides - 1) {
+          clearInterval(autoplayInterval);
+          isPlaying = false;
+          document.getElementById('playBtn').textContent = '▶ Reiniciar';
+          bgMusic.pause();
+        } else {
+          nextSlide();
+        }
+      }, duration);
+    }
+    
+    function toggleAutoplay() {
+      const btn = document.getElementById('playBtn');
+      if (isPlaying) {
+        clearInterval(autoplayInterval);
+        isPlaying = false;
+        btn.textContent = '▶ Reanudar';
+        bgMusic.pause();
+      } else {
+        if (currentSlide === totalSlides - 1) {
+          showSlide(0);
+        }
+        isPlaying = true;
+        btn.textContent = '⏸ Pausar';
+        bgMusic.play().catch(e => console.log('Audio blocked'));
+        startAutoplay();
+      }
+    }
+    
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      } else if (e.key === 'p' || e.key === 'P') {
+        toggleAutoplay();
+      }
+    });
+    
+    // Start autoplay
+    startAutoplay();
+    
+    // Update counter on load
+    document.getElementById('counter').textContent = `1 / ${totalSlides}`;
+  </script>
+
+</body>
+</html>

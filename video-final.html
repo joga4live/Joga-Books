@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joga Books → Joga Covers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0a0908; color: #f5f0e8; overflow: hidden; }
+    
+    .slide { display: none; width: 100vw; height: 100vh; flex-direction: column; align-items: center; justify-content: center; background: #0a0908; }
+    .slide.active { display: flex; }
+    
+    .content { max-width: 90%; text-align: center; }
+    .badge { display: inline-block; padding: 10px 20px; background: rgba(212, 175, 55, 0.2); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 24px; font-size: 16px; font-weight: 600; color: #d4af37; margin-bottom: 30px; }
+    .title { font-family: 'Playfair Display', serif; font-size: 72px; font-weight: 700; color: #f5f0e8; margin-bottom: 20px; text-shadow: 0 4px 20px rgba(212, 175, 55, 0.4); }
+    .subtitle { font-size: 24px; color: #f5f0e8; max-width: 900px; margin: 0 auto; line-height: 1.6; }
+    .img { max-width: 80%; max-height: 60vh; border-radius: 12px; margin: 30px 0; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
+    
+    .lang { position: fixed; top: 30px; left: 30px; padding: 12px 24px; background: rgba(212, 175, 55, 0.2); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 8px; color: #f5f0e8; font-size: 16px; font-weight: 600; cursor: pointer; z-index: 1000; }
+    .lang:hover { background: rgba(212, 175, 55, 0.3); transform: translateY(-2px); }
+    
+    .counter { position: fixed; top: 30px; right: 30px; font-size: 18px; color: rgba(212, 175, 55, 0.8); font-weight: 600; }
+    
+    .controls { position: fixed; bottom: 30px; right: 30px; display: flex; gap: 15px; }
+    .btn { padding: 12px 24px; background: rgba(212, 175, 55, 0.2); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 8px; color: #f5f0e8; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .btn:hover { background: rgba(212, 175, 55, 0.3); transform: translateY(-2px); }
+    
+    .progress { position: fixed; bottom: 0; left: 0; height: 4px; background: linear-gradient(90deg, #d4af37, #f4e4c1); transition: width 0.3s; box-shadow: 0 0 20px rgba(212, 175, 55, 0.6); }
+  </style>
+</head>
+<body>
+
+<button class="lang" id="langBtn">EN</button>
+<div class="counter" id="counter">1 / 13</div>
+
+<!-- SLIDE 1 -->
+<div class="slide active">
+  <div class="content">
+    <div class="badge">🎬 VIDEO WALKTHROUGH</div>
+    <h1 class="title">Joga Books → Joga Covers</h1>
+    <p class="subtitle" id="s1">Flujo completo: de libro terminado a portada profesional en 3 minutos</p>
+  </div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide">
+  <div class="content">
+    <p style="font-size: 18px; color: #d4af37; margin-bottom: 10px;">ESCENA 1 · 0:00-0:15</p>
+    <h2 class="title" style="font-size: 48px;" id="s2t">Landing Joga Books</h2>
+    <p class="subtitle" id="s2">Hero profesional con badge, logo y CTA impactante</p>
+    <img src="screenshots/01-landing-hero.png" class="img">
+  </div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide">
+  <div class="content">
+    <p style="font-size: 18px; color: #d4af37; margin-bottom: 10px;">ESCENA 1 · 0:15-0:25</p>
+    <h2 class="title" style="font-size: 48px;" id="s3t">Features Premium</h2>
+    <p class="subtitle" id="s3">3 cards con hover effects y social proof stats</p>
+    <img src="screenshots/02-landing-features.png" class="img">
+  </div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide">
+  <div class="content">
+    <p style="font-size: 18px; color: #d4af37; margin-bottom: 10px;">ESCENA 1 · 0:25-0:40</p>
+    <h2 class="title" style="font-size: 48px;">Social Proof</h2>
+    <p class="subtitle" id="s4">500+ libros creados · 12 capítulos promedio · &lt;1h</p>
+    <img src="screenshots/03-landing-social-proof.png" class="img">
+  </div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide">
+  <div class="content">
+    <p style="font-size: 18px; color: #d4af37; margin-bottom: 10px;">ESCENA 2 · 0:40-1:00</p>
+    <h2 class="title" style="font-size: 48px;" id="s5t">Editor con Datos Precargados</h2>
+    <p class="subtitle" id="s5">Título y subtítulo listos automáticamente</p>
+    <img src="screenshots/04-editor-inicial.png" class="img">
+  </div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide">
+  <div class="content">
+    <p style="font-size: 18px; color: #d4af37; margin-bottom: 10px;">ESCENA 3 · 1:00-1:20</p>
+    <h2 class="title" style="font-size: 48px;" id="s6t">13 Templates Profesionales</h2>
+    <p class="subtitle" id="s6">Editorial, Self-Help, Business, Memoir...</p>
+    <img src="screenshots/05-templates-grid.png" class="img">
+  </div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide">
+  <div class="content">
+    <p style="font-size: 18px; color: #d4af37; margin-bottom: 10px;">ESCENA 3 · 1:20-1:30</p>
+    <h2 class="title" style="font-size: 48px;" id="s7t">Template Minimalista</h2>
+    <p class="subtitle" id="s7">Clean, título arriba, sin ornamentos</p>
+    <img src="screenshots/06-template-minimalista.png" class="img">
+  </div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide">
+  <div class="content">
+    <p style="font-size: 18px; color: #d4af37; margin-bottom: 10px;">ESCENA 3 · 1:30-1:40</p>
+    <h2 class="title" style="font-size: 48px;" id="s8t">Template Dark Academic</h2>
+    <p class="subtitle" id="s8">Cinzel, ornamento ⚜, aesthetic scholarly</p>
+    <img src="screenshots/07-template-dark-academic.png" class="img">
+  </div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide">
+  <div class="content">
+    <p style="font-size: 18px; color: #d4af37; margin-bottom: 10px;">ESCENA 4 · 1:40-2:00</p>
+    <h2 class="title" style="font-size: 48px;" id="s9t">Portada con IA</h2>
+    <p class="subtitle" id="s9">Imagen generada con ChatGPT</p>
+    <img src="screenshots/08-portada-selfhelp-aplicada.png" class="img">
+  </div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide">
+  <div class="content">
+    <p style="font-size: 18px; color: #d4af37; margin-bottom: 10px;">ESCENA 5 · 2:00-2:20</p>
+    <h2 class="title" style="font-size: 48px;" id="s10t">Ajustar Tipografía</h2>
+    <p class="subtitle" id="s10">Controles en tiempo real</p>
+    <img src="screenshots/09-ajustes-aplicados.png" class="img">
+  </div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide">
+  <div class="content">
+    <p style="font-size: 18px; color: #d4af37; margin-bottom: 10px;">ESCENA 6 · 2:20-2:35</p>
+    <h2 class="title" style="font-size: 48px;" id="s11t">Exportar a Canva</h2>
+    <p class="subtitle" id="s11">Descarga PNG + copia título automáticamente</p>
+    <img src="screenshots/10-modal-canva.png" class="img">
+  </div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide">
+  <div class="content">
+    <p style="font-size: 18px; color: #d4af37; margin-bottom: 10px;">ESCENA 7 · 2:35-3:00</p>
+    <h2 class="title" style="font-size: 48px;" id="s12t">Resultado Final</h2>
+    <p class="subtitle">1600×2400px · 300 DPI · Print-ready PNG</p>
+    <img src="screenshots/11-portada-final.png" class="img">
+  </div>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide">
+  <div class="content">
+    <h2 class="title" id="s13t">Pruébalo Gratis</h2>
+    <p class="subtitle" id="s13">De tu experiencia a un libro publicado</p>
+    <div style="margin-top: 40px;">
+      <a href="https://joga4live.github.io/Joga-Books/" style="padding: 18px 36px; background: linear-gradient(135deg, #d4af37, #f4e4c1); color: #1a1815; border-radius: 8px; font-size: 18px; font-weight: 700; text-decoration: none; margin: 0 10px; display: inline-block;">🚀 Joga Books</a>
+      <a href="https://joga4live.github.io/joga-covers/" style="padding: 18px 36px; background: linear-gradient(135deg, #d4af37, #f4e4c1); color: #1a1815; border-radius: 8px; font-size: 18px; font-weight: 700; text-decoration: none; margin: 0 10px; display: inline-block;">🎨 Joga Covers</a>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="btn" onclick="prev()" id="prevBtn">← Anterior</button>
+  <button class="btn" onclick="togglePlay()" id="playBtn">⏸ Pausar</button>
+  <button class="btn" onclick="next()" id="nextBtn">Siguiente →</button>
+</div>
+
+<div class="progress" id="progress"></div>
+
+<audio id="music" loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const texts = {
+  es: {
+    s1: 'Flujo completo: de libro terminado a portada profesional en 3 minutos',
+    s2t: 'Landing Joga Books',
+    s2: 'Hero profesional con badge, logo y CTA impactante',
+    s3t: 'Features Premium',
+    s3: '3 cards con hover effects y social proof stats',
+    s4: '500+ libros creados · 12 capítulos promedio · <1h',
+    s5t: 'Editor con Datos Precargados',
+    s5: 'Título y subtítulo listos automáticamente',
+    s6t: '13 Templates Profesionales',
+    s6: 'Editorial, Self-Help, Business, Memoir...',
+    s7t: 'Template Minimalista',
+    s7: 'Clean, título arriba, sin ornamentos',
+    s8t: 'Template Dark Academic',
+    s8: 'Cinzel, ornamento ⚜, aesthetic scholarly',
+    s9t: 'Portada con IA',
+    s9: 'Imagen generada con ChatGPT',
+    s10t: 'Ajustar Tipografía',
+    s10: 'Controles en tiempo real',
+    s11t: 'Exportar a Canva',
+    s11: 'Descarga PNG + copia título automáticamente',
+    s12t: 'Resultado Final',
+    s13t: 'Pruébalo Gratis',
+    s13: 'De tu experiencia a un libro publicado',
+    prev: '← Anterior',
+    play: '⏸ Pausar',
+    next: 'Siguiente →'
+  },
+  en: {
+    s1: 'Complete flow: from finished book to professional cover in 3 minutes',
+    s2t: 'Joga Books Landing',
+    s2: 'Professional hero with badge, logo and impactful CTA',
+    s3t: 'Premium Features',
+    s3: '3 cards with hover effects and social proof stats',
+    s4: '500+ books created · 12 chapters average · <1h',
+    s5t: 'Editor with Preloaded Data',
+    s5: 'Title and subtitle automatically ready',
+    s6t: '13 Professional Templates',
+    s6: 'Editorial, Self-Help, Business, Memoir...',
+    s7t: 'Minimalist Template',
+    s7: 'Clean, title on top, no ornaments',
+    s8t: 'Dark Academic Template',
+    s8: 'Cinzel, ornament ⚜, scholarly aesthetic',
+    s9t: 'AI-Generated Cover',
+    s9: 'Image generated with ChatGPT',
+    s10t: 'Adjust Typography',
+    s10: 'Real-time controls',
+    s11t: 'Export to Canva',
+    s11: 'Download PNG + copy title automatically',
+    s12t: 'Final Result',
+    s13t: 'Try it Free',
+    s13: 'From your experience to a published book',
+    prev: '← Previous',
+    play: '⏸ Pause',
+    next: 'Next →'
+  }
+};
+
+let current = 0;
+let lang = 'es';
+let playing = true;
+let timer;
+const total = 13;
+const slides = document.querySelectorAll('.slide');
+const music = document.getElementById('music');
+
+function show(n) {
+  slides[current].classList.remove('active');
+  current = (n + total) % total;
+  slides[current].classList.add('active');
+  document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+  document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+  if (playing) { clearInterval(timer); timer = setInterval(next, 7000); }
+}
+
+function next() { show(current + 1); }
+function prev() { show(current - 1); }
+
+function togglePlay() {
+  playing = !playing;
+  const btn = document.getElementById('playBtn');
+  if (playing) {
+    btn.textContent = texts[lang].play;
+    timer = setInterval(next, 7000);
+    music.play();
+  } else {
+    btn.textContent = lang === 'es' ? '▶ Reanudar' : '▶ Resume';
+    clearInterval(timer);
+    music.pause();
+  }
+}
+
+document.getElementById('langBtn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  lang = lang === 'es' ? 'en' : 'es';
+  this.textContent = lang === 'es' ? 'EN' : 'ES';
+  
+  Object.keys(texts[lang]).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = texts[lang][id];
+  });
+  
+  document.getElementById('prevBtn').textContent = texts[lang].prev;
+  document.getElementById('nextBtn').textContent = texts[lang].next;
+  if (playing) {
+    document.getElementById('playBtn').textContent = texts[lang].play;
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') next();
+  else if (e.key === 'ArrowLeft') prev();
+});
+
+timer = setInterval(next, 7000);
+setTimeout(() => { music.volume = 0.3; music.play().catch(() => {}); }, 500);
+</script>
+
+</body>
+</html>
