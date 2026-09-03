@@ -141,7 +141,7 @@ function jbLimitMessage(e, table) {
   // v26.2: los detalles reales del Worker, traducidos / v26.2: the Worker's real details, translated
   if (codigo === "truncated_max_tokens") return table.capituloLargo;
   if (codigo === "empty_response") return table.respuestaVacia;
-  if (codigo.indexOf("anthropic_5") === 0 || codigo === "anthropic_429") return table.iaSaturada;
+  if (typeof codigo === "string" && (codigo.indexOf("anthropic_5") === 0 || codigo === "anthropic_429")) return table.iaSaturada; // v26.3 CRITICO: el guard de tipo NO es opcional. "codigo" sale de (e && e.message) y puede ser undefined o null; sin el, .indexOf lanza TypeError DENTRO del catch, donde no hay quien lo recoja: no sale ningun aviso Y el boton se queda colgado en "Escribiendo capitulo..." para siempre, sin poder reintentar. Introducido por mi en la v26.2 y medido en el sitio publicado: revienta con {}, con null y con undefined. Las comparaciones === de arriba no tienen este problema; esta linea si, por llamar a un metodo. / v26.3 CRITICAL: the type guard is NOT optional. "codigo" comes from (e && e.message) and can be undefined or null; without it, .indexOf throws a TypeError INSIDE the catch, where nothing catches it: no message appears AND the button stays stuck on "Writing chapter..." forever, with no way to retry. Introduced by me in v26.2 and measured on the live site: it throws with {}, with null and with undefined.
   return null;
 }
 
