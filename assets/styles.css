@@ -178,3 +178,33 @@ textarea.input { resize: vertical; min-height: 140px; line-height: 1.7; border-r
 .tone-btn.on-motivacional { border-color: var(--color-motivacional); color: var(--color-motivacional); }
 
 .footer { text-align: center; padding: 24px 16px; color: var(--muted); font-size: 12px; }
+/* ===== v29: orbe de espera (aprobado por Jose) / waiting orb =====
+   TODO en porcentajes y con min(): vive en la columna del editor, que es estrecha.
+   Con medidas fijas se salia 220 px y sacaba barra horizontal (medido antes de
+   publicar). Medido despues a 1200, 375 y 320 px: 0 px de desborde en los tres.
+   / All percentages and min(): it lives in the narrow editor column. With fixed
+   sizes it overflowed by 220 px. Measured after: 0 px overflow at 1200/375/320. */
+.jbo{text-align:center;padding:22px 8px 6px;max-width:100%;overflow:hidden}
+.jbo-stage{position:relative;width:min(264px,100%);aspect-ratio:1/1;margin:0 auto;container-type:inline-size}
+.jbo-halo{position:absolute;inset:-11%;border-radius:50%;background:radial-gradient(circle,rgba(255,45,120,.34),rgba(139,92,246,.20) 42%,rgba(0,229,255,0) 72%);animation:jbo-breathe 4.6s ease-in-out infinite}
+.jbo-core{position:absolute;inset:15%;border-radius:50%;background:conic-gradient(from 0deg,#ffb020,#ff2d78,#8b5cf6,#00e5ff,#00ffa3,#ffb020);animation:jbo-spin 4.6s linear infinite;box-shadow:0 0 46px rgba(255,45,120,.6),0 0 92px rgba(139,92,246,.4),inset 0 0 40px rgba(255,255,255,.28)}
+.jbo-gloss{position:absolute;inset:15%;border-radius:50%;background:radial-gradient(circle at 32% 26%,rgba(255,255,255,.8),rgba(255,255,255,0) 46%)}
+.jbo-plate{position:absolute;inset:26.5%;border-radius:50%;background:radial-gradient(circle,rgba(20,10,30,.66),rgba(20,10,30,.32) 70%,rgba(20,10,30,0) 100%)}
+.jbo-lockup{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.jbo-name{font-family:"Playfair Display",Georgia,serif;font-weight:700;font-size:clamp(24px,17cqw,44px);color:#fff;line-height:1;letter-spacing:.5px;text-shadow:0 2px 14px rgba(0,0,0,.8),0 0 30px rgba(255,255,255,.35)}
+.jbo-books{font-weight:600;font-size:clamp(8px,5cqw,13px);color:#fff;letter-spacing:.38em;text-transform:uppercase;text-shadow:0 2px 10px rgba(0,0,0,.85)}
+.jbo-ring{position:absolute;inset:3%;border-radius:50%;border:3px solid rgba(255,176,32,.75);border-top-color:#8b5cf6;border-bottom-color:#00e5ff;transform:rotateX(70deg);animation:jbo-spinX 3.4s linear infinite;box-shadow:0 0 18px rgba(139,92,246,.5)}
+.jbo-ring2{position:absolute;inset:0;border-radius:50%;border:3px solid rgba(255,45,120,.5);border-left-color:#00ffa3;transform:rotateY(72deg);animation:jbo-spinY 5.2s linear infinite;box-shadow:0 0 16px rgba(0,255,163,.4)}
+.jbo-orbit{position:absolute;inset:0;animation:jbo-spin 7s linear infinite}
+.jbo-orbit.b{animation-duration:9.5s;animation-direction:reverse}
+.jbo-dot{position:absolute;width:5%;height:5%;border-radius:50%;top:-2.5%;left:47.5%}
+.jbo-dot.p{background:#8b5cf6;box-shadow:0 0 20px #8b5cf6,0 0 38px #8b5cf6}
+.jbo-dot.c{background:#00e5ff;box-shadow:0 0 20px #00e5ff,0 0 38px #00e5ff;top:auto;bottom:-2.5%}
+.jbo-label{margin-top:22px;font-size:16px;font-weight:600}
+.jbo-sub{margin-top:5px;font-size:13px;color:#6b6158}
+@keyframes jbo-spin{to{transform:rotate(360deg)}}
+@keyframes jbo-spinX{to{transform:rotateX(70deg) rotate(360deg)}}
+@keyframes jbo-spinY{to{transform:rotateY(72deg) rotate(360deg)}}
+@keyframes jbo-breathe{0%,100%{opacity:.6;transform:scale(.93)}50%{opacity:1;transform:scale(1.08)}}
+/* Hay gente a la que el movimiento le marea. / Motion makes some people dizzy. */
+@media (prefers-reduced-motion:reduce){.jbo-core,.jbo-ring,.jbo-ring2,.jbo-orbit,.jbo-halo{animation:none!important}}

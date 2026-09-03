@@ -131,17 +131,31 @@ function renderMain() {
   wireMain(cap, cd, prevCap, nextCap);
 }
 
+// v29: el orbe en el editor. Se quita al fallar; al tener exito renderAll() repinta y desaparece solo.
+// / v29: the orb in the editor. Removed on failure; on success renderAll() repaints and it goes.
+function jbMostrarOrbe(etiqueta) {
+  var v = document.getElementById("jbOrbeVivo");
+  if (!etiqueta) { if (v && v.parentNode) v.parentNode.removeChild(v); return; }
+  if (v) return;
+  var main = document.getElementById("editorMain");
+  if (!main) return;
+  var d = document.createElement("div");
+  d.id = "jbOrbeVivo";
+  d.innerHTML = jbOrbeHTML(etiqueta, "");
+  main.insertBefore(d, main.firstChild);
+}
+
 function wireMain(cap, cd, prevCap, nextCap) {
   var table = t.table();
   var genBtn = document.getElementById("genBtn");
   if (genBtn) genBtn.addEventListener("click", async function () {
-    genBtn.disabled = true; genBtn.textContent = table.writing;
+    genBtn.disabled = true; genBtn.textContent = table.writing; jbMostrarOrbe(table.writing); // v29
     try {
       var r = await jbCallWorker("/capitulo", { titulo_libro: book.titulo, nombre_capitulo: cap.nombre, num: cap.num, nicho: book.nicho, audiencia: book.audiencia, idioma: book.idioma });
       book.capitulos[cap.num] = { original: r.contenido || "", humanizado: "", tono: "" };
       recomputeProgress(); book.fechaEdicion = jbToday(); jbUpsertBook(book);
       renderAll();
-    } catch (e) { jbToast(jbLimitMessage(e, table) || (table.genErr + jbCodigoTecnico(e)), "error"); genBtn.disabled = false; genBtn.textContent = table.generate; } // v16 (tarea 3): limite_diario/limite_mensual muestran su propio texto
+    } catch (e) { jbMostrarOrbe(false); jbToast(jbLimitMessage(e, table) || (table.genErr + jbCodigoTecnico(e)), "error"); genBtn.disabled = false; genBtn.textContent = table.generate; } // v16 (tarea 3): limite_diario/limite_mensual muestran su propio texto
   });
   var vo = document.getElementById("viewOrig"), vh = document.getElementById("viewHuman");
   if (vo) vo.addEventListener("click", function () { E.view = "original"; renderMain(); });
@@ -153,13 +167,13 @@ function wireMain(cap, cd, prevCap, nextCap) {
   if (humBtn) humBtn.addEventListener("click", async function () {
     if (!E.tone) { jbToast(table.pickTone, "error"); return; }
     var textNow = document.getElementById("chapText").value;
-    humBtn.disabled = true; humBtn.textContent = table.humanizing;
+    humBtn.disabled = true; humBtn.textContent = table.humanizing; jbMostrarOrbe(table.humanizing); // v29
     try {
       var r = await jbCallWorker("/humanizar", { texto: textNow, tono: E.tone, idioma: book.idioma });
       book.capitulos[cap.num].humanizado = r.contenido || ""; book.capitulos[cap.num].tono = E.tone;
       book.fechaEdicion = jbToday(); jbUpsertBook(book);
       E.view = "humanizado"; renderMain();
-    } catch (e) { jbToast(jbLimitMessage(e, table) || (table.humErr + jbCodigoTecnico(e)), "error"); humBtn.disabled = false; humBtn.textContent = table.humanize; } // v16 (tarea 3): idem genBtn
+    } catch (e) { jbMostrarOrbe(false); jbToast(jbLimitMessage(e, table) || (table.humErr + jbCodigoTecnico(e)), "error"); humBtn.disabled = false; humBtn.textContent = table.humanize; } // v16 (tarea 3): idem genBtn
   });
   var saveBtn = document.getElementById("saveBtn");
   if (saveBtn) saveBtn.addEventListener("click", function () {

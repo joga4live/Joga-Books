@@ -104,7 +104,8 @@ function step2() {
   });
 }
 
-function skeleton(n) { var h = ""; for (var i = 0; i < n; i++) h += '<div class="skeleton"></div>'; return h; }
+function skeleton(n) { return jbOrbeHTML(esperaTexto(), ""); } // v29: el orbe sustituye a las barras grises. Se cambia AQUI y no en los dos sitios que la llaman, para no tocar dos veces la zona fragil de generarOutline. El parametro n ya no se usa. / v29: the orb replaces the grey bars, changed HERE not at both call sites.
+function esperaTexto() { var x = t.table(); return (x.s4 && x.s4.title) || "Generando..."; } // v29: reutiliza el texto que ya usaba la pantalla / v29: reuses the screen existing string
 
 // v2 (M2/m11): une renderTitleError+renderOutlineError, agrega el "Atras" que faltaba (M2) y cambia el <h2> de "Generando..." a error (m11) / v2 (M2/m11): merges renderTitleError+renderOutlineError, adds the missing "Back" (M2), swaps the <h2> from "Generating..." to an error state (m11)
 function stepError(bodyId, errTitle, errMsg, retryLabel, backLabel, onRetry, onBack) {
