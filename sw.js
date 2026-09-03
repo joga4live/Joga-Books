@@ -9,7 +9,7 @@
    Regla de version / version rule: joga-books-v1 -> v2 -> v3 ... (AGENTS.md #3)
 */
 "use strict";
-var CACHE_NAME = "joga-books-v25"; // v25: boton "Disenar portada" en export.html (link a joga-covers). / v25: "Design cover" button in export.html (link to joga-covers). // v24 (v26.3): obligatorio, lo vivo es v23. / v24 (v26.3): mandatory, live is v23.
+var CACHE_NAME = "joga-books-v26"; // v26: landing profesional mejorada (hero mas impactante, features cards, social proof, mejor jerarquia visual). / v26: improved professional landing (more impactful hero, feature cards, social proof, better visual hierarchy). // v25: boton "Disenar portada" en export.html (link a joga-covers). / v25: "Design cover" button in export.html (link to joga-covers).
 
 // Archivos core: si alguno falta, el install debe fallar (bug real).
 // Core files: if any is missing, install should fail (a real bug).
