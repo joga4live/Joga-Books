@@ -150,3 +150,22 @@ function jbCodigoTecnico(e) {
   var codigo = e && e.message;
   return codigo ? " (" + codigo + ")" : "";
 }
+
+// v27: el orbe de espera, aprobado por Jose el 2-sep-2026. Sustituye a las barras grises.
+// Una sola funcion para las CUATRO esperas: titulos, indice, capitulo y humanizar.
+// El nombre NO gira (girando no se lee) y el disco oscuro de detras NO es adorno:
+// es lo unico que mantiene "Joga Books" legible cuando pasa el amarillo por detras.
+// / v27: the waiting orb, approved by Jose. Replaces the grey bars. One function for
+// all FOUR waits. The name does NOT spin, and the dark plate behind it is not
+// decoration: it is what keeps "Joga Books" legible when yellow sweeps behind.
+function jbOrbeHTML(etiqueta, sub) {
+  return '<div class="jbo" role="img" aria-label="' + jbEsc(etiqueta || "Generando") + '">' +
+    '<div class="jbo-stage"><div class="jbo-halo"></div><div class="jbo-ring2"></div>' +
+    '<div class="jbo-core"></div><div class="jbo-gloss"></div><div class="jbo-plate"></div>' +
+    '<div class="jbo-lockup"><span class="jbo-name">Joga</span><span class="jbo-books">Books</span></div>' +
+    '<div class="jbo-ring"></div>' +
+    '<div class="jbo-orbit"><span class="jbo-dot p"></span></div>' +
+    '<div class="jbo-orbit b"><span class="jbo-dot c"></span></div></div>' +
+    (etiqueta ? '<p class="jbo-label">' + jbEsc(etiqueta) + '</p>' : '') +
+    (sub ? '<p class="jbo-sub">' + jbEsc(sub) + '</p>' : '') + '</div>';
+}
