@@ -9,7 +9,7 @@
    Regla de version / version rule: joga-books-v1 -> v2 -> v3 ... (AGENTS.md #3)
 */
 "use strict";
-var CACHE_NAME = "joga-books-v29"; // v27: agregada guia Amazon KDP (amazon-kdp-guide.html + boton en export.html). / v27: added Amazon KDP guide (amazon-kdp-guide.html + button in export.html).
+var CACHE_NAME = "joga-books-v30"; // v30: video de portada (chica leyendo, con musica) + quote en el hero. / v30: hero cover video (woman reading, with music) + hero quote.
 
 // Archivos core: si alguno falta, el install debe fallar (bug real).
 // Core files: if any is missing, install should fail (a real bug).
