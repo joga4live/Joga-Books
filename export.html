@@ -83,7 +83,7 @@ function chapterText(cap) {
 
 function fullPlainText() {
   var table = t.table();
-  var parts = [book.titulo];
+  var parts = [book.titulo, "\n\n" + table.toc.toUpperCase() + "\n" + book.outline.map(function (c) { return c.num + ". " + c.nombre; }).join("\n")];
   book.outline.forEach(function (cap) {
     parts.push("\n\n" + cap.num + ". " + cap.nombre + "\n" + (chapterText(cap) || table.empty));
   });

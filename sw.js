@@ -9,7 +9,7 @@
    Regla de version / version rule: joga-books-v1 -> v2 -> v3 ... (AGENTS.md #3)
 */
 "use strict";
-var CACHE_NAME = "joga-books-v31"; // v31: boton "Terminaste el libro" en el ultimo capitulo del editor, lleva a exportar. / v31: "You finished the book" button on the editor's last chapter, links to export.
+var CACHE_NAME = "joga-books-v32"; // v32: el .txt descargado ahora incluye la tabla de contenido antes de los capitulos. / v32: the downloaded .txt now includes the table of contents before the chapters.
 
 // Archivos core: si alguno falta, el install debe fallar (bug real).
 // Core files: if any is missing, install should fail (a real bug).
