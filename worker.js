@@ -142,8 +142,8 @@ var PROMPTS = {
 var HANDLERS = {
   "/titulos": async function (env, body, f) { return { titulos: parseJson(await askClaude(env, PROMPTS.titulos(body), 600, f)) }; },
   "/outline": async function (env, body, f) { return { capitulos: parseJson(await askClaude(env, PROMPTS.outline(body), 2000, f)) }; },
-  "/capitulo": async function (env, body, f) { return { contenido: (await askClaude(env, PROMPTS.capitulo(body), 4500, f)).trim() }; }, // v2 (M4): 3000 -> 4500, sin holgura para espanol/humanizar
-  "/humanizar": async function (env, body, f) { return { contenido: (await askClaude(env, PROMPTS.humanizar(body), 4500, f)).trim() }; } // v2 (M4): idem
+  "/capitulo": async function (env, body, f) { return { contenido: (await askClaude(env, PROMPTS.capitulo(body), 8000, f)).trim() }; }, // v3 (Nico, 5-sep): 4500 -> 8000. Jose midio en vivo un capitulo real que salio "empty_response": max_tokens es tope duro sobre pensamiento+respuesta (ver comentario de askClaude), y para ciertos temas el pensamiento adaptativo por si solo se comio los 4500 sin dejar nada para el texto. El capitulo pedido son 900-1200 palabras (~1500-2000 tokens en espanol) — 8000 deja margen real para pensar Y escribir, sin acercarse al limite de salida del modelo.
+  "/humanizar": async function (env, body, f) { return { contenido: (await askClaude(env, PROMPTS.humanizar(body), 8000, f)).trim() }; } // v3 (Nico, 5-sep): idem — reescribe el mismo capitulo, mismo riesgo
 };
 
 var CAMPOS_REQUERIDOS = { "/titulos": ["nicho", "audiencia", "idioma"], "/outline": ["titulo", "nicho", "audiencia", "idioma", "num_capitulos"], "/capitulo": ["num", "nombre_capitulo", "titulo_libro", "nicho", "audiencia", "idioma"], "/humanizar": ["tono", "idioma", "texto"] }; // v20 (tarea 3): campos que arma el prompt de cada endpoint (ver PROMPTS) — sin ellos no hay nada que preguntarle a la IA, cortar antes de gastar / fields each endpoint's prompt needs (see PROMPTS) — without them there's nothing to ask the AI, cut before spending
