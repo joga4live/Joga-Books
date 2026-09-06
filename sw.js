@@ -9,7 +9,7 @@
    Regla de version / version rule: joga-books-v1 -> v2 -> v3 ... (AGENTS.md #3)
 */
 "use strict";
-var CACHE_NAME = "joga-books-v30"; // v30: video de portada (chica leyendo, con musica) + quote en el hero. / v30: hero cover video (woman reading, with music) + hero quote.
+var CACHE_NAME = "joga-books-v31"; // v31: boton "Terminaste el libro" en el ultimo capitulo del editor, lleva a exportar. / v31: "You finished the book" button on the editor's last chapter, links to export.
 
 // Archivos core: si alguno falta, el install debe fallar (bug real).
 // Core files: if any is missing, install should fail (a real bug).

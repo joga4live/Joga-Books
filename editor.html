@@ -49,7 +49,7 @@ var i18n = {
   es: { title: "Joga Books — Editor", back: "← Mis libros", generate: "Generar con IA", writing: "Escribiendo capítulo... suele tardar un minuto",
     humanizer: "HUMANIZADOR", tones: { profesional: "Profesional", conversacional: "Conversacional", motivacional: "Motivacional" },
     humanize: "Humanizar texto", humanizing: "Humanizando... suele tardar un minuto", viewOriginal: "Original", viewHuman: "Humanizado",
-    save: "Guardar capítulo", saved: "Capítulo guardado.", prev: "← Cap anterior", next: "Cap siguiente →",
+    save: "Guardar capítulo", saved: "Capítulo guardado.", prev: "← Cap anterior", next: "Cap siguiente →", finish: "Terminaste el libro — ir a exportar →",
     genErr: "No se pudo generar el capítulo. Intenta de nuevo.", humErr: "No se pudo humanizar. Intenta de nuevo.",
     pickTone: "Elige un tono para humanizar.",
     capituloLargo: "El capítulo salió más largo de lo que cabe y se cortó. Vuelve a intentarlo.", respuestaVacia: "La IA devolvió una respuesta vacía. Intenta de nuevo.", iaSaturada: "El servicio de IA está saturado ahora mismo. Espera un momento e intenta de nuevo.", 
@@ -60,7 +60,7 @@ var i18n = {
   en: { title: "Joga Books — Editor", back: "← My books", generate: "Generate with AI", writing: "Writing chapter... usually takes about a minute",
     humanizer: "HUMANIZER", tones: { profesional: "Professional", conversacional: "Conversational", motivacional: "Motivational" },
     humanize: "Humanize text", humanizing: "Humanizing... usually takes about a minute", viewOriginal: "Original", viewHuman: "Humanized",
-    save: "Save chapter", saved: "Chapter saved.", prev: "← Previous chapter", next: "Next chapter →",
+    save: "Save chapter", saved: "Chapter saved.", prev: "← Previous chapter", next: "Next chapter →", finish: "You finished the book — go export →",
     genErr: "Could not generate the chapter. Try again.", humErr: "Could not humanize. Try again.",
     pickTone: "Pick a tone to humanize.",
     capituloLargo: "The chapter came out longer than fits and was cut off. Try again.", respuestaVacia: "The AI returned an empty response. Try again.", iaSaturada: "The AI service is overloaded right now. Wait a moment and try again.", 
@@ -126,7 +126,9 @@ function renderMain() {
   var prevCap = book.outline[idx - 1], nextCap = book.outline[idx + 1];
   body += '<div style="display:flex;gap:10px;margin-top:20px">' +
     '<button class="btn btn-ghost" id="prevBtn" ' + (prevCap ? "" : "disabled") + '>' + table.prev + '</button>' +
-    '<button class="btn btn-ghost" style="flex:1" id="nextBtn" ' + (nextCap ? "" : "disabled") + '>' + table.next + "</button></div>";
+    (nextCap ? '<button class="btn btn-ghost" style="flex:1" id="nextBtn">' + table.next + "</button>" : "") +
+    "</div>" +
+    (!nextCap && cd.original ? '<a class="btn btn-primary btn-block" style="margin-top:10px;text-decoration:none;display:block;text-align:center" href="./export.html?id=' + encodeURIComponent(bookId) + '">' + table.finish + "</a>" : "");
   main.innerHTML = '<h2 class="section-title">' + (cap.num + ". " + jbEsc(cap.nombre)) + "</h2>" + '<div style="margin-top:14px">' + body + "</div>";
   wireMain(cap, cd, prevCap, nextCap);
 }
