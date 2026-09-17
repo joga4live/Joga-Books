@@ -69,6 +69,23 @@
     <img class="logo-hero" src="./assets/logo-hero.jpg" alt="" width="900" height="545">
     <h1 class="hero-title" data-i18n="hero.title"></h1>
     <p class="hero-subtitle" data-i18n="hero.subtitle"></p>
+
+    <!-- PRICING STRIP — added without altering existing sections -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-top:36px;flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-text);margin-bottom:6px;" data-i18n="pricing.label"></div>
+        <div style="font-size:48px;font-weight:900;font-family:'Playfair Display',Georgia,serif;color:var(--accent-text);line-height:1;" data-i18n="pricing.price"></div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;" data-i18n="pricing.sub"></div>
+      </div>
+      <div style="width:1px;height:60px;background:var(--border);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;" data-i18n="pricing.label2"></div>
+        <div style="font-size:48px;font-weight:900;font-family:'Playfair Display',Georgia,serif;color:var(--accent-text);line-height:1;" data-i18n="pricing.price2"></div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;" data-i18n="pricing.sub2"></div>
+      </div>
+    </div>
+    <a href="#access" style="display:inline-block;margin-top:28px;padding:16px 40px;background:linear-gradient(135deg,var(--accent),var(--accent-text));color:white;font-size:15px;font-weight:700;border-radius:12px;text-decoration:none;letter-spacing:0.5px;box-shadow:0 8px 32px rgba(184,146,74,.28);transition:all .3s;" data-i18n="pricing.cta"></a>
+
   </section>
 
   <section class="features-grid">
@@ -167,6 +184,15 @@ var i18n = {
       invalid: "Código inválido. Verifica e intenta de nuevo.", 
       empty: "Ingresa un código." 
     },
+    pricing: {
+      label: "Acceso único",
+      price: "$67",
+      sub: "Un libro completo, para siempre",
+      label2: "Acceso anual",
+      price2: "$127",
+      sub2: "Libros ilimitados · 1 año",
+      cta: "OBTENER ACCESO"
+    },
     footer: { 
       text: "Joga Books", 
       link: "Parte de Joga Intelligence" 
@@ -197,6 +223,15 @@ var i18n = {
       button: "Start my book",
       invalid: "Invalid code. Check it and try again.", 
       empty: "Enter a code." 
+    },
+    pricing: {
+      label: "Single access",
+      price: "$67",
+      sub: "One complete book, forever",
+      label2: "Annual access",
+      price2: "$127",
+      sub2: "Unlimited books · 1 year",
+      cta: "GET ACCESS"
     },
     footer: { 
       text: "Joga Books", 
