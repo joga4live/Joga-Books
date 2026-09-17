@@ -17,7 +17,11 @@
   .hero-title { font-family: 'Playfair Display', Georgia, serif; font-size: 52px; font-weight: 900; line-height: 1.05; letter-spacing: -1px; margin-bottom: 20px; }
   @media (max-width: 480px) { .hero-title { font-size: 42px; } }
   .hero-subtitle { font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 520px; margin: 0 auto; }
-  
+
+  .hero-photo-frame { max-width: 340px; margin: 32px auto 8px; border-radius: 24px; overflow: hidden; box-shadow: var(--shadow); aspect-ratio: 803 / 1440; }
+  .hero-photo-frame video { display: block; width: 100%; height: 100%; object-fit: cover; background: #000; }
+  .hero-quote { max-width: 420px; margin: 18px auto 0; font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 17px; line-height: 1.5; color: var(--accent-text); }
+
   .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 40px 0; }
   .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px 24px; text-align: center; transition: all 0.2s; box-shadow: var(--shadow); }
   .feature-card:hover { transform: translateY(-2px); box-shadow: 0 32px 80px rgba(31,25,22,.12); border-color: var(--accent); }
@@ -69,8 +73,14 @@
     <img class="logo-hero" src="./assets/logo-hero.jpg" alt="" width="900" height="545">
     <h1 class="hero-title" data-i18n="hero.title"></h1>
     <p class="hero-subtitle" data-i18n="hero.subtitle"></p>
+    <div class="hero-photo-frame">
+      <video controls playsinline preload="metadata" poster="./assets/images/hero-lectora.jpg" width="803" height="1440">
+        <source src="./assets/videos/hero-lectora.mp4" type="video/mp4">
+      </video>
+    </div>
+    <p class="hero-quote" data-i18n="hero.quote"></p>
 
-    <!-- PRICING STRIP — added without altering existing sections -->
+    <!-- PRICING STRIP -->
     <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-top:36px;flex-wrap:wrap;">
       <div style="text-align:center;">
         <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent-text);margin-bottom:6px;" data-i18n="pricing.label"></div>
@@ -85,7 +95,6 @@
       </div>
     </div>
     <a href="#access" style="display:inline-block;margin-top:28px;padding:16px 40px;background:linear-gradient(135deg,var(--accent),var(--accent-text));color:white;font-size:15px;font-weight:700;border-radius:12px;text-decoration:none;letter-spacing:0.5px;box-shadow:0 8px 32px rgba(184,146,74,.28);transition:all .3s;" data-i18n="pricing.cta"></a>
-
   </section>
 
   <section class="features-grid">
@@ -163,7 +172,8 @@ var i18n = {
     hero: { 
       badge: "Escritura premium con IA",
       title: "El libro que ya está en ti.",
-      subtitle: "Tú pones la experiencia. Joga Books la convierte en capítulos: outline, escritura y humanizado." 
+      subtitle: "Tú pones la experiencia. Joga Books la convierte en capítulos: outline, escritura y humanizado.",
+      quote: "«Cada página que escribes te acerca a quien te estás convirtiendo.»"
     },
     features: { 
       f1: { title: "Outline completo", desc: "Estructura de 12 capítulos generada en segundos — tu libro cobra forma al instante." },
@@ -203,7 +213,8 @@ var i18n = {
     hero: { 
       badge: "Premium AI writing",
       title: "The book already within you.",
-      subtitle: "You bring the expertise. Joga Books turns it into chapters: outline, writing, and humanizing." 
+      subtitle: "You bring the expertise. Joga Books turns it into chapters: outline, writing, and humanizing.",
+      quote: "“Every page you write brings you closer to who you're becoming.”"
     },
     features: { 
       f1: { title: "Complete outline", desc: "12-chapter structure generated in seconds — your book takes shape instantly." },
