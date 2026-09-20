@@ -8,3 +8,5 @@
 # access codes in plain text, and the whole point of the gate is that those
 # codes stay private.
 .joga/
+*.b64
+assets/icon-*.png
