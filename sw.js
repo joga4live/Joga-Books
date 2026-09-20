@@ -9,7 +9,7 @@
    Regla de version / version rule: joga-books-v1 -> v2 -> v3 ... (AGENTS.md #3)
 */
 "use strict";
-var CACHE_NAME = "joga-books-v32"; // v32: el .txt descargado ahora incluye la tabla de contenido antes de los capitulos. / v32: the downloaded .txt now includes the table of contents before the chapters.
+var CACHE_NAME = "joga-books-v33"; // v33: íconos profesionales AI + pricing $67/$127 / v33: AI professional icons + pricing update
 
 // Archivos core: si alguno falta, el install debe fallar (bug real).
 // Core files: if any is missing, install should fail (a real bug).
