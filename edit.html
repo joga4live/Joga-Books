@@ -8,152 +8,145 @@
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     :root{
-      --bg:#060608;--bg2:#0F0E12;--bg3:#16141C;
-      --gold:#C9A84C;--goldb:#E8C97A;--golddim:rgba(201,168,76,.12);--goldbdr:rgba(201,168,76,.22);
-      --txt:#F1EDE4;--txt2:#B8AA97;--txt3:#6B5F4F;
-      --green:#22C55E;--red:#EF4444;
+      --bg:#F8F7F4;--bg2:#FFFFFF;--bg3:#F1EDE6;--bg4:#EAE5DD;
+      --gold:#B8860B;--goldb:#C9A84C;--goldc:#E8C97A;
+      --golddim:rgba(184,134,11,.08);--goldbdr:rgba(184,134,11,.2);
+      --txt:#1A1714;--txt2:#4A3F35;--txt3:#8C7B6E;
+      --green:#16A34A;--red:#DC2626;--blue:#1D4ED8;
+      --shadow:0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+      --shadow-lg:0 4px 24px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
+      --radius:12px;--radius-sm:8px;
       --sans:'Space Grotesk',system-ui,sans-serif;
-      --radius:14px;
     }
     html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--txt);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+    body{background:var(--bg);color:var(--txt);font-family:var(--sans);min-height:100vh}
 
     /* NAV */
     nav{
       position:sticky;top:0;z-index:100;
       display:flex;justify-content:space-between;align-items:center;
-      padding:16px 32px;
-      background:rgba(6,6,8,.85);backdrop-filter:blur(20px);
+      padding:14px 32px;
+      background:rgba(248,247,244,.92);backdrop-filter:blur(20px);
       border-bottom:1px solid var(--goldbdr);
+      box-shadow:0 1px 8px rgba(0,0,0,.04);
     }
-    .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none}
-    .nav-icon{width:36px;height:36px;background:var(--golddim);border:1px solid var(--goldbdr);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
-    .nav-title{font-size:15px;font-weight:700;color:var(--txt)}
-    .nav-title span{color:var(--gold)}
-    .nav-right{display:flex;align-items:center;gap:12px}
-    .btn-lang{background:transparent;border:1px solid var(--goldbdr);color:var(--gold);padding:7px 18px;border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:1.5px;transition:all .3s}
+    .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .nav-icon{width:34px;height:34px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:800;letter-spacing:-1px}
+    .nav-name{font-size:15px;font-weight:700;color:var(--txt)}
+    .nav-name span{color:var(--gold)}
+    .nav-right{display:flex;align-items:center;gap:10px}
+    .badge-edit{background:var(--golddim);color:var(--gold);border:1px solid var(--goldbdr);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1.5px}
+    .btn-lang{background:var(--bg2);border:1px solid var(--goldbdr);color:var(--gold);padding:6px 16px;border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:1.5px;transition:all .25s;box-shadow:var(--shadow)}
     .btn-lang:hover{background:var(--golddim)}
-    .badge-books{background:var(--golddim);color:var(--gold);border:1px solid var(--goldbdr);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1.5px}
 
     /* HERO */
-    .hero{text-align:center;padding:64px 32px 48px;max-width:700px;margin:0 auto}
-    .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);border:1px solid var(--goldbdr);background:var(--golddim);padding:8px 20px;border-radius:100px;margin-bottom:28px}
-    .hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px rgba(201,168,76,.9);animation:pulse 2s infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.8)}}
-    .hero h1{font-size:clamp(36px,6vw,64px);font-weight:900;letter-spacing:-2px;line-height:1;margin-bottom:16px}
-    .hero h1 .gold{background:linear-gradient(135deg,var(--goldb),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .hero-desc{font-size:17px;color:var(--txt2);line-height:1.7;font-weight:300;max-width:500px;margin:0 auto}
-
-    /* TABS */
-    .tabs{display:flex;gap:4px;background:var(--bg3);border:1px solid var(--goldbdr);border-radius:12px;padding:4px;max-width:500px;margin:40px auto 0}
-    .tab{flex:1;padding:10px;border:none;background:transparent;color:var(--txt3);cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:600;border-radius:9px;transition:all .3s;letter-spacing:.3px}
-    .tab.active{background:var(--gold);color:#060608}
-    .tab:not(.active):hover{color:var(--txt);background:var(--golddim)}
+    .hero{
+      background:linear-gradient(135deg,#FFFDF7 0%,#FFF8EC 50%,#FFFDF7 100%);
+      border-bottom:1px solid var(--goldbdr);
+      padding:52px 32px 44px;text-align:center;
+    }
+    .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);border:1px solid var(--goldbdr);background:var(--golddim);padding:7px 18px;border-radius:100px;margin-bottom:22px}
+    .hero-eyebrow::before{content:'✏️';font-size:12px}
+    .hero h1{font-size:clamp(32px,5vw,54px);font-weight:900;letter-spacing:-1.5px;color:var(--txt);margin-bottom:12px}
+    .hero h1 .accent{color:var(--gold)}
+    .hero-desc{font-size:16px;color:var(--txt2);line-height:1.7;max-width:480px;margin:0 auto;font-weight:400}
 
     /* MAIN */
-    .main{max-width:1100px;margin:40px auto;padding:0 24px 80px}
+    .main{max-width:1120px;margin:0 auto;padding:32px 24px 80px}
 
-    /* EDITOR AREA */
+    /* OPTIONS */
+    .section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txt3);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .section-title::after{content:'';flex:1;height:1px;background:var(--bg4)}
+    .options{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+    .opt{padding:8px 16px;border:1px solid var(--bg4);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--txt3);background:var(--bg2);font-family:var(--sans);box-shadow:var(--shadow)}
+    .opt.selected{border-color:var(--gold);color:var(--gold);background:var(--golddim);box-shadow:none}
+    .opt:hover{border-color:var(--goldbdr);color:var(--goldb)}
+
+    /* CONTROLS */
+    .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;align-items:center}
+    .btn-edit{
+      background:var(--gold);color:#fff;
+      padding:13px 32px;border-radius:var(--radius-sm);border:none;
+      font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.5px;
+      cursor:pointer;transition:all .25s;
+      box-shadow:0 4px 16px rgba(184,134,11,.3);
+      display:flex;align-items:center;gap:8px;
+    }
+    .btn-edit:hover{background:#A07509;box-shadow:0 6px 24px rgba(184,134,11,.4);transform:translateY(-1px)}
+    .btn-edit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .btn-secondary{background:var(--bg2);border:1px solid var(--bg4);color:var(--txt2);padding:13px 22px;border-radius:var(--radius-sm);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;box-shadow:var(--shadow)}
+    .btn-secondary:hover{border-color:var(--goldbdr);color:var(--gold);background:var(--golddim)}
+
+    /* EDITOR */
     .editor-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px}
     @media(max-width:768px){.editor-wrap{grid-template-columns:1fr}}
 
-    .panel{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden}
-    .panel-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
-    .panel-title{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txt3)}
-    .panel-title span{color:var(--gold)}
-    .char-count{font-size:11px;color:var(--txt3)}
+    .panel{background:var(--bg2);border:1px solid var(--bg4);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+    .panel-header{padding:14px 18px;border-bottom:1px solid var(--bg4);display:flex;align-items:center;justify-content:space-between;background:var(--bg3)}
+    .panel-label{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3)}
+    .panel-label .hl{color:var(--gold)}
+    .char-count{font-size:11px;color:var(--txt3);font-weight:500}
 
     textarea{
-      width:100%;min-height:380px;background:transparent;border:none;outline:none;
-      color:var(--txt);font-family:var(--sans);font-size:14px;line-height:1.75;
+      width:100%;min-height:360px;background:var(--bg2);border:none;outline:none;
+      color:var(--txt);font-family:var(--sans);font-size:14px;line-height:1.8;
       padding:20px;resize:vertical;
     }
     textarea::placeholder{color:var(--txt3)}
 
-    /* OUTPUT */
     .output-area{
-      min-height:380px;padding:20px;font-size:14px;line-height:1.75;color:var(--txt);
-      white-space:pre-wrap;overflow-y:auto;
+      min-height:360px;padding:20px;font-size:14px;line-height:1.8;
+      color:var(--txt);white-space:pre-wrap;overflow-y:auto;background:var(--bg2);
     }
-    .output-placeholder{color:var(--txt3);font-style:italic}
-    .output-area ins{background:rgba(34,197,94,.15);color:#4ade80;text-decoration:none;border-radius:3px;padding:0 2px}
-    .output-area del{background:rgba(239,68,68,.12);color:#f87171;text-decoration:line-through;border-radius:3px;padding:0 2px}
-
-    /* CONTROLS */
-    .controls{margin:20px 0;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-    .btn-edit{
-      background:var(--gold);color:#060608;
-      padding:14px 36px;border-radius:10px;border:none;
-      font-family:var(--sans);font-size:13px;font-weight:800;letter-spacing:1.5px;
-      cursor:pointer;transition:all .35s;
-      box-shadow:0 0 40px rgba(201,168,76,.3);
-      display:flex;align-items:center;gap:10px;
-    }
-    .btn-edit:hover{box-shadow:0 0 80px rgba(201,168,76,.55);transform:translateY(-2px)}
-    .btn-edit:disabled{opacity:.5;cursor:not-allowed;transform:none}
-    .btn-copy{background:transparent;border:1px solid var(--goldbdr);color:var(--gold);padding:14px 24px;border-radius:10px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all .3s}
-    .btn-copy:hover{background:var(--golddim)}
-    .btn-clear{background:transparent;border:1px solid rgba(255,255,255,.08);color:var(--txt3);padding:14px 20px;border-radius:10px;font-family:var(--sans);font-size:13px;cursor:pointer;transition:all .3s}
-    .btn-clear:hover{border-color:rgba(255,255,255,.2);color:var(--txt)}
-
-    /* OPTIONS */
-    .options{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
-    .opt{padding:8px 16px;border:1px solid rgba(255,255,255,.08);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .3s;color:var(--txt3);background:transparent;font-family:var(--sans)}
-    .opt.selected{border-color:var(--goldbdr);color:var(--gold);background:var(--golddim)}
-    .opt:hover{border-color:var(--goldbdr);color:var(--gold)}
+    .output-ph{color:var(--txt3);font-style:italic}
 
     /* STATS */
-    .stats{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px}
-    .stat{background:var(--bg3);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:12px 20px;text-align:center;min-width:100px}
-    .stat-n{font-size:24px;font-weight:900;color:var(--gold)}
+    .stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;display:none}
+    .stat{background:var(--bg2);border:1px solid var(--bg4);border-radius:var(--radius-sm);padding:14px 20px;text-align:center;min-width:110px;box-shadow:var(--shadow)}
+    .stat-n{font-size:26px;font-weight:900;color:var(--gold)}
     .stat-l{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3);margin-top:4px}
 
-    /* LOADING */
-    .spinner{width:18px;height:18px;border:2px solid rgba(6,6,8,.3);border-top-color:#060608;border-radius:50%;animation:spin .7s linear infinite;display:none}
+    /* SUGGESTIONS */
+    .suggestions{background:var(--bg2);border:1px solid var(--bg4);border-radius:var(--radius);margin-top:20px;display:none;box-shadow:var(--shadow)}
+    .sug-header{padding:14px 18px;border-bottom:1px solid var(--bg4);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3);background:var(--bg3)}
+    .sug-list{padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+    .sug-item{padding:12px 16px;background:var(--bg3);border-radius:var(--radius-sm);font-size:13px;color:var(--txt2);border-left:3px solid var(--gold);line-height:1.65}
+
+    /* SPINNER */
+    .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .loading .spinner{display:block}
-    .loading .btn-text{display:none}
+    .loading .spinner{display:block}.loading .btn-text{display:none}
 
     /* TOAST */
-    .toast{position:fixed;bottom:32px;right:32px;background:var(--bg3);border:1px solid var(--goldbdr);color:var(--txt);padding:14px 24px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .4s;z-index:200;pointer-events:none}
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--txt);color:#fff;padding:12px 22px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;opacity:0;transform:translateY(16px);transition:all .35s;z-index:200;pointer-events:none;box-shadow:var(--shadow-lg)}
     .toast.show{opacity:1;transform:translateY(0)}
 
-    /* SUGGESTIONS PANEL */
-    .suggestions{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);margin-top:20px;display:none}
-    .suggestions.visible{display:block}
-    .sug-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txt3)}
-    .sug-list{padding:16px 20px;display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto}
-    .sug-item{padding:12px 16px;background:var(--bg3);border-radius:10px;font-size:13px;color:var(--txt2);border-left:3px solid var(--gold);line-height:1.6}
-    .sug-item strong{color:var(--txt);display:block;margin-bottom:4px}
-
-    /* LANG SECTION LABELS */
-    .section-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txt3);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-    .section-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.05)}
+    /* DIVIDER */
+    .divider{height:1px;background:var(--bg4);margin:28px 0}
   </style>
 </head>
 <body>
 
 <nav>
   <a href="#" class="nav-brand">
-    <div class="nav-icon">✏️</div>
-    <div class="nav-title"><span>Jog-A</span> Books</div>
+    <div class="nav-icon">JA</div>
+    <div class="nav-name"><span>Jog-A</span> Books</div>
   </a>
   <div class="nav-right">
-    <span class="badge-books" data-t="tool">EDIT</span>
+    <span class="badge-edit" data-t="tool">EDITAR</span>
     <button class="btn-lang" id="lt" onclick="toggleLang()">EN</button>
   </div>
 </nav>
 
 <div class="hero">
-  <div class="hero-eyebrow" data-t="eyebrow">Corrección Inteligente</div>
-  <h1><span class="gold" data-t="h1a">Edit</span><br><span data-t="h1b">tu libro con IA</span></h1>
-  <p class="hero-desc" data-t="desc">Pega tu texto y Claude lo corregirá: gramática, estilo, claridad y fluidez. En español e inglés.</p>
+  <div class="hero-eyebrow" data-t="eyebrow">Corrección Inteligente con IA</div>
+  <h1><span class="accent" data-t="h1a">Edit</span> — <span data-t="h1b">tu libro con IA</span></h1>
+  <p class="hero-desc" data-t="desc">Corrige gramática, mejora el estilo y eleva la claridad de tu texto con inteligencia artificial.</p>
 </div>
 
 <div class="main">
 
-  <!-- OPCIONES DE CORRECCIÓN -->
-  <p class="section-label" data-t="optlabel">¿Qué quieres corregir?</p>
+  <p class="section-title" data-t="optlabel">Tipo de corrección</p>
   <div class="options" id="opts">
     <button class="opt selected" data-val="grammar" onclick="toggleOpt(this)" data-t="o1">✓ Gramática</button>
     <button class="opt selected" data-val="style" onclick="toggleOpt(this)" data-t="o2">✓ Estilo</button>
@@ -164,44 +157,40 @@
     <button class="opt" data-val="expand" onclick="toggleOpt(this)" data-t="o7">Expandir ideas</button>
   </div>
 
-  <!-- CONTROLS -->
   <div class="controls">
     <button class="btn-edit" id="editBtn" onclick="runEdit()">
       <span class="btn-text" data-t="btnEdit">✏️ Corregir con IA</span>
       <div class="spinner"></div>
     </button>
-    <button class="btn-copy" onclick="copyResult()" data-t="btnCopy">Copiar resultado</button>
-    <button class="btn-clear" onclick="clearAll()" data-t="btnClear">Limpiar</button>
+    <button class="btn-secondary" onclick="copyResult()" data-t="btnCopy">Copiar resultado</button>
+    <button class="btn-secondary" onclick="clearAll()" data-t="btnClear">Limpiar</button>
   </div>
 
-  <!-- EDITOR -->
   <div class="editor-wrap">
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-title" data-t="inputLabel">Tu <span>texto original</span></span>
-        <span class="char-count" id="charCount">0 caracteres</span>
+        <span class="panel-label" data-t="inputLabel">Texto <span class="hl">original</span></span>
+        <span class="char-count" id="charCount">0 palabras</span>
       </div>
       <textarea id="inputText" data-t-ph="placeholder" placeholder="Pega aquí tu texto, capítulo o párrafo..." oninput="updateCount()"></textarea>
     </div>
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-title" data-t="outputLabel">Texto <span>corregido</span></span>
+        <span class="panel-label" data-t="outputLabel">Texto <span class="hl">corregido</span></span>
         <span class="char-count" id="charCountOut">—</span>
       </div>
       <div class="output-area" id="outputArea">
-        <span class="output-placeholder" data-t="outputPh">El texto corregido aparecerá aquí...</span>
+        <span class="output-ph" data-t="outputPh">El texto corregido aparecerá aquí...</span>
       </div>
     </div>
   </div>
 
-  <!-- STATS -->
   <div class="stats" id="statsArea" style="display:none">
-    <div class="stat"><div class="stat-n" id="statOrig">0</div><div class="stat-l" data-t="statOrigL">Original</div></div>
-    <div class="stat"><div class="stat-n" id="statCorr">0</div><div class="stat-l" data-t="statCorrL">Corregido</div></div>
+    <div class="stat"><div class="stat-n" id="statOrig">0</div><div class="stat-l" data-t="statOrigL">Palabras orig.</div></div>
+    <div class="stat"><div class="stat-n" id="statCorr">0</div><div class="stat-l" data-t="statCorrL">Palabras corr.</div></div>
     <div class="stat"><div class="stat-n" id="statChanges">0</div><div class="stat-l" data-t="statChangesL">Cambios</div></div>
   </div>
 
-  <!-- SUGGESTIONS -->
   <div class="suggestions" id="suggestionsPanel">
     <div class="sug-header" data-t="sugHeader">💡 Sugerencias adicionales</div>
     <div class="sug-list" id="sugList"></div>
@@ -212,157 +201,107 @@
 <div class="toast" id="toast"></div>
 
 <script>
-var WORKER_URL = 'https://joga-ai.omhotien90.workers.dev';
-
-var S = {
+var WORKER_URL='https://joga-ai.omhotien90.workers.dev';
+var S={
   es:{
-    eyebrow:'Corrección Inteligente',
-    h1a:'Edit', h1b:'tu libro con IA',
-    desc:'Pega tu texto y Claude lo corregirá: gramática, estilo, claridad y fluidez. En español e inglés.',
-    tool:'EDITAR',
-    optlabel:'¿Qué quieres corregir?',
-    o1:'✓ Gramática', o2:'✓ Estilo', o3:'✓ Claridad',
-    o4:'Tono formal', o5:'Tono casual', o6:'Más conciso', o7:'Expandir ideas',
-    btnEdit:'✏️ Corregir con IA', btnCopy:'Copiar resultado', btnClear:'Limpiar',
-    inputLabel:'Tu texto original', outputLabel:'Texto corregido',
+    eyebrow:'Corrección Inteligente con IA',h1a:'Edit',h1b:'tu libro con IA',
+    desc:'Corrige gramática, mejora el estilo y eleva la claridad de tu texto con inteligencia artificial.',
+    tool:'EDITAR',optlabel:'Tipo de corrección',
+    o1:'✓ Gramática',o2:'✓ Estilo',o3:'✓ Claridad',
+    o4:'Tono formal',o5:'Tono casual',o6:'Más conciso',o7:'Expandir ideas',
+    btnEdit:'✏️ Corregir con IA',btnCopy:'Copiar resultado',btnClear:'Limpiar',
+    inputLabel:'Texto original',outputLabel:'Texto corregido',
     placeholder:'Pega aquí tu texto, capítulo o párrafo...',
     outputPh:'El texto corregido aparecerá aquí...',
-    statOrigL:'Original', statCorrL:'Corregido', statChangesL:'Cambios',
+    statOrigL:'Palabras orig.',statCorrL:'Palabras corr.',statChangesL:'Cambios',
     sugHeader:'💡 Sugerencias adicionales',
-    toastCopy:'✅ Copiado al portapapeles',
-    toastClear:'🗑️ Texto limpiado',
-    toastEmpty:'⚠️ Escribe algo primero',
-    errorMsg:'❌ Error al procesar. Intenta de nuevo.',
-    thinking:'Analizando tu texto...'
+    toastCopy:'✅ Copiado al portapapeles',toastClear:'Texto limpiado',
+    toastEmpty:'⚠️ Escribe algo primero',errorMsg:'❌ Error. Intenta de nuevo.',
+    thinking:'Analizando tu texto con IA...'
   },
   en:{
-    eyebrow:'AI Proofreading',
-    h1a:'Edit', h1b:'your book with AI',
-    desc:'Paste your text and Claude will correct it: grammar, style, clarity and flow. In Spanish and English.',
-    tool:'EDIT',
-    optlabel:'What do you want to correct?',
-    o1:'✓ Grammar', o2:'✓ Style', o3:'✓ Clarity',
-    o4:'Formal tone', o5:'Casual tone', o6:'More concise', o7:'Expand ideas',
-    btnEdit:'✏️ Edit with AI', btnCopy:'Copy result', btnClear:'Clear',
-    inputLabel:'Your original text', outputLabel:'Corrected text',
+    eyebrow:'AI-Powered Proofreading',h1a:'Edit',h1b:'your book with AI',
+    desc:'Fix grammar, improve style and enhance the clarity of your text with artificial intelligence.',
+    tool:'EDIT',optlabel:'Correction type',
+    o1:'✓ Grammar',o2:'✓ Style',o3:'✓ Clarity',
+    o4:'Formal tone',o5:'Casual tone',o6:'More concise',o7:'Expand ideas',
+    btnEdit:'✏️ Edit with AI',btnCopy:'Copy result',btnClear:'Clear',
+    inputLabel:'Original text',outputLabel:'Corrected text',
     placeholder:'Paste your text, chapter or paragraph here...',
     outputPh:'The corrected text will appear here...',
-    statOrigL:'Original', statCorrL:'Corrected', statChangesL:'Changes',
+    statOrigL:'Orig. words',statCorrL:'Corr. words',statChangesL:'Changes',
     sugHeader:'💡 Additional suggestions',
-    toastCopy:'✅ Copied to clipboard',
-    toastClear:'🗑️ Text cleared',
-    toastEmpty:'⚠️ Write something first',
-    errorMsg:'❌ Error processing. Please try again.',
-    thinking:'Analyzing your text...'
+    toastCopy:'✅ Copied to clipboard',toastClear:'Text cleared',
+    toastEmpty:'⚠️ Write something first',errorMsg:'❌ Error. Please try again.',
+    thinking:'Analyzing your text with AI...'
   }
 };
-
 function gl(){return localStorage.getItem('jaLang')||'es'}
 function t(k){var l=gl();return(S[l]&&S[l][k])||S.es[k]||k}
 function toggleLang(){localStorage.setItem('jaLang',gl()==='es'?'en':'es');apply()}
 function apply(){
-  document.querySelectorAll('[data-t]').forEach(function(e){
-    e.textContent=t(e.getAttribute('data-t'));
-  });
-  document.querySelectorAll('[data-t-ph]').forEach(function(e){
-    e.placeholder=t(e.getAttribute('data-t-ph'));
-  });
+  document.querySelectorAll('[data-t]').forEach(function(e){e.textContent=t(e.getAttribute('data-t'))});
+  document.querySelectorAll('[data-t-ph]').forEach(function(e){e.placeholder=t(e.getAttribute('data-t-ph'))});
   document.getElementById('lt').textContent=gl()==='es'?'EN':'ES';
 }
-
-function toggleOpt(el){
-  el.classList.toggle('selected');
-}
-
-function getSelectedOpts(){
-  return Array.from(document.querySelectorAll('.opt.selected')).map(function(o){return o.dataset.val});
-}
-
+function toggleOpt(el){el.classList.toggle('selected')}
+function getOpts(){return Array.from(document.querySelectorAll('.opt.selected')).map(function(o){return o.dataset.val})}
 function updateCount(){
-  var txt=document.getElementById('inputText').value;
-  document.getElementById('charCount').textContent=txt.length+' caracteres';
+  var w=document.getElementById('inputText').value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('charCount').textContent=w+' palabras';
 }
-
-function showToast(msg){
-  var el=document.getElementById('toast');
-  el.textContent=msg;el.classList.add('show');
-  setTimeout(function(){el.classList.remove('show')},2500);
-}
-
+function showToast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2500)}
 function clearAll(){
   document.getElementById('inputText').value='';
-  document.getElementById('outputArea').innerHTML='<span class="output-placeholder">'+t('outputPh')+'</span>';
+  document.getElementById('outputArea').innerHTML='<span class="output-ph">'+t('outputPh')+'</span>';
   document.getElementById('statsArea').style.display='none';
-  document.getElementById('suggestionsPanel').classList.remove('visible');
-  document.getElementById('charCount').textContent='0 caracteres';
+  document.getElementById('suggestionsPanel').style.display='none';
+  document.getElementById('charCount').textContent='0 palabras';
   document.getElementById('charCountOut').textContent='—';
   showToast(t('toastClear'));
 }
-
 function copyResult(){
   var out=document.getElementById('outputArea').innerText;
   if(!out||out===t('outputPh')){showToast(t('toastEmpty'));return}
   navigator.clipboard.writeText(out).then(function(){showToast(t('toastCopy'))});
 }
-
 async function runEdit(){
   var text=document.getElementById('inputText').value.trim();
   if(!text){showToast(t('toastEmpty'));return}
-
-  var opts=getSelectedOpts();
-  var lang=gl();
+  var opts=getOpts();var lang=gl();
   var btn=document.getElementById('editBtn');
   btn.disabled=true;btn.classList.add('loading');
-
   var prompt=lang==='es'
-    ?'Eres un editor literario profesional experto en español e inglés. Corrige el siguiente texto según estas instrucciones:\n\nOpciones seleccionadas: '+opts.join(', ')+'\n\nInstrucciones:\n- Corrige gramática, ortografía y puntuación\n- Mejora el estilo y la fluidez\n- Mantén la voz y el tono del autor\n- Si seleccionaron "tono formal", hazlo más profesional. Si es "casual", más cercano\n- Si es "más conciso", elimina redundancias. Si es "expandir", desarrolla las ideas\n- Devuelve SOLO el texto corregido, sin explicaciones ni comentarios\n- Después del texto corregido, agrega una sección "SUGERENCIAS:" con 3 recomendaciones específicas para mejorar el texto\n\nTEXTO A CORREGIR:\n'+text
-    :'You are a professional literary editor expert in English and Spanish. Correct the following text according to these instructions:\n\nSelected options: '+opts.join(', ')+'\n\nInstructions:\n- Fix grammar, spelling and punctuation\n- Improve style and flow\n- Keep the author\'s voice and tone\n- If "formal tone" selected, make it more professional. If "casual", more conversational\n- If "more concise", remove redundancies. If "expand", develop the ideas\n- Return ONLY the corrected text, no explanations\n- After the corrected text, add a "SUGGESTIONS:" section with 3 specific recommendations\n\nTEXT TO CORRECT:\n'+text;
-
-  document.getElementById('outputArea').innerHTML='<span class="output-placeholder">'+t('thinking')+'</span>';
-
+    ?'Eres un editor literario profesional. Corrige el siguiente texto con estas opciones: '+opts.join(', ')+'. Instrucciones: corrige gramática y ortografía, mejora el estilo y la fluidez, mantén la voz del autor. Devuelve SOLO el texto corregido. Después agrega "SUGERENCIAS:" con 3 recomendaciones breves.\n\nTEXTO:\n'+text
+    :'You are a professional literary editor. Correct this text with these options: '+opts.join(', ')+'. Instructions: fix grammar and spelling, improve style and flow, keep the author\'s voice. Return ONLY the corrected text. Then add "SUGGESTIONS:" with 3 brief recommendations.\n\nTEXT:\n'+text;
+  document.getElementById('outputArea').innerHTML='<span class="output-ph">'+t('thinking')+'</span>';
   try{
-    var res=await fetch(WORKER_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:prompt,lang:lang})
-    });
+    var res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:prompt,lang:lang})});
     var data=await res.json();
     var reply=data.response||data.reply||data.text||'';
-
-    if(!reply){throw new Error('No response')}
-
+    if(!reply)throw new Error('empty');
     var parts=reply.split(/SUGERENCIAS:|SUGGESTIONS:/i);
     var corrected=parts[0].trim();
     var suggestions=parts[1]?parts[1].trim():'';
-
     document.getElementById('outputArea').textContent=corrected;
-    document.getElementById('charCountOut').textContent=corrected.length+' caracteres';
-
-    var origWords=text.trim().split(/\s+/).length;
-    var corrWords=corrected.trim().split(/\s+/).length;
-    var changes=Math.abs(text.length-corrected.length);
-
-    document.getElementById('statOrig').textContent=origWords;
-    document.getElementById('statCorr').textContent=corrWords;
-    document.getElementById('statChanges').textContent=changes;
+    var w1=text.trim().split(/\s+/).filter(Boolean).length;
+    var w2=corrected.trim().split(/\s+/).filter(Boolean).length;
+    document.getElementById('charCountOut').textContent=w2+' palabras';
+    document.getElementById('statOrig').textContent=w1;
+    document.getElementById('statCorr').textContent=w2;
+    document.getElementById('statChanges').textContent=Math.abs(text.length-corrected.length);
     document.getElementById('statsArea').style.display='flex';
-
     if(suggestions){
       var lines=suggestions.split('\n').filter(function(l){return l.trim()});
-      var html=lines.map(function(l){
-        return '<div class="sug-item">'+l.replace(/^\d+\.\s*/,'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')+'</div>';
-      }).join('');
-      document.getElementById('sugList').innerHTML=html;
-      document.getElementById('suggestionsPanel').classList.add('visible');
+      document.getElementById('sugList').innerHTML=lines.map(function(l){return '<div class="sug-item">'+l.replace(/^\d+\.\s*/,'')+'</div>'}).join('');
+      document.getElementById('suggestionsPanel').style.display='block';
     }
-
   }catch(e){
-    document.getElementById('outputArea').innerHTML='<span class="output-placeholder">'+t('errorMsg')+'</span>';
+    document.getElementById('outputArea').innerHTML='<span class="output-ph">'+t('errorMsg')+'</span>';
   }finally{
     btn.disabled=false;btn.classList.remove('loading');
   }
 }
-
 apply();
 </script>
 </body>
