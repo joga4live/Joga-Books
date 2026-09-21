@@ -4,428 +4,494 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jog-A Books · Edit</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     :root{
-      --bg:#FDFBF7;--bg2:#FFFFFF;--bg3:#F5F1EA;--bg4:#EDE8DF;--bg5:#E3DDD3;
-      --gold:#B8860B;--goldb:#C9A84C;--goldc:#E8C97A;--golddim:rgba(184,134,11,.07);--goldbdr:rgba(184,134,11,.18);
-      --ink:#1C1410;--ink2:#3D3028;--ink3:#7A6B5E;--ink4:#A89880;
-      --shadow:0 1px 3px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04);
-      --shadow-md:0 2px 8px rgba(0,0,0,.06),0 8px 32px rgba(0,0,0,.06);
-      --shadow-gold:0 4px 24px rgba(184,134,11,.18);
-      --radius:14px;--radius-sm:8px;
-      --sans:'Space Grotesk',system-ui,sans-serif;
-      --serif:'Playfair Display',Georgia,serif;
+      --bg:#F5F5F7;--bg2:#FFFFFF;--bg3:#FBFBFD;
+      --ink:#1D1D1F;--ink2:#3D3D3F;--ink3:#6E6E73;--ink4:#A1A1A6;
+      --gold:#B8860B;--goldb:#C9A84C;
+      --ai1:#7B61FF;--ai2:#C960FF;--ai3:#FF6B9D;--ai4:#4FC3F7;
+      --aig:linear-gradient(135deg,#7B61FF,#C960FF,#FF6B9D);
+      --aig2:linear-gradient(135deg,#6A51E8,#B048EE,#F05090);
+      --radius:18px;--radius-sm:12px;--radius-xs:8px;
+      --shadow:0 2px 8px rgba(0,0,0,.06),0 0 1px rgba(0,0,0,.04);
+      --shadow-md:0 8px 32px rgba(0,0,0,.1),0 2px 8px rgba(0,0,0,.06);
+      --sans:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;
     }
     html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh}
+    body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased}
 
     /* ─── NAV ─── */
     nav{
       position:sticky;top:0;z-index:100;
       display:flex;justify-content:space-between;align-items:center;
-      padding:14px 40px;
-      background:rgba(253,251,247,.94);backdrop-filter:blur(24px);
-      border-bottom:1px solid var(--goldbdr);
+      padding:0 28px;height:52px;
+      background:rgba(245,245,247,.72);backdrop-filter:saturate(180%) blur(20px);
+      border-bottom:1px solid rgba(0,0,0,.08);
     }
-    .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none}
-    .nav-logo{width:36px;height:36px;background:var(--ink);border-radius:9px;display:flex;align-items:center;justify-content:center}
-    .nav-logo svg{width:20px;height:20px}
-    .nav-name{font-size:15px;font-weight:700;color:var(--ink)}
-    .nav-name .accent{color:var(--gold)}
-    .nav-pill{background:var(--golddim);color:var(--gold);border:1px solid var(--goldbdr);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1.5px}
-    .nav-right{display:flex;align-items:center;gap:10px}
-    .btn-lang{background:transparent;border:1px solid var(--bg5);color:var(--ink3);padding:6px 16px;border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:1px;transition:all .2s}
-    .btn-lang:hover{border-color:var(--goldbdr);color:var(--gold)}
+    .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .nav-logo{
+      width:30px;height:30px;border-radius:8px;
+      background:var(--aig);
+      display:flex;align-items:center;justify-content:center;
+    }
+    .nav-logo svg{width:16px;height:16px;fill:#fff}
+    .nav-name{font-size:15px;font-weight:600;color:var(--ink);letter-spacing:-.3px}
+    .nav-divider{width:1px;height:16px;background:rgba(0,0,0,.12);margin:0 4px}
+    .nav-tool{font-size:15px;font-weight:400;color:var(--ink3);letter-spacing:-.2px}
+    .nav-right{display:flex;align-items:center;gap:8px}
+    .btn-lang{
+      background:rgba(0,0,0,.05);border:none;color:var(--ink3);
+      padding:5px 12px;border-radius:20px;cursor:pointer;
+      font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.3px;
+      transition:all .2s;
+    }
+    .btn-lang:hover{background:rgba(0,0,0,.1)}
 
     /* ─── HERO ─── */
     .hero{
+      text-align:center;padding:80px 24px 64px;
+      background:var(--bg3);
       position:relative;overflow:hidden;
-      background:linear-gradient(160deg,#1C1410 0%,#2C2018 40%,#1A1208 100%);
-      padding:80px 40px 0;text-align:center;
     }
-    .hero-glow{
-      position:absolute;top:-40%;left:50%;transform:translateX(-50%);
-      width:800px;height:500px;border-radius:50%;
-      background:radial-gradient(ellipse,rgba(201,168,76,.12) 0%,transparent 70%);
-      pointer-events:none;
-    }
-    .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--goldc);border:1px solid rgba(201,168,76,.25);background:rgba(201,168,76,.08);padding:8px 20px;border-radius:100px;margin-bottom:24px}
-    .hero h1{font-family:var(--serif);font-size:clamp(40px,6vw,78px);font-weight:900;letter-spacing:-1px;color:#FFF8EC;line-height:1.05;margin-bottom:16px}
-    .hero h1 em{font-style:italic;color:var(--goldc)}
-    .hero-sub{font-size:17px;color:rgba(241,237,228,.6);line-height:1.7;max-width:480px;margin:0 auto 48px;font-weight:300}
+    .hero-orbs{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35}
+    .orb1{width:600px;height:600px;top:-200px;left:50%;transform:translateX(-50%);background:radial-gradient(circle,#7B61FF,transparent 60%)}
+    .orb2{width:400px;height:400px;top:-100px;left:15%;background:radial-gradient(circle,#C960FF,transparent 60%);opacity:.2}
+    .orb3{width:400px;height:400px;top:-80px;right:10%;background:radial-gradient(circle,#FF6B9D,transparent 60%);opacity:.2}
 
-    /* ─── VIDEO CONTAINER ─── */
-    .video-wrap{
-      position:relative;width:100%;max-width:860px;margin:0 auto;
-      border-radius:20px 20px 0 0;overflow:hidden;
-      border:1px solid rgba(201,168,76,.2);border-bottom:none;
-      box-shadow:0 -8px 60px rgba(0,0,0,.5);
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:13px;font-weight:500;letter-spacing:-.2px;
+      color:var(--ink2);
+      background:rgba(255,255,255,.7);border:1px solid rgba(0,0,0,.06);
+      padding:6px 14px;border-radius:20px;margin-bottom:24px;
+      backdrop-filter:blur(8px);
+      box-shadow:var(--shadow);
     }
-    .video-inner{position:relative;padding-top:42.857%;background:#0C0A06;overflow:hidden}
-    .video-inner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-    .video-placeholder{
+    .hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--aig);background:linear-gradient(135deg,#7B61FF,#C960FF)}
+
+    .hero h1{
+      font-size:clamp(48px,7vw,88px);font-weight:800;letter-spacing:-3px;
+      color:var(--ink);line-height:.95;margin-bottom:20px;
+    }
+    .hero h1 .gradient-text{
+      background:var(--aig);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .hero-desc{
+      font-size:19px;font-weight:400;color:var(--ink3);
+      line-height:1.6;max-width:500px;margin:0 auto 40px;
+      letter-spacing:-.3px;
+    }
+
+    /* ─── VIDEO ─── */
+    .video-container{
+      max-width:900px;margin:0 auto;
+      border-radius:24px;overflow:hidden;
+      box-shadow:0 32px 80px rgba(0,0,0,.18),0 0 0 1px rgba(0,0,0,.06);
+      background:#000;
+      position:relative;
+    }
+    .video-inner{position:relative;padding-top:56.25%;background:#000}
+    .video-inner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+    .vid-placeholder{
       position:absolute;inset:0;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      background:linear-gradient(135deg,#0C0A06,#1C1410);
-      gap:16px;cursor:pointer;
-      transition:opacity .3s;
+      background:linear-gradient(160deg,#0F0F1A 0%,#1A0F2E 40%,#0F0A1A 100%);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+      cursor:pointer;
     }
-    .video-placeholder:hover{opacity:.85}
-    .play-btn{width:64px;height:64px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(201,168,76,.4)}
-    .play-btn svg{width:24px;height:24px;fill:#fff;margin-left:4px}
-    .video-placeholder p{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:1px;font-weight:500}
-    .video-bar{
-      background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.15);border-top:none;
-      padding:10px 20px;display:flex;align-items:center;gap:8px;max-width:860px;margin:0 auto;
-      border-radius:0 0 16px 16px;
+    .vid-placeholder:hover .play-ring{transform:scale(1.08)}
+    .play-ring{
+      width:72px;height:72px;border-radius:50%;
+      background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+      display:flex;align-items:center;justify-content:center;
+      backdrop-filter:blur(8px);
+      transition:transform .3s;
     }
-    .vid-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px rgba(201,168,76,.6);animation:blink 2s infinite}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-    .vid-label{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(201,168,76,.8)}
+    .play-ring svg{width:28px;height:28px;fill:#fff;margin-left:4px}
+    .vid-caption{font-size:13px;font-weight:500;color:rgba(255,255,255,.4);letter-spacing:.5px;text-transform:uppercase}
+    .vid-caption span{
+      background:var(--aig);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      font-weight:700;
+    }
 
-    /* ─── MAIN CONTENT ─── */
-    .main{max-width:1100px;margin:0 auto;padding:48px 28px 80px}
+    /* ─── MAIN ─── */
+    .main{max-width:1000px;margin:0 auto;padding:48px 20px 80px}
 
-    /* ─── SECTION HEADERS ─── */
-    .section-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-    .section-num{width:28px;height:28px;background:var(--ink);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
-    .section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink3)}
-    .section-line{flex:1;height:1px;background:var(--bg4)}
+    /* ─── STEPS ─── */
+    .steps-bar{
+      display:flex;gap:0;background:var(--bg2);border:1px solid rgba(0,0,0,.07);
+      border-radius:14px;overflow:hidden;margin-bottom:40px;
+      box-shadow:var(--shadow);
+    }
+    .step-item{
+      flex:1;padding:14px 12px;text-align:center;cursor:pointer;
+      border-right:1px solid rgba(0,0,0,.06);transition:background .2s;
+    }
+    .step-item:last-child{border-right:none}
+    .step-item.active{background:var(--ink)}
+    .step-label{font-size:12px;font-weight:600;letter-spacing:-.2px;color:var(--ink3)}
+    .step-item.active .step-label{color:rgba(255,255,255,.9)}
+    .step-icon{font-size:16px;margin-bottom:4px;display:block}
+    @media(max-width:580px){.steps-bar{flex-direction:column}.step-item{border-right:none;border-bottom:1px solid rgba(0,0,0,.06)}.step-item:last-child{border-bottom:none}}
 
-    /* ─── OPTIONS ─── */
-    .options{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
-    .opt{padding:9px 18px;border:1px solid var(--bg4);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--ink3);background:var(--bg2);font-family:var(--sans)}
-    .opt.selected{border-color:var(--gold);color:var(--gold);background:var(--golddim)}
-    .opt:hover:not(.selected){border-color:var(--goldbdr);color:var(--ink2)}
+    /* ─── CHIP OPTIONS ─── */
+    .label-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+    .label{font-size:13px;font-weight:600;color:var(--ink2);letter-spacing:-.2px}
+    .label-line{flex:1;height:1px;background:rgba(0,0,0,.06)}
 
-    /* ─── CONTROLS ─── */
-    .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
-    .btn-primary{
-      background:var(--ink);color:var(--goldc);
-      padding:14px 32px;border-radius:var(--radius-sm);border:none;
-      font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.5px;
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+    .chip{
+      padding:8px 16px;border-radius:20px;font-size:13px;font-weight:500;
+      cursor:pointer;transition:all .2s;color:var(--ink3);
+      background:var(--bg2);border:1px solid rgba(0,0,0,.08);
+      font-family:var(--sans);letter-spacing:-.1px;
+      box-shadow:var(--shadow);
+    }
+    .chip.on{
+      background:var(--ink);color:#fff;border-color:transparent;
+      box-shadow:0 4px 12px rgba(0,0,0,.15);
+    }
+    .chip:hover:not(.on){border-color:rgba(0,0,0,.16);background:rgba(0,0,0,.03)}
+
+    /* ─── ACTIONS ─── */
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;align-items:center}
+    .btn-ai{
+      background:var(--aig);color:#fff;border:none;
+      padding:14px 28px;border-radius:var(--radius-xs);
+      font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:-.2px;
       cursor:pointer;transition:all .25s;
       display:flex;align-items:center;gap:8px;
-      box-shadow:0 4px 16px rgba(0,0,0,.15);
+      box-shadow:0 4px 20px rgba(123,97,255,.35);
     }
-    .btn-primary:hover{background:#2C2018;box-shadow:0 6px 24px rgba(0,0,0,.2);transform:translateY(-1px)}
-    .btn-primary:disabled{opacity:.45;cursor:not-allowed;transform:none}
-    .btn-ghost{background:var(--bg2);border:1px solid var(--bg4);color:var(--ink2);padding:14px 22px;border-radius:var(--radius-sm);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
-    .btn-ghost:hover{border-color:var(--goldbdr);color:var(--gold)}
+    .btn-ai:hover{background:var(--aig2);box-shadow:0 6px 28px rgba(123,97,255,.5);transform:translateY(-1px)}
+    .btn-ai:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .btn-sm{
+      background:var(--bg2);border:1px solid rgba(0,0,0,.08);
+      color:var(--ink2);padding:14px 20px;border-radius:var(--radius-xs);
+      font-family:var(--sans);font-size:13px;font-weight:500;
+      cursor:pointer;transition:all .2s;letter-spacing:-.1px;
+      box-shadow:var(--shadow);
+    }
+    .btn-sm:hover{border-color:rgba(0,0,0,.18);background:rgba(0,0,0,.03)}
 
-    /* ─── EDITOR PANELS ─── */
-    .editor-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-    @media(max-width:768px){.editor-wrap{grid-template-columns:1fr}}
+    /* ─── EDITOR ─── */
+    .editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:720px){.editor-grid{grid-template-columns:1fr}}
 
-    .panel{background:var(--bg2);border:1px solid var(--bg4);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
-    .panel-head{padding:14px 20px;border-bottom:1px solid var(--bg4);display:flex;align-items:center;justify-content:space-between;background:var(--bg3)}
-    .panel-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink3)}
-    .panel-label .hl{color:var(--gold)}
-    .word-count{font-size:11px;color:var(--ink4);font-weight:500;font-variant-numeric:tabular-nums}
+    .pane{background:var(--bg2);border:1px solid rgba(0,0,0,.07);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+    .pane-top{
+      padding:12px 18px;border-bottom:1px solid rgba(0,0,0,.06);
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .pane-label{font-size:12px;font-weight:600;letter-spacing:-.1px;color:var(--ink3)}
+    .pane-label b{color:var(--ink2)}
+    .pane-count{font-size:12px;color:var(--ink4);font-variant-numeric:tabular-nums}
 
     textarea{
-      width:100%;min-height:340px;background:var(--bg2);border:none;outline:none;
-      color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.85;
-      padding:22px;resize:vertical;
+      width:100%;min-height:320px;background:transparent;border:none;outline:none;
+      color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.8;
+      padding:18px;resize:vertical;letter-spacing:-.1px;
     }
-    textarea::placeholder{color:var(--ink4);font-style:italic}
+    textarea::placeholder{color:var(--ink4)}
 
-    .output-area{
-      min-height:340px;padding:22px;font-size:14px;line-height:1.85;
-      color:var(--ink);white-space:pre-wrap;overflow-y:auto;
-      font-family:var(--sans);
+    .out-area{
+      min-height:320px;padding:18px;
+      font-size:14px;line-height:1.8;color:var(--ink);
+      white-space:pre-wrap;overflow-y:auto;letter-spacing:-.1px;
     }
-    .output-ph{color:var(--ink4);font-style:italic}
+    .out-ph{color:var(--ink4);font-style:normal}
 
     /* ─── STATS ─── */
-    .stats-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
-    .stat-card{background:var(--bg2);border:1px solid var(--bg4);border-radius:var(--radius-sm);padding:16px 22px;text-align:center;flex:1;min-width:100px;box-shadow:var(--shadow)}
-    .stat-n{font-size:28px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums}
-    .stat-n.gold{color:var(--gold)}
-    .stat-l{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink4);margin-top:6px}
+    .stats{display:flex;gap:12px;margin-top:16px}
+    .stat{flex:1;background:var(--bg2);border:1px solid rgba(0,0,0,.07);border-radius:var(--radius-sm);padding:16px 18px;box-shadow:var(--shadow)}
+    .stat-n{font-size:26px;font-weight:700;letter-spacing:-1px;color:var(--ink)}
+    .stat-n.ai{background:var(--aig);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .stat-l{font-size:11px;font-weight:500;color:var(--ink4);margin-top:4px;letter-spacing:-.1px}
 
     /* ─── SUGGESTIONS ─── */
-    .suggestions{background:var(--bg2);border:1px solid var(--bg4);border-radius:var(--radius);margin-top:20px;display:none;overflow:hidden;box-shadow:var(--shadow)}
-    .sug-head{padding:14px 20px;border-bottom:1px solid var(--bg4);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);background:var(--bg3);display:flex;align-items:center;gap:8px}
-    .sug-list{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
-    .sug-item{
-      padding:14px 18px;background:var(--bg3);border-radius:var(--radius-sm);
-      font-size:13px;color:var(--ink2);border-left:3px solid var(--gold);line-height:1.7;
+    .sugs{background:var(--bg2);border:1px solid rgba(0,0,0,.07);border-radius:var(--radius);margin-top:16px;display:none;overflow:hidden;box-shadow:var(--shadow)}
+    .sugs-head{
+      padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.06);
+      font-size:12px;font-weight:600;letter-spacing:-.1px;color:var(--ink3);
+      display:flex;align-items:center;gap:8px;
+    }
+    .sugs-head .ai-icon{
+      width:20px;height:20px;border-radius:6px;background:var(--aig);
+      display:flex;align-items:center;justify-content:center;font-size:11px;
+    }
+    .sugs-list{padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+    .sug{
+      padding:12px 16px;border-radius:var(--radius-xs);
+      background:var(--bg);border:1px solid rgba(0,0,0,.05);
+      font-size:13px;color:var(--ink2);line-height:1.65;letter-spacing:-.1px;
     }
 
-    /* ─── SPINNER / LOADING ─── */
-    .spinner{width:16px;height:16px;border:2px solid rgba(201,168,76,.3);border-top-color:var(--goldc);border-radius:50%;animation:spin .7s linear infinite;display:none}
+    /* ─── SPINNER ─── */
+    .spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite;display:none}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .loading .spinner{display:block}.loading .btn-text{display:none}
+    .loading .spin{display:block}.loading .btn-text{display:none}
 
     /* ─── TOAST ─── */
-    .toast{position:fixed;bottom:28px;right:28px;background:var(--ink);color:var(--goldc);padding:12px 22px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;opacity:0;transform:translateY(14px);transition:all .35s;z-index:300;pointer-events:none;box-shadow:var(--shadow-md)}
-    .toast.show{opacity:1;transform:translateY(0)}
-
-    /* ─── STEPS STRIP ─── */
-    .steps{display:flex;gap:0;background:var(--bg3);border:1px solid var(--bg4);border-radius:var(--radius);overflow:hidden;margin-bottom:32px;box-shadow:var(--shadow)}
-    .step{flex:1;padding:16px 18px;border-right:1px solid var(--bg4);cursor:pointer;transition:background .2s;text-align:center}
-    .step:last-child{border-right:none}
-    .step.active{background:var(--ink)}
-    .step-num{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink4);margin-bottom:4px}
-    .step.active .step-num{color:var(--goldc)}
-    .step-name{font-size:13px;font-weight:700;color:var(--ink2)}
-    .step.active .step-name{color:#fff}
-    @media(max-width:600px){.steps{flex-direction:column}.step{border-right:none;border-bottom:1px solid var(--bg4)}.step:last-child{border-bottom:none}}
-
-    /* spacer */
-    .spacer{height:32px}
+    .toast{
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);
+      background:rgba(29,29,31,.88);color:#fff;backdrop-filter:blur(20px);
+      padding:10px 20px;border-radius:20px;font-size:13px;font-weight:500;
+      opacity:0;transition:all .4s cubic-bezier(.16,1,.3,1);z-index:300;
+      pointer-events:none;white-space:nowrap;letter-spacing:-.1px;
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <a href="#" class="nav-brand">
     <div class="nav-logo">
-      <svg viewBox="0 0 20 20" fill="none">
-        <path d="M10 2L12.5 7H17.5L13.5 10.5L15 15.5L10 12.5L5 15.5L6.5 10.5L2.5 7H7.5L10 2Z" fill="#C9A84C"/>
-      </svg>
+      <svg viewBox="0 0 16 16"><path d="M8 1L9.8 5.8H15L10.8 8.7L12.3 13.5L8 10.7L3.7 13.5L5.2 8.7L1 5.8H6.2Z"/></svg>
     </div>
-    <div class="nav-name"><span class="accent">Jog-A</span> Books</div>
+    <span class="nav-name">Jog‑A Books</span>
+    <div class="nav-divider"></div>
+    <span class="nav-tool" data-t="tool">Edit</span>
   </a>
   <div class="nav-right">
-    <span class="nav-pill" data-t="tool">EDIT</span>
     <button class="btn-lang" id="lt" onclick="toggleLang()">EN</button>
   </div>
 </nav>
 
-<!-- HERO OSCURO CON VIDEO -->
+<!-- HERO -->
 <div class="hero">
-  <div class="hero-glow"></div>
-  <div class="hero-eyebrow" data-t="eyebrow">✦ Corrección Inteligente</div>
-  <h1><em data-t="h1a">Edit</em> <span data-t="h1b">— tu libro,</span><br><span data-t="h1c">perfecto.</span></h1>
-  <p class="hero-sub" data-t="desc">Transforma un texto con errores en una obra impecable. Gramática, estilo, claridad — todo con IA.</p>
+  <div class="hero-orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+  </div>
+  <div class="hero-badge">
+    <div class="hero-badge-dot"></div>
+    <span data-t="badge">Impulsado por IA</span>
+  </div>
+  <h1>
+    <span data-t="h1a">Edita tu</span><br>
+    <span class="gradient-text" data-t="h1b">libro con IA</span>
+  </h1>
+  <p class="hero-desc" data-t="desc">Corrige gramática, perfecciona el estilo y eleva la claridad de cada palabra.</p>
 
-  <!-- VIDEO HIGGSFIELD -->
-  <div class="video-wrap">
+  <div class="video-container">
     <div class="video-inner">
-      <!-- Cuando tengas el video de Higgsfield, reemplaza el src -->
-      <video id="heroVideo" autoplay muted loop playsinline style="display:none">
-        <source src="hero-video.mp4" type="video/mp4">
-      </video>
-      <div class="video-placeholder" id="vidPlaceholder" onclick="playVideo()">
-        <div class="play-btn">
+      <video id="heroVid" autoplay muted loop playsinline></video>
+      <div class="vid-placeholder" id="vidPh">
+        <div class="play-ring">
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </div>
-        <p data-t="vidLabel">VIDEO DEMO — PRÓXIMAMENTE</p>
+        <div class="vid-caption"><span>Higgsfield AI</span> · <span data-t="vidcoming">Próximamente</span></div>
       </div>
     </div>
-  </div>
-  <div class="video-bar">
-    <div class="vid-dot"></div>
-    <span class="vid-label" data-t="vidBar">Generado con Higgsfield AI</span>
   </div>
 </div>
 
-<!-- STEPS -->
+<!-- MAIN -->
 <div class="main">
-  <div class="steps">
-    <div class="step active">
-      <div class="step-num">01</div>
-      <div class="step-name">✏️ Edit</div>
+
+  <!-- STEPS -->
+  <div class="steps-bar">
+    <div class="step-item active">
+      <span class="step-icon">✏️</span>
+      <div class="step-label">Edit</div>
     </div>
-    <div class="step">
-      <div class="step-num">02</div>
-      <div class="step-name">📐 Format</div>
+    <div class="step-item">
+      <span class="step-icon">📐</span>
+      <div class="step-label">Format</div>
     </div>
-    <div class="step">
-      <div class="step-num">03</div>
-      <div class="step-name">🎨 Cover</div>
+    <div class="step-item">
+      <span class="step-icon">🎨</span>
+      <div class="step-label">Cover</div>
     </div>
-    <div class="step">
-      <div class="step-num">04</div>
-      <div class="step-name">🔊 Audio</div>
+    <div class="step-item">
+      <span class="step-icon">🔊</span>
+      <div class="step-label">Audio</div>
     </div>
-    <div class="step">
-      <div class="step-num">05</div>
-      <div class="step-name">🎬 Motion</div>
+    <div class="step-item">
+      <span class="step-icon">🎬</span>
+      <div class="step-label">Motion</div>
     </div>
   </div>
 
-  <!-- OPCIONES -->
-  <div class="section-head">
-    <div class="section-num">1</div>
-    <span class="section-title" data-t="optlabel">Tipo de corrección</span>
-    <div class="section-line"></div>
+  <!-- OPTIONS -->
+  <div class="label-row">
+    <span class="label" data-t="oplabel">Tipo de corrección</span>
+    <div class="label-line"></div>
   </div>
-  <div class="options" id="opts">
-    <button class="opt selected" data-val="grammar" onclick="toggleOpt(this)" data-t="o1">✓ Gramática</button>
-    <button class="opt selected" data-val="style" onclick="toggleOpt(this)" data-t="o2">✓ Estilo</button>
-    <button class="opt selected" data-val="clarity" onclick="toggleOpt(this)" data-t="o3">✓ Claridad</button>
-    <button class="opt" data-val="formal" onclick="toggleOpt(this)" data-t="o4">Tono formal</button>
-    <button class="opt" data-val="casual" onclick="toggleOpt(this)" data-t="o5">Tono casual</button>
-    <button class="opt" data-val="concise" onclick="toggleOpt(this)" data-t="o6">Más conciso</button>
-    <button class="opt" data-val="expand" onclick="toggleOpt(this)" data-t="o7">Expandir ideas</button>
+  <div class="chips" id="chips">
+    <button class="chip on" data-val="grammar" onclick="toggleChip(this)" data-t="c1">Gramática</button>
+    <button class="chip on" data-val="style" onclick="toggleChip(this)" data-t="c2">Estilo</button>
+    <button class="chip on" data-val="clarity" onclick="toggleChip(this)" data-t="c3">Claridad</button>
+    <button class="chip" data-val="formal" onclick="toggleChip(this)" data-t="c4">Tono formal</button>
+    <button class="chip" data-val="casual" onclick="toggleChip(this)" data-t="c5">Tono casual</button>
+    <button class="chip" data-val="concise" onclick="toggleChip(this)" data-t="c6">Más conciso</button>
+    <button class="chip" data-val="expand" onclick="toggleChip(this)" data-t="c7">Expandir</button>
   </div>
 
-  <!-- BOTONES -->
-  <div class="section-head">
-    <div class="section-num">2</div>
-    <span class="section-title" data-t="step2">Pega tu texto y corrige</span>
-    <div class="section-line"></div>
-  </div>
-  <div class="controls">
-    <button class="btn-primary" id="editBtn" onclick="runEdit()">
-      <span class="btn-text" data-t="btnEdit">✏️ Corregir con IA</span>
-      <div class="spinner"></div>
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button class="btn-ai" id="editBtn" onclick="runEdit()">
+      <span class="btn-text" data-t="btnEdit">✦ Corregir con IA</span>
+      <div class="spin"></div>
     </button>
-    <button class="btn-ghost" onclick="copyResult()" data-t="btnCopy">Copiar</button>
-    <button class="btn-ghost" onclick="clearAll()" data-t="btnClear">Limpiar</button>
+    <button class="btn-sm" onclick="copyResult()" data-t="btnCopy">Copiar</button>
+    <button class="btn-sm" onclick="clearAll()" data-t="btnClear">Limpiar</button>
   </div>
 
   <!-- EDITOR -->
-  <div class="editor-wrap">
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-label" data-t="inputLabel">Texto <span class="hl">original</span></span>
-        <span class="word-count" id="charCount">0 palabras</span>
+  <div class="editor-grid">
+    <div class="pane">
+      <div class="pane-top">
+        <span class="pane-label" data-t="inLabel">Texto <b>original</b></span>
+        <span class="pane-count" id="wc">0 palabras</span>
       </div>
-      <textarea id="inputText" data-t-ph="placeholder" placeholder="Pega aquí tu texto con errores..." oninput="updateCount()"></textarea>
+      <textarea id="txt" data-t-ph="ph" placeholder="Pega aquí tu texto con errores..." oninput="wcount()"></textarea>
     </div>
-    <div class="panel">
-      <div class="panel-head">
-        <span class="panel-label" data-t="outputLabel">Texto <span class="hl">corregido</span></span>
-        <span class="word-count" id="charCountOut">—</span>
+    <div class="pane">
+      <div class="pane-top">
+        <span class="pane-label" data-t="outLabel">Texto <b>corregido</b></span>
+        <span class="pane-count" id="wcOut">—</span>
       </div>
-      <div class="output-area" id="outputArea">
-        <span class="output-ph" data-t="outputPh">El texto corregido aparecerá aquí...</span>
+      <div class="out-area" id="out">
+        <span class="out-ph" data-t="outPh">El texto corregido aparecerá aquí...</span>
       </div>
     </div>
   </div>
 
   <!-- STATS -->
-  <div class="stats-row" id="statsArea" style="display:none">
-    <div class="stat-card"><div class="stat-n" id="statOrig">0</div><div class="stat-l" data-t="statOrigL">Palabras orig.</div></div>
-    <div class="stat-card"><div class="stat-n gold" id="statCorr">0</div><div class="stat-l" data-t="statCorrL">Palabras corr.</div></div>
-    <div class="stat-card"><div class="stat-n" id="statChanges">0</div><div class="stat-l" data-t="statChangesL">Cambios</div></div>
+  <div class="stats" id="stats" style="display:none">
+    <div class="stat"><div class="stat-n" id="sOrig">0</div><div class="stat-l" data-t="sl1">Palabras originales</div></div>
+    <div class="stat"><div class="stat-n ai" id="sCorr">0</div><div class="stat-l" data-t="sl2">Palabras corregidas</div></div>
+    <div class="stat"><div class="stat-n" id="sChg">0</div><div class="stat-l" data-t="sl3">Caracteres modificados</div></div>
   </div>
 
-  <!-- SUGERENCIAS -->
-  <div class="suggestions" id="suggestionsPanel">
-    <div class="sug-head">💡 <span data-t="sugHeader">Sugerencias del editor IA</span></div>
-    <div class="sug-list" id="sugList"></div>
+  <!-- SUGGESTIONS -->
+  <div class="sugs" id="sugs">
+    <div class="sugs-head">
+      <div class="ai-icon">✦</div>
+      <span data-t="sugHead">Sugerencias de la IA</span>
+    </div>
+    <div class="sugs-list" id="sugList"></div>
   </div>
 
-  <div class="spacer"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-var WORKER_URL='https://joga-ai.omhotien90.workers.dev';
+var W='https://joga-ai.omhotien90.workers.dev';
 var S={
   es:{
-    eyebrow:'✦ Corrección Inteligente',h1a:'Edit',h1b:'— tu libro,',h1c:'perfecto.',
-    desc:'Transforma un texto con errores en una obra impecable. Gramática, estilo, claridad — todo con IA.',
-    tool:'EDIT',vidLabel:'VIDEO DEMO — PRÓXIMAMENTE',vidBar:'Generado con Higgsfield AI',
-    optlabel:'Tipo de corrección',step2:'Pega tu texto y corrige',
-    o1:'✓ Gramática',o2:'✓ Estilo',o3:'✓ Claridad',
-    o4:'Tono formal',o5:'Tono casual',o6:'Más conciso',o7:'Expandir ideas',
-    btnEdit:'✏️ Corregir con IA',btnCopy:'Copiar',btnClear:'Limpiar',
-    inputLabel:'Texto original',outputLabel:'Texto corregido',
-    placeholder:'Pega aquí tu texto con errores...',
-    outputPh:'El texto corregido aparecerá aquí...',
-    statOrigL:'Palabras orig.',statCorrL:'Palabras corr.',statChangesL:'Cambios',
-    sugHeader:'Sugerencias del editor IA',
-    toastCopy:'✅ Copiado',toastClear:'Texto limpiado',
-    toastEmpty:'⚠️ Escribe algo primero',errorMsg:'❌ Error. Intenta de nuevo.',
-    thinking:'✦ Analizando con IA...'
+    tool:'Edit',badge:'Impulsado por IA',
+    h1a:'Edita tu',h1b:'libro con IA',
+    desc:'Corrige gramática, perfecciona el estilo y eleva la claridad de cada palabra.',
+    vidcoming:'Próximamente',
+    oplabel:'Tipo de corrección',
+    c1:'Gramática',c2:'Estilo',c3:'Claridad',c4:'Tono formal',c5:'Tono casual',c6:'Más conciso',c7:'Expandir',
+    btnEdit:'✦ Corregir con IA',btnCopy:'Copiar',btnClear:'Limpiar',
+    inLabel:'Texto original',outLabel:'Texto corregido',
+    ph:'Pega aquí tu texto con errores...',
+    outPh:'El texto corregido aparecerá aquí...',
+    sl1:'Palabras originales',sl2:'Palabras corregidas',sl3:'Caracteres modificados',
+    sugHead:'Sugerencias de la IA',
+    tcopy:'Copiado al portapapeles',tclear:'Texto limpiado',
+    tempty:'Escribe algo primero',terr:'Error al procesar. Intenta de nuevo.',
+    tthink:'Analizando con IA...'
   },
   en:{
-    eyebrow:'✦ Intelligent Proofreading',h1a:'Edit',h1b:'— your book,',h1c:'perfected.',
-    desc:'Transform error-filled text into a flawless piece. Grammar, style, clarity — all with AI.',
-    tool:'EDIT',vidLabel:'VIDEO DEMO — COMING SOON',vidBar:'Generated with Higgsfield AI',
-    optlabel:'Correction type',step2:'Paste your text and correct',
-    o1:'✓ Grammar',o2:'✓ Style',o3:'✓ Clarity',
-    o4:'Formal tone',o5:'Casual tone',o6:'More concise',o7:'Expand ideas',
-    btnEdit:'✏️ Edit with AI',btnCopy:'Copy',btnClear:'Clear',
-    inputLabel:'Original text',outputLabel:'Corrected text',
-    placeholder:'Paste your error-filled text here...',
-    outputPh:'The corrected text will appear here...',
-    statOrigL:'Orig. words',statCorrL:'Corr. words',statChangesL:'Changes',
-    sugHeader:'AI Editor Suggestions',
-    toastCopy:'✅ Copied',toastClear:'Text cleared',
-    toastEmpty:'⚠️ Write something first',errorMsg:'❌ Error. Please try again.',
-    thinking:'✦ Analyzing with AI...'
+    tool:'Edit',badge:'Powered by AI',
+    h1a:'Edit your',h1b:'book with AI',
+    desc:'Fix grammar, refine style and elevate the clarity of every word.',
+    vidcoming:'Coming soon',
+    oplabel:'Correction type',
+    c1:'Grammar',c2:'Style',c3:'Clarity',c4:'Formal tone',c5:'Casual tone',c6:'More concise',c7:'Expand',
+    btnEdit:'✦ Edit with AI',btnCopy:'Copy',btnClear:'Clear',
+    inLabel:'Original text',outLabel:'Corrected text',
+    ph:'Paste your error-filled text here...',
+    outPh:'The corrected text will appear here...',
+    sl1:'Original words',sl2:'Corrected words',sl3:'Changed characters',
+    sugHead:'AI suggestions',
+    tcopy:'Copied to clipboard',tclear:'Text cleared',
+    tempty:'Write something first',terr:'Error. Please try again.',
+    tthink:'Analyzing with AI...'
   }
 };
-function gl(){return localStorage.getItem('jaLang')||'es'}
+function gl(){return localStorage.getItem('jaL')||'es'}
 function t(k){var l=gl();return(S[l]&&S[l][k])||S.es[k]||k}
-function toggleLang(){localStorage.setItem('jaLang',gl()==='es'?'en':'es');apply()}
+function toggleLang(){localStorage.setItem('jaL',gl()==='es'?'en':'es');apply()}
 function apply(){
-  document.querySelectorAll('[data-t]').forEach(function(e){e.textContent=t(e.getAttribute('data-t'))});
-  document.querySelectorAll('[data-t-ph]').forEach(function(e){e.placeholder=t(e.getAttribute('data-t-ph'))});
+  document.querySelectorAll('[data-t]').forEach(function(e){e.textContent=t(e.dataset.t)});
+  document.querySelectorAll('[data-t-ph]').forEach(function(e){e.placeholder=t(e.dataset.tPh||e.getAttribute('data-t-ph'))});
   document.getElementById('lt').textContent=gl()==='es'?'EN':'ES';
 }
-function toggleOpt(el){el.classList.toggle('selected')}
-function getOpts(){return Array.from(document.querySelectorAll('.opt.selected')).map(function(o){return o.dataset.val})}
-function updateCount(){
-  var w=document.getElementById('inputText').value.trim().split(/\s+/).filter(Boolean).length;
-  document.getElementById('charCount').textContent=w+(gl()==='es'?' palabras':' words');
+function toggleChip(el){el.classList.toggle('on')}
+function getOpts(){return Array.from(document.querySelectorAll('.chip.on')).map(function(c){return c.dataset.val})}
+function wcount(){
+  var w=document.getElementById('txt').value.trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('wc').textContent=w+(gl()==='es'?' palabras':' words');
 }
-function showToast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2500)}
+function toast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2200)}
 function clearAll(){
-  document.getElementById('inputText').value='';
-  document.getElementById('outputArea').innerHTML='<span class="output-ph">'+t('outputPh')+'</span>';
-  document.getElementById('statsArea').style.display='none';
-  document.getElementById('suggestionsPanel').style.display='none';
-  document.getElementById('charCount').textContent='0 '+(gl()==='es'?'palabras':'words');
-  document.getElementById('charCountOut').textContent='—';
-  showToast(t('toastClear'));
+  document.getElementById('txt').value='';
+  document.getElementById('out').innerHTML='<span class="out-ph">'+t('outPh')+'</span>';
+  document.getElementById('stats').style.display='none';
+  document.getElementById('sugs').style.display='none';
+  document.getElementById('wc').textContent='0 '+(gl()==='es'?'palabras':'words');
+  document.getElementById('wcOut').textContent='—';
+  toast(t('tclear'));
 }
 function copyResult(){
-  var out=document.getElementById('outputArea').innerText;
-  if(!out||out===t('outputPh')){showToast(t('toastEmpty'));return}
-  navigator.clipboard.writeText(out).then(function(){showToast(t('toastCopy'))});
-}
-function playVideo(){
-  var v=document.getElementById('heroVideo');
-  v.style.display='block';v.play();
-  document.getElementById('vidPlaceholder').style.display='none';
+  var txt=document.getElementById('out').innerText;
+  if(!txt||txt===t('outPh')){toast(t('tempty'));return}
+  navigator.clipboard.writeText(txt).then(function(){toast(t('tcopy'))});
 }
 async function runEdit(){
-  var text=document.getElementById('inputText').value.trim();
-  if(!text){showToast(t('toastEmpty'));return}
-  var opts=getOpts();var lang=gl();
+  var text=document.getElementById('txt').value.trim();
+  if(!text){toast(t('tempty'));return}
+  var opts=getOpts(),lang=gl();
   var btn=document.getElementById('editBtn');
   btn.disabled=true;btn.classList.add('loading');
+  document.getElementById('out').innerHTML='<span class="out-ph">'+t('tthink')+'</span>';
   var prompt=lang==='es'
-    ?'Eres un editor literario profesional de primer nivel. Corrige el siguiente texto con estas opciones activas: '+opts.join(', ')+'. Reglas: corrige todos los errores de gramática y ortografía, mejora el estilo para que fluya naturalmente, mantén la voz y personalidad del autor, hazlo más legible y profesional. Devuelve SOLO el texto corregido sin comentarios. Luego agrega la sección "SUGERENCIAS:" con exactamente 3 recomendaciones breves y específicas para seguir mejorando.\n\nTEXTO ORIGINAL:\n'+text
-    :'You are a top-tier professional literary editor. Correct the following text with these active options: '+opts.join(', ')+'. Rules: fix all grammar and spelling errors, improve style for natural flow, keep the author\'s voice and personality, make it more readable and professional. Return ONLY the corrected text without comments. Then add "SUGGESTIONS:" with exactly 3 brief specific recommendations.\n\nORIGINAL TEXT:\n'+text;
-  document.getElementById('outputArea').innerHTML='<span class="output-ph">'+t('thinking')+'</span>';
+    ?'Eres un editor literario profesional de primer nivel. Corrige el siguiente texto con estas opciones: '+opts.join(', ')+'. Reglas estrictas: corrige gramática y ortografía, mejora el estilo para que fluya naturalmente, mantén la voz y personalidad del autor. Devuelve SOLO el texto corregido sin comentarios ni explicaciones. Después agrega "SUGERENCIAS:" con exactamente 3 recomendaciones específicas y breves.\n\nTEXTO:\n'+text
+    :'You are a top professional literary editor. Correct this text with these options: '+opts.join(', ')+'. Strict rules: fix all grammar/spelling, improve style for natural flow, keep the author\'s voice. Return ONLY the corrected text, no comments. Then add "SUGGESTIONS:" with exactly 3 brief specific tips.\n\nTEXT:\n'+text;
   try{
-    var res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:prompt,lang:lang})});
-    var data=await res.json();
-    var reply=data.response||data.reply||data.text||'';
-    if(!reply)throw new Error('empty');
-    var parts=reply.split(/SUGERENCIAS:|SUGGESTIONS:/i);
-    var corrected=parts[0].trim();var suggestions=parts[1]?parts[1].trim():'';
-    document.getElementById('outputArea').textContent=corrected;
-    var w1=text.trim().split(/\s+/).filter(Boolean).length;
-    var w2=corrected.trim().split(/\s+/).filter(Boolean).length;
+    var r=await fetch(W,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:prompt,lang:lang})});
+    var d=await r.json();
+    var reply=d.response||d.reply||d.text||'';
+    if(!reply)throw 0;
+    var p=reply.split(/SUGERENCIAS:|SUGGESTIONS:/i);
+    var corr=p[0].trim(),sugs=p[1]?p[1].trim():'';
+    document.getElementById('out').textContent=corr;
     var wl=gl()==='es'?' palabras':' words';
-    document.getElementById('charCountOut').textContent=w2+wl;
-    document.getElementById('statOrig').textContent=w1;
-    document.getElementById('statCorr').textContent=w2;
-    document.getElementById('statChanges').textContent=Math.abs(text.length-corrected.length);
-    document.getElementById('statsArea').style.display='flex';
-    if(suggestions){
-      var lines=suggestions.split('\n').filter(function(l){return l.trim()});
-      document.getElementById('sugList').innerHTML=lines.map(function(l){return '<div class="sug-item">'+l.replace(/^\d+\.\s*/,'')+'</div>'}).join('');
-      document.getElementById('suggestionsPanel').style.display='block';
+    var w1=text.trim().split(/\s+/).filter(Boolean).length;
+    var w2=corr.trim().split(/\s+/).filter(Boolean).length;
+    document.getElementById('wcOut').textContent=w2+wl;
+    document.getElementById('sOrig').textContent=w1;
+    document.getElementById('sCorr').textContent=w2;
+    document.getElementById('sChg').textContent=Math.abs(text.length-corr.length);
+    document.getElementById('stats').style.display='flex';
+    if(sugs){
+      var lines=sugs.split('\n').filter(function(l){return l.trim()});
+      document.getElementById('sugList').innerHTML=lines.map(function(l){return'<div class="sug">'+l.replace(/^\d+\.\s*/,'')+'</div>'}).join('');
+      document.getElementById('sugs').style.display='block';
     }
   }catch(e){
-    document.getElementById('outputArea').innerHTML='<span class="output-ph">'+t('errorMsg')+'</span>';
+    document.getElementById('out').innerHTML='<span class="out-ph">'+t('terr')+'</span>';
   }finally{btn.disabled=false;btn.classList.remove('loading')}
 }
+// load video if exists
+(function(){
+  var v=document.getElementById('heroVid');
+  v.addEventListener('loadeddata',function(){v.style.display='block';document.getElementById('vidPh').style.display='none'});
+  v.src='hero-video.mp4';
+  v.load();
+})();
 apply();
 </script>
 </body>
