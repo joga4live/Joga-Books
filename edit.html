@@ -4,149 +4,258 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jog-A Books · Edit</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     :root{
-      --bg:#F8F7F4;--bg2:#FFFFFF;--bg3:#F1EDE6;--bg4:#EAE5DD;
-      --gold:#B8860B;--goldb:#C9A84C;--goldc:#E8C97A;
-      --golddim:rgba(184,134,11,.08);--goldbdr:rgba(184,134,11,.2);
-      --txt:#1A1714;--txt2:#4A3F35;--txt3:#8C7B6E;
-      --green:#16A34A;--red:#DC2626;--blue:#1D4ED8;
-      --shadow:0 1px 4px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
-      --shadow-lg:0 4px 24px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
-      --radius:12px;--radius-sm:8px;
+      --bg:#FDFBF7;--bg2:#FFFFFF;--bg3:#F5F1EA;--bg4:#EDE8DF;--bg5:#E3DDD3;
+      --gold:#B8860B;--goldb:#C9A84C;--goldc:#E8C97A;--golddim:rgba(184,134,11,.07);--goldbdr:rgba(184,134,11,.18);
+      --ink:#1C1410;--ink2:#3D3028;--ink3:#7A6B5E;--ink4:#A89880;
+      --shadow:0 1px 3px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.04);
+      --shadow-md:0 2px 8px rgba(0,0,0,.06),0 8px 32px rgba(0,0,0,.06);
+      --shadow-gold:0 4px 24px rgba(184,134,11,.18);
+      --radius:14px;--radius-sm:8px;
       --sans:'Space Grotesk',system-ui,sans-serif;
+      --serif:'Playfair Display',Georgia,serif;
     }
     html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--txt);font-family:var(--sans);min-height:100vh}
+    body{background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh}
 
-    /* NAV */
+    /* ─── NAV ─── */
     nav{
       position:sticky;top:0;z-index:100;
       display:flex;justify-content:space-between;align-items:center;
-      padding:14px 32px;
-      background:rgba(248,247,244,.92);backdrop-filter:blur(20px);
+      padding:14px 40px;
+      background:rgba(253,251,247,.94);backdrop-filter:blur(24px);
       border-bottom:1px solid var(--goldbdr);
-      box-shadow:0 1px 8px rgba(0,0,0,.04);
     }
-    .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .nav-icon{width:34px;height:34px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:800;letter-spacing:-1px}
-    .nav-name{font-size:15px;font-weight:700;color:var(--txt)}
-    .nav-name span{color:var(--gold)}
+    .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+    .nav-logo{width:36px;height:36px;background:var(--ink);border-radius:9px;display:flex;align-items:center;justify-content:center}
+    .nav-logo svg{width:20px;height:20px}
+    .nav-name{font-size:15px;font-weight:700;color:var(--ink)}
+    .nav-name .accent{color:var(--gold)}
+    .nav-pill{background:var(--golddim);color:var(--gold);border:1px solid var(--goldbdr);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1.5px}
     .nav-right{display:flex;align-items:center;gap:10px}
-    .badge-edit{background:var(--golddim);color:var(--gold);border:1px solid var(--goldbdr);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1.5px}
-    .btn-lang{background:var(--bg2);border:1px solid var(--goldbdr);color:var(--gold);padding:6px 16px;border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:1.5px;transition:all .25s;box-shadow:var(--shadow)}
-    .btn-lang:hover{background:var(--golddim)}
+    .btn-lang{background:transparent;border:1px solid var(--bg5);color:var(--ink3);padding:6px 16px;border-radius:6px;cursor:pointer;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:1px;transition:all .2s}
+    .btn-lang:hover{border-color:var(--goldbdr);color:var(--gold)}
 
-    /* HERO */
+    /* ─── HERO ─── */
     .hero{
-      background:linear-gradient(135deg,#FFFDF7 0%,#FFF8EC 50%,#FFFDF7 100%);
-      border-bottom:1px solid var(--goldbdr);
-      padding:52px 32px 44px;text-align:center;
+      position:relative;overflow:hidden;
+      background:linear-gradient(160deg,#1C1410 0%,#2C2018 40%,#1A1208 100%);
+      padding:80px 40px 0;text-align:center;
     }
-    .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold);border:1px solid var(--goldbdr);background:var(--golddim);padding:7px 18px;border-radius:100px;margin-bottom:22px}
-    .hero-eyebrow::before{content:'✏️';font-size:12px}
-    .hero h1{font-size:clamp(32px,5vw,54px);font-weight:900;letter-spacing:-1.5px;color:var(--txt);margin-bottom:12px}
-    .hero h1 .accent{color:var(--gold)}
-    .hero-desc{font-size:16px;color:var(--txt2);line-height:1.7;max-width:480px;margin:0 auto;font-weight:400}
+    .hero-glow{
+      position:absolute;top:-40%;left:50%;transform:translateX(-50%);
+      width:800px;height:500px;border-radius:50%;
+      background:radial-gradient(ellipse,rgba(201,168,76,.12) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--goldc);border:1px solid rgba(201,168,76,.25);background:rgba(201,168,76,.08);padding:8px 20px;border-radius:100px;margin-bottom:24px}
+    .hero h1{font-family:var(--serif);font-size:clamp(40px,6vw,78px);font-weight:900;letter-spacing:-1px;color:#FFF8EC;line-height:1.05;margin-bottom:16px}
+    .hero h1 em{font-style:italic;color:var(--goldc)}
+    .hero-sub{font-size:17px;color:rgba(241,237,228,.6);line-height:1.7;max-width:480px;margin:0 auto 48px;font-weight:300}
 
-    /* MAIN */
-    .main{max-width:1120px;margin:0 auto;padding:32px 24px 80px}
+    /* ─── VIDEO CONTAINER ─── */
+    .video-wrap{
+      position:relative;width:100%;max-width:860px;margin:0 auto;
+      border-radius:20px 20px 0 0;overflow:hidden;
+      border:1px solid rgba(201,168,76,.2);border-bottom:none;
+      box-shadow:0 -8px 60px rgba(0,0,0,.5);
+    }
+    .video-inner{position:relative;padding-top:42.857%;background:#0C0A06;overflow:hidden}
+    .video-inner video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .video-placeholder{
+      position:absolute;inset:0;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,#0C0A06,#1C1410);
+      gap:16px;cursor:pointer;
+      transition:opacity .3s;
+    }
+    .video-placeholder:hover{opacity:.85}
+    .play-btn{width:64px;height:64px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(201,168,76,.4)}
+    .play-btn svg{width:24px;height:24px;fill:#fff;margin-left:4px}
+    .video-placeholder p{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:1px;font-weight:500}
+    .video-bar{
+      background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.15);border-top:none;
+      padding:10px 20px;display:flex;align-items:center;gap:8px;max-width:860px;margin:0 auto;
+      border-radius:0 0 16px 16px;
+    }
+    .vid-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px rgba(201,168,76,.6);animation:blink 2s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .vid-label{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(201,168,76,.8)}
 
-    /* OPTIONS */
-    .section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txt3);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-    .section-title::after{content:'';flex:1;height:1px;background:var(--bg4)}
-    .options{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
-    .opt{padding:8px 16px;border:1px solid var(--bg4);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--txt3);background:var(--bg2);font-family:var(--sans);box-shadow:var(--shadow)}
-    .opt.selected{border-color:var(--gold);color:var(--gold);background:var(--golddim);box-shadow:none}
-    .opt:hover{border-color:var(--goldbdr);color:var(--goldb)}
+    /* ─── MAIN CONTENT ─── */
+    .main{max-width:1100px;margin:0 auto;padding:48px 28px 80px}
 
-    /* CONTROLS */
-    .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;align-items:center}
-    .btn-edit{
-      background:var(--gold);color:#fff;
-      padding:13px 32px;border-radius:var(--radius-sm);border:none;
+    /* ─── SECTION HEADERS ─── */
+    .section-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .section-num{width:28px;height:28px;background:var(--ink);color:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+    .section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink3)}
+    .section-line{flex:1;height:1px;background:var(--bg4)}
+
+    /* ─── OPTIONS ─── */
+    .options{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+    .opt{padding:9px 18px;border:1px solid var(--bg4);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:var(--ink3);background:var(--bg2);font-family:var(--sans)}
+    .opt.selected{border-color:var(--gold);color:var(--gold);background:var(--golddim)}
+    .opt:hover:not(.selected){border-color:var(--goldbdr);color:var(--ink2)}
+
+    /* ─── CONTROLS ─── */
+    .controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+    .btn-primary{
+      background:var(--ink);color:var(--goldc);
+      padding:14px 32px;border-radius:var(--radius-sm);border:none;
       font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.5px;
       cursor:pointer;transition:all .25s;
-      box-shadow:0 4px 16px rgba(184,134,11,.3);
       display:flex;align-items:center;gap:8px;
+      box-shadow:0 4px 16px rgba(0,0,0,.15);
     }
-    .btn-edit:hover{background:#A07509;box-shadow:0 6px 24px rgba(184,134,11,.4);transform:translateY(-1px)}
-    .btn-edit:disabled{opacity:.5;cursor:not-allowed;transform:none}
-    .btn-secondary{background:var(--bg2);border:1px solid var(--bg4);color:var(--txt2);padding:13px 22px;border-radius:var(--radius-sm);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;box-shadow:var(--shadow)}
-    .btn-secondary:hover{border-color:var(--goldbdr);color:var(--gold);background:var(--golddim)}
+    .btn-primary:hover{background:#2C2018;box-shadow:0 6px 24px rgba(0,0,0,.2);transform:translateY(-1px)}
+    .btn-primary:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .btn-ghost{background:var(--bg2);border:1px solid var(--bg4);color:var(--ink2);padding:14px 22px;border-radius:var(--radius-sm);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+    .btn-ghost:hover{border-color:var(--goldbdr);color:var(--gold)}
 
-    /* EDITOR */
+    /* ─── EDITOR PANELS ─── */
     .editor-wrap{display:grid;grid-template-columns:1fr 1fr;gap:20px}
     @media(max-width:768px){.editor-wrap{grid-template-columns:1fr}}
 
     .panel{background:var(--bg2);border:1px solid var(--bg4);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
-    .panel-header{padding:14px 18px;border-bottom:1px solid var(--bg4);display:flex;align-items:center;justify-content:space-between;background:var(--bg3)}
-    .panel-label{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3)}
+    .panel-head{padding:14px 20px;border-bottom:1px solid var(--bg4);display:flex;align-items:center;justify-content:space-between;background:var(--bg3)}
+    .panel-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink3)}
     .panel-label .hl{color:var(--gold)}
-    .char-count{font-size:11px;color:var(--txt3);font-weight:500}
+    .word-count{font-size:11px;color:var(--ink4);font-weight:500;font-variant-numeric:tabular-nums}
 
     textarea{
-      width:100%;min-height:360px;background:var(--bg2);border:none;outline:none;
-      color:var(--txt);font-family:var(--sans);font-size:14px;line-height:1.8;
-      padding:20px;resize:vertical;
+      width:100%;min-height:340px;background:var(--bg2);border:none;outline:none;
+      color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.85;
+      padding:22px;resize:vertical;
     }
-    textarea::placeholder{color:var(--txt3)}
+    textarea::placeholder{color:var(--ink4);font-style:italic}
 
     .output-area{
-      min-height:360px;padding:20px;font-size:14px;line-height:1.8;
-      color:var(--txt);white-space:pre-wrap;overflow-y:auto;background:var(--bg2);
+      min-height:340px;padding:22px;font-size:14px;line-height:1.85;
+      color:var(--ink);white-space:pre-wrap;overflow-y:auto;
+      font-family:var(--sans);
     }
-    .output-ph{color:var(--txt3);font-style:italic}
+    .output-ph{color:var(--ink4);font-style:italic}
 
-    /* STATS */
-    .stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;display:none}
-    .stat{background:var(--bg2);border:1px solid var(--bg4);border-radius:var(--radius-sm);padding:14px 20px;text-align:center;min-width:110px;box-shadow:var(--shadow)}
-    .stat-n{font-size:26px;font-weight:900;color:var(--gold)}
-    .stat-l{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3);margin-top:4px}
+    /* ─── STATS ─── */
+    .stats-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+    .stat-card{background:var(--bg2);border:1px solid var(--bg4);border-radius:var(--radius-sm);padding:16px 22px;text-align:center;flex:1;min-width:100px;box-shadow:var(--shadow)}
+    .stat-n{font-size:28px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums}
+    .stat-n.gold{color:var(--gold)}
+    .stat-l{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink4);margin-top:6px}
 
-    /* SUGGESTIONS */
-    .suggestions{background:var(--bg2);border:1px solid var(--bg4);border-radius:var(--radius);margin-top:20px;display:none;box-shadow:var(--shadow)}
-    .sug-header{padding:14px 18px;border-bottom:1px solid var(--bg4);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt3);background:var(--bg3)}
-    .sug-list{padding:16px 18px;display:flex;flex-direction:column;gap:8px}
-    .sug-item{padding:12px 16px;background:var(--bg3);border-radius:var(--radius-sm);font-size:13px;color:var(--txt2);border-left:3px solid var(--gold);line-height:1.65}
+    /* ─── SUGGESTIONS ─── */
+    .suggestions{background:var(--bg2);border:1px solid var(--bg4);border-radius:var(--radius);margin-top:20px;display:none;overflow:hidden;box-shadow:var(--shadow)}
+    .sug-head{padding:14px 20px;border-bottom:1px solid var(--bg4);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);background:var(--bg3);display:flex;align-items:center;gap:8px}
+    .sug-list{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+    .sug-item{
+      padding:14px 18px;background:var(--bg3);border-radius:var(--radius-sm);
+      font-size:13px;color:var(--ink2);border-left:3px solid var(--gold);line-height:1.7;
+    }
 
-    /* SPINNER */
-    .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+    /* ─── SPINNER / LOADING ─── */
+    .spinner{width:16px;height:16px;border:2px solid rgba(201,168,76,.3);border-top-color:var(--goldc);border-radius:50%;animation:spin .7s linear infinite;display:none}
     @keyframes spin{to{transform:rotate(360deg)}}
     .loading .spinner{display:block}.loading .btn-text{display:none}
 
-    /* TOAST */
-    .toast{position:fixed;bottom:28px;right:28px;background:var(--txt);color:#fff;padding:12px 22px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;opacity:0;transform:translateY(16px);transition:all .35s;z-index:200;pointer-events:none;box-shadow:var(--shadow-lg)}
+    /* ─── TOAST ─── */
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--ink);color:var(--goldc);padding:12px 22px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;opacity:0;transform:translateY(14px);transition:all .35s;z-index:300;pointer-events:none;box-shadow:var(--shadow-md)}
     .toast.show{opacity:1;transform:translateY(0)}
 
-    /* DIVIDER */
-    .divider{height:1px;background:var(--bg4);margin:28px 0}
+    /* ─── STEPS STRIP ─── */
+    .steps{display:flex;gap:0;background:var(--bg3);border:1px solid var(--bg4);border-radius:var(--radius);overflow:hidden;margin-bottom:32px;box-shadow:var(--shadow)}
+    .step{flex:1;padding:16px 18px;border-right:1px solid var(--bg4);cursor:pointer;transition:background .2s;text-align:center}
+    .step:last-child{border-right:none}
+    .step.active{background:var(--ink)}
+    .step-num{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink4);margin-bottom:4px}
+    .step.active .step-num{color:var(--goldc)}
+    .step-name{font-size:13px;font-weight:700;color:var(--ink2)}
+    .step.active .step-name{color:#fff}
+    @media(max-width:600px){.steps{flex-direction:column}.step{border-right:none;border-bottom:1px solid var(--bg4)}.step:last-child{border-bottom:none}}
+
+    /* spacer */
+    .spacer{height:32px}
   </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav>
   <a href="#" class="nav-brand">
-    <div class="nav-icon">JA</div>
-    <div class="nav-name"><span>Jog-A</span> Books</div>
+    <div class="nav-logo">
+      <svg viewBox="0 0 20 20" fill="none">
+        <path d="M10 2L12.5 7H17.5L13.5 10.5L15 15.5L10 12.5L5 15.5L6.5 10.5L2.5 7H7.5L10 2Z" fill="#C9A84C"/>
+      </svg>
+    </div>
+    <div class="nav-name"><span class="accent">Jog-A</span> Books</div>
   </a>
   <div class="nav-right">
-    <span class="badge-edit" data-t="tool">EDITAR</span>
+    <span class="nav-pill" data-t="tool">EDIT</span>
     <button class="btn-lang" id="lt" onclick="toggleLang()">EN</button>
   </div>
 </nav>
 
+<!-- HERO OSCURO CON VIDEO -->
 <div class="hero">
-  <div class="hero-eyebrow" data-t="eyebrow">Corrección Inteligente con IA</div>
-  <h1><span class="accent" data-t="h1a">Edit</span> — <span data-t="h1b">tu libro con IA</span></h1>
-  <p class="hero-desc" data-t="desc">Corrige gramática, mejora el estilo y eleva la claridad de tu texto con inteligencia artificial.</p>
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow" data-t="eyebrow">✦ Corrección Inteligente</div>
+  <h1><em data-t="h1a">Edit</em> <span data-t="h1b">— tu libro,</span><br><span data-t="h1c">perfecto.</span></h1>
+  <p class="hero-sub" data-t="desc">Transforma un texto con errores en una obra impecable. Gramática, estilo, claridad — todo con IA.</p>
+
+  <!-- VIDEO HIGGSFIELD -->
+  <div class="video-wrap">
+    <div class="video-inner">
+      <!-- Cuando tengas el video de Higgsfield, reemplaza el src -->
+      <video id="heroVideo" autoplay muted loop playsinline style="display:none">
+        <source src="hero-video.mp4" type="video/mp4">
+      </video>
+      <div class="video-placeholder" id="vidPlaceholder" onclick="playVideo()">
+        <div class="play-btn">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <p data-t="vidLabel">VIDEO DEMO — PRÓXIMAMENTE</p>
+      </div>
+    </div>
+  </div>
+  <div class="video-bar">
+    <div class="vid-dot"></div>
+    <span class="vid-label" data-t="vidBar">Generado con Higgsfield AI</span>
+  </div>
 </div>
 
+<!-- STEPS -->
 <div class="main">
+  <div class="steps">
+    <div class="step active">
+      <div class="step-num">01</div>
+      <div class="step-name">✏️ Edit</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-name">📐 Format</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-name">🎨 Cover</div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-name">🔊 Audio</div>
+    </div>
+    <div class="step">
+      <div class="step-num">05</div>
+      <div class="step-name">🎬 Motion</div>
+    </div>
+  </div>
 
-  <p class="section-title" data-t="optlabel">Tipo de corrección</p>
+  <!-- OPCIONES -->
+  <div class="section-head">
+    <div class="section-num">1</div>
+    <span class="section-title" data-t="optlabel">Tipo de corrección</span>
+    <div class="section-line"></div>
+  </div>
   <div class="options" id="opts">
     <button class="opt selected" data-val="grammar" onclick="toggleOpt(this)" data-t="o1">✓ Gramática</button>
     <button class="opt selected" data-val="style" onclick="toggleOpt(this)" data-t="o2">✓ Estilo</button>
@@ -157,27 +266,34 @@
     <button class="opt" data-val="expand" onclick="toggleOpt(this)" data-t="o7">Expandir ideas</button>
   </div>
 
+  <!-- BOTONES -->
+  <div class="section-head">
+    <div class="section-num">2</div>
+    <span class="section-title" data-t="step2">Pega tu texto y corrige</span>
+    <div class="section-line"></div>
+  </div>
   <div class="controls">
-    <button class="btn-edit" id="editBtn" onclick="runEdit()">
+    <button class="btn-primary" id="editBtn" onclick="runEdit()">
       <span class="btn-text" data-t="btnEdit">✏️ Corregir con IA</span>
       <div class="spinner"></div>
     </button>
-    <button class="btn-secondary" onclick="copyResult()" data-t="btnCopy">Copiar resultado</button>
-    <button class="btn-secondary" onclick="clearAll()" data-t="btnClear">Limpiar</button>
+    <button class="btn-ghost" onclick="copyResult()" data-t="btnCopy">Copiar</button>
+    <button class="btn-ghost" onclick="clearAll()" data-t="btnClear">Limpiar</button>
   </div>
 
+  <!-- EDITOR -->
   <div class="editor-wrap">
     <div class="panel">
-      <div class="panel-header">
+      <div class="panel-head">
         <span class="panel-label" data-t="inputLabel">Texto <span class="hl">original</span></span>
-        <span class="char-count" id="charCount">0 palabras</span>
+        <span class="word-count" id="charCount">0 palabras</span>
       </div>
-      <textarea id="inputText" data-t-ph="placeholder" placeholder="Pega aquí tu texto, capítulo o párrafo..." oninput="updateCount()"></textarea>
+      <textarea id="inputText" data-t-ph="placeholder" placeholder="Pega aquí tu texto con errores..." oninput="updateCount()"></textarea>
     </div>
     <div class="panel">
-      <div class="panel-header">
+      <div class="panel-head">
         <span class="panel-label" data-t="outputLabel">Texto <span class="hl">corregido</span></span>
-        <span class="char-count" id="charCountOut">—</span>
+        <span class="word-count" id="charCountOut">—</span>
       </div>
       <div class="output-area" id="outputArea">
         <span class="output-ph" data-t="outputPh">El texto corregido aparecerá aquí...</span>
@@ -185,17 +301,20 @@
     </div>
   </div>
 
-  <div class="stats" id="statsArea" style="display:none">
-    <div class="stat"><div class="stat-n" id="statOrig">0</div><div class="stat-l" data-t="statOrigL">Palabras orig.</div></div>
-    <div class="stat"><div class="stat-n" id="statCorr">0</div><div class="stat-l" data-t="statCorrL">Palabras corr.</div></div>
-    <div class="stat"><div class="stat-n" id="statChanges">0</div><div class="stat-l" data-t="statChangesL">Cambios</div></div>
+  <!-- STATS -->
+  <div class="stats-row" id="statsArea" style="display:none">
+    <div class="stat-card"><div class="stat-n" id="statOrig">0</div><div class="stat-l" data-t="statOrigL">Palabras orig.</div></div>
+    <div class="stat-card"><div class="stat-n gold" id="statCorr">0</div><div class="stat-l" data-t="statCorrL">Palabras corr.</div></div>
+    <div class="stat-card"><div class="stat-n" id="statChanges">0</div><div class="stat-l" data-t="statChangesL">Cambios</div></div>
   </div>
 
+  <!-- SUGERENCIAS -->
   <div class="suggestions" id="suggestionsPanel">
-    <div class="sug-header" data-t="sugHeader">💡 Sugerencias adicionales</div>
+    <div class="sug-head">💡 <span data-t="sugHeader">Sugerencias del editor IA</span></div>
     <div class="sug-list" id="sugList"></div>
   </div>
 
+  <div class="spacer"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -204,36 +323,38 @@
 var WORKER_URL='https://joga-ai.omhotien90.workers.dev';
 var S={
   es:{
-    eyebrow:'Corrección Inteligente con IA',h1a:'Edit',h1b:'tu libro con IA',
-    desc:'Corrige gramática, mejora el estilo y eleva la claridad de tu texto con inteligencia artificial.',
-    tool:'EDITAR',optlabel:'Tipo de corrección',
+    eyebrow:'✦ Corrección Inteligente',h1a:'Edit',h1b:'— tu libro,',h1c:'perfecto.',
+    desc:'Transforma un texto con errores en una obra impecable. Gramática, estilo, claridad — todo con IA.',
+    tool:'EDIT',vidLabel:'VIDEO DEMO — PRÓXIMAMENTE',vidBar:'Generado con Higgsfield AI',
+    optlabel:'Tipo de corrección',step2:'Pega tu texto y corrige',
     o1:'✓ Gramática',o2:'✓ Estilo',o3:'✓ Claridad',
     o4:'Tono formal',o5:'Tono casual',o6:'Más conciso',o7:'Expandir ideas',
-    btnEdit:'✏️ Corregir con IA',btnCopy:'Copiar resultado',btnClear:'Limpiar',
+    btnEdit:'✏️ Corregir con IA',btnCopy:'Copiar',btnClear:'Limpiar',
     inputLabel:'Texto original',outputLabel:'Texto corregido',
-    placeholder:'Pega aquí tu texto, capítulo o párrafo...',
+    placeholder:'Pega aquí tu texto con errores...',
     outputPh:'El texto corregido aparecerá aquí...',
     statOrigL:'Palabras orig.',statCorrL:'Palabras corr.',statChangesL:'Cambios',
-    sugHeader:'💡 Sugerencias adicionales',
-    toastCopy:'✅ Copiado al portapapeles',toastClear:'Texto limpiado',
+    sugHeader:'Sugerencias del editor IA',
+    toastCopy:'✅ Copiado',toastClear:'Texto limpiado',
     toastEmpty:'⚠️ Escribe algo primero',errorMsg:'❌ Error. Intenta de nuevo.',
-    thinking:'Analizando tu texto con IA...'
+    thinking:'✦ Analizando con IA...'
   },
   en:{
-    eyebrow:'AI-Powered Proofreading',h1a:'Edit',h1b:'your book with AI',
-    desc:'Fix grammar, improve style and enhance the clarity of your text with artificial intelligence.',
-    tool:'EDIT',optlabel:'Correction type',
+    eyebrow:'✦ Intelligent Proofreading',h1a:'Edit',h1b:'— your book,',h1c:'perfected.',
+    desc:'Transform error-filled text into a flawless piece. Grammar, style, clarity — all with AI.',
+    tool:'EDIT',vidLabel:'VIDEO DEMO — COMING SOON',vidBar:'Generated with Higgsfield AI',
+    optlabel:'Correction type',step2:'Paste your text and correct',
     o1:'✓ Grammar',o2:'✓ Style',o3:'✓ Clarity',
     o4:'Formal tone',o5:'Casual tone',o6:'More concise',o7:'Expand ideas',
-    btnEdit:'✏️ Edit with AI',btnCopy:'Copy result',btnClear:'Clear',
+    btnEdit:'✏️ Edit with AI',btnCopy:'Copy',btnClear:'Clear',
     inputLabel:'Original text',outputLabel:'Corrected text',
-    placeholder:'Paste your text, chapter or paragraph here...',
+    placeholder:'Paste your error-filled text here...',
     outputPh:'The corrected text will appear here...',
     statOrigL:'Orig. words',statCorrL:'Corr. words',statChangesL:'Changes',
-    sugHeader:'💡 Additional suggestions',
-    toastCopy:'✅ Copied to clipboard',toastClear:'Text cleared',
+    sugHeader:'AI Editor Suggestions',
+    toastCopy:'✅ Copied',toastClear:'Text cleared',
     toastEmpty:'⚠️ Write something first',errorMsg:'❌ Error. Please try again.',
-    thinking:'Analyzing your text with AI...'
+    thinking:'✦ Analyzing with AI...'
   }
 };
 function gl(){return localStorage.getItem('jaLang')||'es'}
@@ -248,7 +369,7 @@ function toggleOpt(el){el.classList.toggle('selected')}
 function getOpts(){return Array.from(document.querySelectorAll('.opt.selected')).map(function(o){return o.dataset.val})}
 function updateCount(){
   var w=document.getElementById('inputText').value.trim().split(/\s+/).filter(Boolean).length;
-  document.getElementById('charCount').textContent=w+' palabras';
+  document.getElementById('charCount').textContent=w+(gl()==='es'?' palabras':' words');
 }
 function showToast(msg){var el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(function(){el.classList.remove('show')},2500)}
 function clearAll(){
@@ -256,7 +377,7 @@ function clearAll(){
   document.getElementById('outputArea').innerHTML='<span class="output-ph">'+t('outputPh')+'</span>';
   document.getElementById('statsArea').style.display='none';
   document.getElementById('suggestionsPanel').style.display='none';
-  document.getElementById('charCount').textContent='0 palabras';
+  document.getElementById('charCount').textContent='0 '+(gl()==='es'?'palabras':'words');
   document.getElementById('charCountOut').textContent='—';
   showToast(t('toastClear'));
 }
@@ -265,6 +386,11 @@ function copyResult(){
   if(!out||out===t('outputPh')){showToast(t('toastEmpty'));return}
   navigator.clipboard.writeText(out).then(function(){showToast(t('toastCopy'))});
 }
+function playVideo(){
+  var v=document.getElementById('heroVideo');
+  v.style.display='block';v.play();
+  document.getElementById('vidPlaceholder').style.display='none';
+}
 async function runEdit(){
   var text=document.getElementById('inputText').value.trim();
   if(!text){showToast(t('toastEmpty'));return}
@@ -272,8 +398,8 @@ async function runEdit(){
   var btn=document.getElementById('editBtn');
   btn.disabled=true;btn.classList.add('loading');
   var prompt=lang==='es'
-    ?'Eres un editor literario profesional. Corrige el siguiente texto con estas opciones: '+opts.join(', ')+'. Instrucciones: corrige gramática y ortografía, mejora el estilo y la fluidez, mantén la voz del autor. Devuelve SOLO el texto corregido. Después agrega "SUGERENCIAS:" con 3 recomendaciones breves.\n\nTEXTO:\n'+text
-    :'You are a professional literary editor. Correct this text with these options: '+opts.join(', ')+'. Instructions: fix grammar and spelling, improve style and flow, keep the author\'s voice. Return ONLY the corrected text. Then add "SUGGESTIONS:" with 3 brief recommendations.\n\nTEXT:\n'+text;
+    ?'Eres un editor literario profesional de primer nivel. Corrige el siguiente texto con estas opciones activas: '+opts.join(', ')+'. Reglas: corrige todos los errores de gramática y ortografía, mejora el estilo para que fluya naturalmente, mantén la voz y personalidad del autor, hazlo más legible y profesional. Devuelve SOLO el texto corregido sin comentarios. Luego agrega la sección "SUGERENCIAS:" con exactamente 3 recomendaciones breves y específicas para seguir mejorando.\n\nTEXTO ORIGINAL:\n'+text
+    :'You are a top-tier professional literary editor. Correct the following text with these active options: '+opts.join(', ')+'. Rules: fix all grammar and spelling errors, improve style for natural flow, keep the author\'s voice and personality, make it more readable and professional. Return ONLY the corrected text without comments. Then add "SUGGESTIONS:" with exactly 3 brief specific recommendations.\n\nORIGINAL TEXT:\n'+text;
   document.getElementById('outputArea').innerHTML='<span class="output-ph">'+t('thinking')+'</span>';
   try{
     var res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:prompt,lang:lang})});
@@ -281,12 +407,12 @@ async function runEdit(){
     var reply=data.response||data.reply||data.text||'';
     if(!reply)throw new Error('empty');
     var parts=reply.split(/SUGERENCIAS:|SUGGESTIONS:/i);
-    var corrected=parts[0].trim();
-    var suggestions=parts[1]?parts[1].trim():'';
+    var corrected=parts[0].trim();var suggestions=parts[1]?parts[1].trim():'';
     document.getElementById('outputArea').textContent=corrected;
     var w1=text.trim().split(/\s+/).filter(Boolean).length;
     var w2=corrected.trim().split(/\s+/).filter(Boolean).length;
-    document.getElementById('charCountOut').textContent=w2+' palabras';
+    var wl=gl()==='es'?' palabras':' words';
+    document.getElementById('charCountOut').textContent=w2+wl;
     document.getElementById('statOrig').textContent=w1;
     document.getElementById('statCorr').textContent=w2;
     document.getElementById('statChanges').textContent=Math.abs(text.length-corrected.length);
@@ -298,9 +424,7 @@ async function runEdit(){
     }
   }catch(e){
     document.getElementById('outputArea').innerHTML='<span class="output-ph">'+t('errorMsg')+'</span>';
-  }finally{
-    btn.disabled=false;btn.classList.remove('loading');
-  }
+  }finally{btn.disabled=false;btn.classList.remove('loading')}
 }
 apply();
 </script>
