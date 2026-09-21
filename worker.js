@@ -1,7 +1,9 @@
 /* worker.js — Joga Books, Cloudflare Worker. 4 endpoints con los 4 prompts EXACTOS del brief (BRIEF.md); ANTHROPIC_API_KEY se lee como secreto de Cloudflare, nunca hardcodeada aqui.
    v16: lista blanca de CORS (antes "*", capa liviana, ver ORIGENES_PERMITIDOS) + limites diario/mensual por KV. v18 (plan-mvp-25ago-v18.md): 3 agujeros de gasto que Nico midio ejecutando el codigo (C1/C2/C3, ver esos comentarios) + guard de KV (I1) + effort de Opus explicito (I2). Detalle completo en implementacion-mvp-25ago-v18.md, no repetido aqui.
+   v27 (plan-books-edit-21sep.md): + ruta /editar para Joga Edit (edit.html llamaba al Worker equivocado, joga-ai, y siempre fallaba con app_desconocida). Prompt en el servidor, opciones de edicion contra una lista blanca fija (OPCIONES_EDITAR), max_tokens 8000 como /capitulo y /humanizar, respuesta {contenido, sugerencias}.
    4 endpoints with the 4 EXACT prompts from BRIEF.md; ANTHROPIC_API_KEY is read as a Cloudflare secret, never hardcoded here.
-   v16: allowlisted CORS (was "*", light layer, see ORIGENES_PERMITIDOS) + KV-backed daily/monthly limits. v18 (plan-mvp-25ago-v18.md): 3 spend holes Nico measured by running the code (C1/C2/C3, see those comments) + a KV guard (I1) + explicit Opus effort (I2). Full detail in implementacion-mvp-25ago-v18.md, not repeated here. */
+   v16: allowlisted CORS (was "*", light layer, see ORIGENES_PERMITIDOS) + KV-backed daily/monthly limits. v18 (plan-mvp-25ago-v18.md): 3 spend holes Nico measured by running the code (C1/C2/C3, see those comments) + a KV guard (I1) + explicit Opus effort (I2). Full detail in implementacion-mvp-25ago-v18.md, not repeated here.
+   v27 (plan-books-edit-21sep.md): + /editar route for Joga Edit (edit.html was calling the wrong Worker, joga-ai, and always failed with app_desconocida). Prompt lives server-side, edit options checked against a fixed whitelist (OPCIONES_EDITAR), max_tokens 8000 like /capitulo and /humanizar, response {contenido, sugerencias}. */
 "use strict";
 
 // Modelo: Opus, a proposito — Jose lo eligio sabiendo que cuesta mas (v16), no se cambia. / Model: Opus, on purpose — José chose it knowing it costs more (v16), unchanged.
@@ -78,13 +80,36 @@ function parseJson(text) {
 // v18 (C3): input caps — the sibling had MAX_SITUACION=1200, lost in the adaptation (Nico: 960,747 characters to /humanizar counted as 1 call). 'texto' is REJECTED (truncating would give a half-done, unfaithful humanization); everything else is a short phrase where trimming loses no meaning, so those are CLAMPED instead of blocking the flow.
 var MAX_CORTO = 200;   // nicho, audiencia, titulo, titulo_libro, nombre_capitulo, num: frases, no ensayos / short phrases, not essays
 var MAX_TONO = 50;     // tono, idioma: valores fijos cortos / short fixed values
-var MAX_TEXTO = 20000; // humanizar: un capitulo real ronda 7000 caracteres, da margen / a real chapter runs ~7000 chars, this gives headroom
+var MAX_TEXTO = 20000; // humanizar y editar: un capitulo real ronda 7000 caracteres, da margen / humanizar and editar: a real chapter runs ~7000 chars, this gives headroom
+
+// v27: /editar (Joga Edit) — mapa fijo de opcion -> instruccion concreta para el prompt.
+// Esta MISMA lista blanca filtra "opciones" en limpiarCuerpo: solo estas 7 llaves llegan al prompt.
+// v27: /editar (Joga Edit) — fixed map of option -> concrete prompt instruction.
+// This SAME whitelist filters "opciones" in limpiarCuerpo: only these 7 keys reach the prompt.
+var OPCIONES_EDITAR = {
+  gramatica: "Corrige ortografia, gramatica y puntuacion.",
+  estilo: "Mejora la fluidez y el ritmo de las frases.",
+  claridad: "Haz las frases mas claras, sin ambiguedad.",
+  formal: "Usa un tono formal.",
+  casual: "Usa un tono cercano y casual.",
+  conciso: "Recorta relleno sin perder ideas.",
+  expandir: "Desarrolla las ideas con mas detalle."
+};
 
 function limpiarCuerpo(b) {
   if (!b || typeof b !== "object") return false; // v19 (CRITICO 3): cuerpo null/no-objeto no debe reventar leyendo b.texto — regresion, v16 respondia 502 con CORS
   if (b.texto != null) { b.texto = String(b.texto); if (b.texto.length > MAX_TEXTO) return false; } // v19 (CRITICO 1): normalizar ANTES de medir — "typeof === string" dejaba pasar un array (["x".repeat(3800000)]) entero, $4.75 en 1 llamada, contada como 1
   ["nicho", "audiencia", "titulo", "titulo_libro", "nombre_capitulo", "num"].forEach(function (k) { if (b[k] != null) b[k] = String(b[k]).slice(0, MAX_CORTO); });
   ["idioma", "tono"].forEach(function (k) { if (b[k] != null) b[k] = String(b[k]).slice(0, MAX_TONO); });
+  // v27: /editar — "opciones" se normaliza ANTES de usarse en el prompt (misma leccion v19: normalizar antes de medir/usar).
+  // No-array -> []; cada elemento a String().slice(0,20); maximo 7; se filtra contra OPCIONES_EDITAR; vacio -> ["gramatica"].
+  // Corre siempre (no solo en /editar) para quedar en el mismo patron que nicho/audiencia/etc arriba; los demas endpoints no leen b.opciones.
+  // v27: /editar — "opciones" is normalized BEFORE it's used in the prompt (same v19 lesson: normalize before measuring/using).
+  // Non-array -> []; each item to String().slice(0,20); max 7; filtered against OPCIONES_EDITAR; empty -> ["gramatica"].
+  // Runs unconditionally (not just for /editar) to match the nicho/audiencia/etc pattern above; the other endpoints never read b.opciones.
+  var crudoOpciones = Array.isArray(b.opciones) ? b.opciones : [];
+  var opcionesLimpias = crudoOpciones.slice(0, 7).map(function (o) { return String(o).slice(0, 20); }).filter(function (o) { return OPCIONES_EDITAR.hasOwnProperty(o); });
+  b.opciones = opcionesLimpias.length ? opcionesLimpias : ["gramatica"];
   return true;
 }
 
@@ -136,6 +161,26 @@ var PROMPTS = {
       "- Maximo 2 lineas por parrafo\n\n" +
       "Texto a humanizar:\n" + b.texto + "\n\n" +
       "Responde SOLO con el texto humanizado, sin explicaciones.";
+  },
+  // v27: /editar (Joga Edit). "b.opciones" ya llego limpio y no vacio desde limpiarCuerpo (lista blanca OPCIONES_EDITAR, min 1 elemento).
+  // v27: /editar (Joga Edit). "b.opciones" arrives already clean and non-empty from limpiarCuerpo (OPCIONES_EDITAR whitelist, at least 1 item).
+  editar: function (b) {
+    var instrucciones = b.opciones.map(function (o) { return "- " + OPCIONES_EDITAR[o]; }).join("\n");
+    return "Eres un editor literario profesional.\n" +
+      "Edita el siguiente texto aplicando estos cambios:\n" + instrucciones + "\n\n" +
+      "Idioma de salida: " + b.idioma + ".\n\n" +
+      "Reglas:\n" +
+      "- Conserva la voz del autor.\n" +
+      "- No inventes hechos ni ejemplos que no esten en el texto original.\n" +
+      "- No resumas el texto, salvo que arriba este 'Recorta relleno sin perder ideas'.\n" +
+      "- Manten los mismos parrafos y saltos de linea del texto original.\n" +
+      "- Sin titulos con #. Sin comentarios tuyos, sin explicaciones.\n\n" +
+      "Formato de salida EXACTO, en este orden:\n" +
+      "1. El texto editado completo.\n" +
+      "2. Una linea exacta: SUGERENCIAS:\n" +
+      "3. De 1 a 5 lineas numeradas con mejoras que el autor podria hacer.\n" +
+      "Nada mas antes ni despues.\n\n" +
+      "TEXTO:\n" + b.texto;
   }
 };
 
@@ -143,10 +188,24 @@ var HANDLERS = {
   "/titulos": async function (env, body, f) { return { titulos: parseJson(await askClaude(env, PROMPTS.titulos(body), 600, f)) }; },
   "/outline": async function (env, body, f) { return { capitulos: parseJson(await askClaude(env, PROMPTS.outline(body), 2000, f)) }; },
   "/capitulo": async function (env, body, f) { return { contenido: (await askClaude(env, PROMPTS.capitulo(body), 8000, f)).trim() }; }, // v3 (Nico, 5-sep): 4500 -> 8000. Jose midio en vivo un capitulo real que salio "empty_response": max_tokens es tope duro sobre pensamiento+respuesta (ver comentario de askClaude), y para ciertos temas el pensamiento adaptativo por si solo se comio los 4500 sin dejar nada para el texto. El capitulo pedido son 900-1200 palabras (~1500-2000 tokens en espanol) — 8000 deja margen real para pensar Y escribir, sin acercarse al limite de salida del modelo.
-  "/humanizar": async function (env, body, f) { return { contenido: (await askClaude(env, PROMPTS.humanizar(body), 8000, f)).trim() }; } // v3 (Nico, 5-sep): idem — reescribe el mismo capitulo, mismo riesgo
+  "/humanizar": async function (env, body, f) { return { contenido: (await askClaude(env, PROMPTS.humanizar(body), 8000, f)).trim() }; }, // v3 (Nico, 5-sep): idem — reescribe el mismo capitulo, mismo riesgo
+  // v27: /editar — mismo max_tokens 8000 que /capitulo y /humanizar (mismo riesgo de pensamiento adaptativo comiendose la respuesta, ver comentario de askClaude). Separa por la PRIMERA "SUGERENCIAS:" (insensible a mayusculas): todo lo anterior es "contenido", lo siguiente se parte en lineas, se les quita el "N. "/"N) " inicial y las vacias se descartan, hasta 5. Sin el marcador, sugerencias queda en []. Si "contenido" queda vacio (p.ej. el modelo respondio arrancando con SUGERENCIAS:), se lanza "empty_response" — mismo patron que askClaude ya usa para una respuesta vacia de Anthropic.
+  // v27: /editar — same max_tokens 8000 as /capitulo and /humanizar (same risk of adaptive thinking eating the response, see askClaude's comment). Splits on the FIRST "SUGERENCIAS:" (case-insensitive): everything before is "contenido", everything after is split into lines, stripped of a leading "N. "/"N) " and empties dropped, up to 5. No marker -> sugerencias stays []. If "contenido" ends up empty (e.g. the model answered starting with SUGERENCIAS:), "empty_response" is thrown — same pattern askClaude already uses for an empty Anthropic reply.
+  "/editar": async function (env, body, f) {
+    var texto = (await askClaude(env, PROMPTS.editar(body), 8000, f)).trim();
+    var marcador = /SUGERENCIAS:/i.exec(texto);
+    var contenido = (marcador ? texto.slice(0, marcador.index) : texto).trim();
+    var sugerencias = marcador
+      ? texto.slice(marcador.index + marcador[0].length).split("\n")
+          .map(function (l) { return l.replace(/^\s*\d+[.)]\s*/, "").trim(); })
+          .filter(Boolean).slice(0, 5)
+      : [];
+    if (!contenido) throw new Error("empty_response");
+    return { contenido: contenido, sugerencias: sugerencias };
+  }
 };
 
-var CAMPOS_REQUERIDOS = { "/titulos": ["nicho", "audiencia", "idioma"], "/outline": ["titulo", "nicho", "audiencia", "idioma", "num_capitulos"], "/capitulo": ["num", "nombre_capitulo", "titulo_libro", "nicho", "audiencia", "idioma"], "/humanizar": ["tono", "idioma", "texto"] }; // v20 (tarea 3): campos que arma el prompt de cada endpoint (ver PROMPTS) — sin ellos no hay nada que preguntarle a la IA, cortar antes de gastar / fields each endpoint's prompt needs (see PROMPTS) — without them there's nothing to ask the AI, cut before spending
+var CAMPOS_REQUERIDOS = { "/titulos": ["nicho", "audiencia", "idioma"], "/outline": ["titulo", "nicho", "audiencia", "idioma", "num_capitulos"], "/capitulo": ["num", "nombre_capitulo", "titulo_libro", "nicho", "audiencia", "idioma"], "/humanizar": ["tono", "idioma", "texto"], "/editar": ["texto", "idioma"] }; // v20 (tarea 3): campos que arma el prompt de cada endpoint (ver PROMPTS) — sin ellos no hay nada que preguntarle a la IA, cortar antes de gastar / fields each endpoint's prompt needs (see PROMPTS) — without them there's nothing to ask the AI, cut before spending. v27: + /editar ("opciones" no es obligatorio, limpiarCuerpo ya lo deja en ["gramatica"] si viene vacio/basura)
 
 export default {
   async fetch(request, env) {
