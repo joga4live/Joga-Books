@@ -9,7 +9,7 @@
    Regla de version / version rule: joga-books-v1 -> v2 -> v3 ... (AGENTS.md #3)
 */
 "use strict";
-var CACHE_NAME = "joga-books-v33"; // v33: íconos profesionales AI + pricing $67/$127 / v33: AI professional icons + pricing update
+var CACHE_NAME = "joga-books-v34"; // v34: Joga Edit llama al Worker de Joga Books; sin subir la version, el edit.html roto se queda en cache (Nico, CRITICO 1) / v34: Joga Edit calls the Joga Books Worker; without bumping the version, the broken edit.html stays cached (Nico, CRITICAL 1)
 
 // Archivos core: si alguno falta, el install debe fallar (bug real).
 // Core files: if any is missing, install should fail (a real bug).

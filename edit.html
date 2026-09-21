@@ -436,8 +436,18 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="./assets/common.js"></script>
 <script>
-var W='https://joga-ai.omhotien90.workers.dev';
+try { if (localStorage.getItem("jogaBooks_licensed") !== "true") location.replace("./index.html"); } catch (e) {}
+// v2 (books-edit-21sep-v2, plan Cambio B): edit.html llamaba directo a un Worker viejo (joga-ai) con un
+// prompt armado en el navegador; ahora usa jbCallWorker('/editar', ...) de assets/common.js, que apunta a
+// WORKER_URL (joga-books) y deja el prompt del lado del servidor (worker.js).
+// v2 (books-edit-21sep-v2, plan Change B): edit.html used to call an old Worker (joga-ai) directly with a
+// prompt built in the browser; it now uses jbCallWorker('/editar', ...) from assets/common.js, which points
+// at WORKER_URL (joga-books) and keeps the prompt server-side (worker.js).
+var MAX_TEXTO_EDITAR=20000; // mismo tope que MAX_TEXTO en worker.js — avisar ANTES de llamar, sin gastar la llamada / same cap as MAX_TEXTO in worker.js — warn BEFORE calling, without spending the call
+// data-val del chip -> lista blanca de opciones del Worker (OPCIONES_EDITAR en worker.js). / chip data-val -> the Worker's options whitelist (OPCIONES_EDITAR in worker.js).
+var OPCIONES_MAP={grammar:'gramatica',style:'estilo',clarity:'claridad',formal:'formal',casual:'casual',concise:'conciso',expand:'expandir'};
 var S={
   es:{
     navSub:'Edit',eyebrow:'Impulsado por IA',
@@ -453,8 +463,18 @@ var S={
     sl1:'Palabras orig.',sl2:'Palabras corr.',sl3:'Caracteres',
     sugsTitle:'Sugerencias de la IA',
     tCopy:'Copiado al portapapeles',tClear:'Texto limpiado',
-    tEmpty:'Escribe algo primero',tErr:'Error al procesar. Intenta de nuevo.',
-    tThink:'Analizando con IA...'
+    tEmpty:'Escribe algo primero',
+    tThink:'Analizando con IA...',
+    genErr:'No se pudo editar el texto. Intenta de nuevo.',
+    limiteDiario:'Llegaste a tu límite de hoy. Vuelve mañana.',
+    limiteMensual:'El servicio alcanzó su límite del mes. Vuelve el día 1.',
+    textoLargo:'El texto es demasiado largo para editar (máximo 20 000 caracteres). Acórtalo e intenta de nuevo.',
+    tiempoAgotado:'Tardó demasiado y se cortó. Vuelve a intentarlo.',
+    sinConexion:'Se perdió la conexión con el servicio. Revisa tu internet e intenta de nuevo.',
+    respuestaIncompleta:'La respuesta llegó incompleta. Intenta de nuevo.',
+    capituloLargo:'El texto salió más largo de lo que cabe y se cortó. Vuelve a intentarlo.',
+    respuestaVacia:'La IA devolvió una respuesta vacía. Intenta de nuevo.',
+    iaSaturada:'El servicio de IA está saturado ahora mismo. Espera un momento e intenta de nuevo.'
   },
   en:{
     navSub:'Edit',eyebrow:'Powered by AI',
@@ -470,21 +490,58 @@ var S={
     sl1:'Orig. words',sl2:'Corr. words',sl3:'Characters',
     sugsTitle:'AI Suggestions',
     tCopy:'Copied to clipboard',tClear:'Text cleared',
-    tEmpty:'Write something first',tErr:'Error. Please try again.',
-    tThink:'Analyzing with AI...'
+    tEmpty:'Write something first',
+    tThink:'Analyzing with AI...',
+    genErr:'Could not edit the text. Try again.',
+    limiteDiario:"You've reached today's limit. Come back tomorrow.",
+    limiteMensual:'The service reached its monthly limit. Come back on the 1st.',
+    textoLargo:'The text is too long to edit (20,000 characters max). Shorten it and try again.',
+    tiempoAgotado:'It took too long and was cut off. Try again.',
+    sinConexion:'Lost connection to the service. Check your internet and try again.',
+    respuestaIncompleta:'The response arrived incomplete. Try again.',
+    capituloLargo:'The text came out longer than fits and was cut off. Try again.',
+    respuestaVacia:'The AI returned an empty response. Try again.',
+    iaSaturada:'The AI service is overloaded right now. Wait a moment and try again.'
   }
 };
-function gl(){return localStorage.getItem('jaL')||'es'}
+// MENOR 1 (Nico; decision de Kimo MD: SI se unifica, regla de oro #3): la llave de idioma pasa a
+// jogaBooks_lang (la que usa el resto de la app, AGENTS.md #6), migrando desde la vieja llave local "jaL"
+// como respaldo para no perder la preferencia de quien ya la tenia. Antes, si alguien ponia la app en
+// ingles en index.html pero nunca tocaba el toggle de esta pantalla, "jaL" salia vacio, se mandaba
+// idioma:"es" al Worker y la IA le devolvia el texto en espanol pese a haber elegido ingles.
+// MINOR 1 (Nico; Kimo MD's call: YES unify, golden rule #3): the language key moves to jogaBooks_lang
+// (the one the rest of the app uses, AGENTS.md #6), migrating from the old local key "jaL" as a fallback
+// so whoever already had a preference doesn't lose it. Before, someone who set the app to English in
+// index.html but never touched this screen's toggle got an empty "jaL", sent idioma:"es" to the Worker,
+// and got their text back in Spanish despite having picked English.
+function gl(){
+  var v=null;
+  try { v=localStorage.getItem('jogaBooks_lang'); if(v==null) v=localStorage.getItem('jaL'); } catch(e){}
+  return (v==='es'||v==='en')?v:'es';
+}
 function t(k){var l=gl();return(S[l]&&S[l][k])||S.es[k]||k}
-function toggleLang(){localStorage.setItem('jaL',gl()==='es'?'en':'es');apply()}
+function toggleLang(){try{localStorage.setItem('jogaBooks_lang',gl()==='es'?'en':'es');}catch(e){}apply()}
+var lastCorrWords=null; // MEDIO 2 (Nico): numero de palabras del ultimo texto corregido, para repintar #wcOut con la unidad del idioma vivo al cambiar de idioma / MEDIUM 2 (Nico): word count of the last corrected text, to repaint #wcOut with the live language's unit on a language switch
 function apply(){
   document.querySelectorAll('[data-t]').forEach(function(e){e.textContent=t(e.dataset.t)});
   document.querySelectorAll('[data-t-ph]').forEach(function(e){e.placeholder=t(e.getAttribute('data-t-ph'))});
   document.getElementById('lt').textContent=gl()==='es'?'EN':'ES';
-  wcount();
+  wcount(); // MEDIO 2: ya recalculaba el contador de ENTRADA; ahora tambien repinta el de SALIDA (abajo) — antes el boton EN/ES traducia la etiqueta del panel pero dejaba "6 palabras"/"7 palabras" sin traducir / MEDIUM 2: already recalculated the INPUT counter; now it also repaints the OUTPUT one (below) — before, the EN/ES button translated the panel label but left "6 palabras"/"7 palabras" untranslated
+  if(lastCorrWords!=null){
+    document.getElementById('wcOut').textContent=lastCorrWords+' '+(gl()==='es'?'palabras':'words');
+  }
 }
 function tc(el){el.classList.toggle('on')}
-function opts(){return Array.from(document.querySelectorAll('.chip.on')).map(function(c){return c.dataset.val})}
+// getOpts(): valores de la lista blanca del Worker (OPCIONES_MAP), sin repetidos — con chips no hay forma de
+// activar el mismo dos veces desde la UI, pero mantiene el mismo criterio que limpiarCuerpo() en worker.js.
+// getOpts(): the Worker's whitelist values (OPCIONES_MAP), deduplicated — chips can't be turned on twice from
+// the UI, but this keeps the same criterion as limpiarCuerpo() in worker.js.
+function getOpts(){
+  var vals=Array.from(document.querySelectorAll('.chip.on')).map(function(c){return OPCIONES_MAP[c.dataset.val]||c.dataset.val});
+  var vistos={},unicos=[];
+  for(var i=0;i<vals.length;i++){ if(!vistos[vals[i]]){ vistos[vals[i]]=true; unicos.push(vals[i]); } }
+  return unicos;
+}
 function wcount(){
   var w=document.getElementById('txt').value.trim().split(/\s+/).filter(Boolean).length;
   document.getElementById('wc').textContent=w+' '+(gl()==='es'?'palabras':'words');
@@ -497,6 +554,7 @@ function clearAll(){
   document.getElementById('sugs').style.display='none';
   document.getElementById('wc').textContent='0 '+(gl()==='es'?'palabras':'words');
   document.getElementById('wcOut').textContent='—';
+  lastCorrWords=null;
   toast(t('tClear'));
 }
 function copyResult(){
@@ -507,38 +565,33 @@ function copyResult(){
 async function runEdit(){
   var text=document.getElementById('txt').value.trim();
   if(!text){toast(t('tEmpty'));return}
-  var o=opts(),l=gl();
+  if(text.length>MAX_TEXTO_EDITAR){toast(t('textoLargo'));return} // mismo tope que MAX_TEXTO en worker.js, avisa antes de llamar (0 llamadas al Worker) / same cap as MAX_TEXTO in worker.js, warns before calling (0 calls to the Worker)
+  var o=getOpts(),l=gl();
   var btn=document.getElementById('editBtn');
   btn.disabled=true;btn.classList.add('loading');
   document.getElementById('out').innerHTML='<span class="ph">'+t('tThink')+'</span>';
-  var prompt=l==='es'
-    ?'Eres un editor literario profesional de primer nivel. Corrige el siguiente texto con estas opciones activas: '+o.join(', ')+'. Reglas estrictas: corrige todos los errores de gramática y ortografía, mejora el estilo para que fluya naturalmente, mantén la voz y personalidad del autor, hazlo profesional y claro. Devuelve SOLO el texto corregido sin comentarios ni explicaciones previas. Después agrega la sección "SUGERENCIAS:" con exactamente 3 recomendaciones específicas y breves numeradas.\n\nTEXTO ORIGINAL:\n'+text
-    :'You are a top-tier professional literary editor. Correct the following text with these active options: '+o.join(', ')+'. Strict rules: fix all grammar and spelling errors, improve style for natural flow, keep the author\'s voice and personality, make it professional and clear. Return ONLY the corrected text with no prior comments. Then add the section "SUGGESTIONS:" with exactly 3 numbered specific brief recommendations.\n\nORIGINAL TEXT:\n'+text;
+  document.getElementById('sugs').style.display='none';
   try{
-    var r=await fetch(W,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:prompt,lang:l})});
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    var d=await r.json();
-    var reply=d.response||d.reply||d.text||'';
-    if(!reply)throw new Error('empty');
-    var p=reply.split(/SUGERENCIAS:|SUGGESTIONS:/i);
-    var corr=p[0].trim(),sugs=p[1]?p[1].trim():'';
+    var r=await jbCallWorker('/editar',{texto:text,idioma:l,opciones:o}); // idioma: mismos valores 'es'/'en' que usa el resto de la app para book.idioma (ver wizard.html) / idioma: same 'es'/'en' values the rest of the app uses for book.idioma (see wizard.html)
+    var corr=r.contenido||'';
+    if(!corr)throw new Error('empty_response');
     document.getElementById('out').textContent=corr;
-    var wl=' '+(l==='es'?'palabras':'words');
     var w1=text.trim().split(/\s+/).filter(Boolean).length;
     var w2=corr.trim().split(/\s+/).filter(Boolean).length;
-    document.getElementById('wcOut').textContent=w2+wl;
+    lastCorrWords=w2;
+    document.getElementById('wcOut').textContent=w2+' '+(l==='es'?'palabras':'words');
     document.getElementById('sO').textContent=w1;
     document.getElementById('sC').textContent=w2;
     document.getElementById('sX').textContent=Math.abs(text.length-corr.length);
     document.getElementById('stats').style.display='flex';
-    if(sugs){
-      var lines=sugs.split('\n').filter(function(l){return l.trim()});
-      document.getElementById('sugsList').innerHTML=lines.map(function(ln){return'<div class="sug">'+ln.replace(/^\d+\.\s*/,'')+'</div>'}).join('');
+    var sugs=r.sugerencias||[];
+    if(sugs.length){
+      document.getElementById('sugsList').innerHTML=sugs.map(function(ln){return'<div class="sug">'+jbEsc(ln)+'</div>'}).join(''); // jbEsc: texto viene de la IA via el Worker, no confiar a ciegas (mismo criterio que wizard.html) / jbEsc: text comes from the AI via the Worker, never trust it blindly (same rule wizard.html follows)
       document.getElementById('sugs').style.display='block';
     }
   }catch(e){
-    document.getElementById('out').innerHTML='<span class="ph">'+t('tErr')+'</span>';
-    console.error(e);
+    var table=S[gl()]||S.es;
+    document.getElementById('out').innerHTML='<span class="ph">'+(jbLimitMessage(e,table)||(table.genErr+jbCodigoTecnico(e)))+'</span>'; // errores reales del Worker, no "Error al procesar" generico (mismo patron que editor.html:160) / real Worker errors, not a generic "Error al procesar" (same pattern as editor.html:160)
   }finally{btn.disabled=false;btn.classList.remove('loading')}
 }
 apply();

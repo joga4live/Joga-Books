@@ -1,9 +1,11 @@
 /* worker.js — Joga Books, Cloudflare Worker. 4 endpoints con los 4 prompts EXACTOS del brief (BRIEF.md); ANTHROPIC_API_KEY se lee como secreto de Cloudflare, nunca hardcodeada aqui.
    v16: lista blanca de CORS (antes "*", capa liviana, ver ORIGENES_PERMITIDOS) + limites diario/mensual por KV. v18 (plan-mvp-25ago-v18.md): 3 agujeros de gasto que Nico midio ejecutando el codigo (C1/C2/C3, ver esos comentarios) + guard de KV (I1) + effort de Opus explicito (I2). Detalle completo en implementacion-mvp-25ago-v18.md, no repetido aqui.
    v27 (plan-books-edit-21sep.md): + ruta /editar para Joga Edit (edit.html llamaba al Worker equivocado, joga-ai, y siempre fallaba con app_desconocida). Prompt en el servidor, opciones de edicion contra una lista blanca fija (OPCIONES_EDITAR), max_tokens 8000 como /capitulo y /humanizar, respuesta {contenido, sugerencias}.
+   v28 (plan-books-edit-21sep-v2.md, veredicto CAMBIOS de Nico): CRITICO 3 — el marcador de sugerencias de /editar se busca ahora como LINEA COMPLETA y se toma la ULTIMA aparicion (antes: la primera "SUGERENCIAS:" en cualquier posicion, lo que le cortaba el texto a un autor que usa esa misma palabra en su capitulo). MEDIO 1 — acepta tambien "SUGGESTIONS:". MENOR 2 — "opciones" se deduplica DESPUES de filtrar contra la lista blanca (antes, opciones repetidas dejaban lineas de instruccion identicas en el prompt).
    4 endpoints with the 4 EXACT prompts from BRIEF.md; ANTHROPIC_API_KEY is read as a Cloudflare secret, never hardcoded here.
    v16: allowlisted CORS (was "*", light layer, see ORIGENES_PERMITIDOS) + KV-backed daily/monthly limits. v18 (plan-mvp-25ago-v18.md): 3 spend holes Nico measured by running the code (C1/C2/C3, see those comments) + a KV guard (I1) + explicit Opus effort (I2). Full detail in implementacion-mvp-25ago-v18.md, not repeated here.
-   v27 (plan-books-edit-21sep.md): + /editar route for Joga Edit (edit.html was calling the wrong Worker, joga-ai, and always failed with app_desconocida). Prompt lives server-side, edit options checked against a fixed whitelist (OPCIONES_EDITAR), max_tokens 8000 like /capitulo and /humanizar, response {contenido, sugerencias}. */
+   v27 (plan-books-edit-21sep.md): + /editar route for Joga Edit (edit.html was calling the wrong Worker, joga-ai, and always failed with app_desconocida). Prompt lives server-side, edit options checked against a fixed whitelist (OPCIONES_EDITAR), max_tokens 8000 like /capitulo and /humanizar, response {contenido, sugerencias}.
+   v28 (plan-books-edit-21sep-v2.md, Nico's CAMBIOS verdict): CRITICAL 3 — /editar's suggestions marker is now matched as a WHOLE LINE and the LAST occurrence wins (before: the first "SUGERENCIAS:" anywhere, which cut an author's chapter short if they used that same word). MEDIUM 1 — also accepts "SUGGESTIONS:". MINOR 2 — "opciones" is deduplicated AFTER filtering against the whitelist (before, repeated options left identical instruction lines in the prompt). */
 "use strict";
 
 // Modelo: Opus, a proposito — Jose lo eligio sabiendo que cuesta mas (v16), no se cambia. / Model: Opus, on purpose — José chose it knowing it costs more (v16), unchanged.
@@ -102,13 +104,26 @@ function limpiarCuerpo(b) {
   ["nicho", "audiencia", "titulo", "titulo_libro", "nombre_capitulo", "num"].forEach(function (k) { if (b[k] != null) b[k] = String(b[k]).slice(0, MAX_CORTO); });
   ["idioma", "tono"].forEach(function (k) { if (b[k] != null) b[k] = String(b[k]).slice(0, MAX_TONO); });
   // v27: /editar — "opciones" se normaliza ANTES de usarse en el prompt (misma leccion v19: normalizar antes de medir/usar).
-  // No-array -> []; cada elemento a String().slice(0,20); maximo 7; se filtra contra OPCIONES_EDITAR; vacio -> ["gramatica"].
+  // No-array -> []; cada elemento a String().slice(0,20); se filtra contra OPCIONES_EDITAR; vacio -> ["gramatica"].
   // Corre siempre (no solo en /editar) para quedar en el mismo patron que nicho/audiencia/etc arriba; los demas endpoints no leen b.opciones.
+  // v28 (MENOR 2, Nico): deduplicar DESPUES de filtrar, no antes. El slice(0,7) vivia ANTES del filtro (v27),
+  // asi que 50 veces "expandir" dejaba pasar 7 copias identicas y el prompt repetia la misma instruccion 7 veces.
+  // Ahora se filtra el array completo contra la lista blanca y se toma como maximo 7 UNICAS — que ademas es el
+  // total de llaves de OPCIONES_EDITAR, asi que el tope nunca se alcanza salvo con opciones repetidas.
   // v27: /editar — "opciones" is normalized BEFORE it's used in the prompt (same v19 lesson: normalize before measuring/using).
-  // Non-array -> []; each item to String().slice(0,20); max 7; filtered against OPCIONES_EDITAR; empty -> ["gramatica"].
+  // Non-array -> []; each item to String().slice(0,20); filtered against OPCIONES_EDITAR; empty -> ["gramatica"].
   // Runs unconditionally (not just for /editar) to match the nicho/audiencia/etc pattern above; the other endpoints never read b.opciones.
+  // v28 (MINOR 2, Nico): dedupe AFTER filtering, not before. The slice(0,7) used to run BEFORE the filter (v27),
+  // so 50x "expandir" let 7 identical copies through and the prompt repeated the same instruction 7 times.
+  // Now the whole array is filtered against the whitelist and capped at 7 UNIQUE values — which is also the
+  // total count of OPCIONES_EDITAR keys, so the cap is only ever hit with repeated options.
   var crudoOpciones = Array.isArray(b.opciones) ? b.opciones : [];
-  var opcionesLimpias = crudoOpciones.slice(0, 7).map(function (o) { return String(o).slice(0, 20); }).filter(function (o) { return OPCIONES_EDITAR.hasOwnProperty(o); });
+  var opcionesFiltradas = crudoOpciones.map(function (o) { return String(o).slice(0, 20); }).filter(function (o) { return OPCIONES_EDITAR.hasOwnProperty(o); });
+  var opcionesVistas = {};
+  var opcionesLimpias = [];
+  for (var i = 0; i < opcionesFiltradas.length && opcionesLimpias.length < 7; i++) {
+    if (!opcionesVistas[opcionesFiltradas[i]]) { opcionesVistas[opcionesFiltradas[i]] = true; opcionesLimpias.push(opcionesFiltradas[i]); }
+  }
   b.opciones = opcionesLimpias.length ? opcionesLimpias : ["gramatica"];
   return true;
 }
@@ -189,14 +204,34 @@ var HANDLERS = {
   "/outline": async function (env, body, f) { return { capitulos: parseJson(await askClaude(env, PROMPTS.outline(body), 2000, f)) }; },
   "/capitulo": async function (env, body, f) { return { contenido: (await askClaude(env, PROMPTS.capitulo(body), 8000, f)).trim() }; }, // v3 (Nico, 5-sep): 4500 -> 8000. Jose midio en vivo un capitulo real que salio "empty_response": max_tokens es tope duro sobre pensamiento+respuesta (ver comentario de askClaude), y para ciertos temas el pensamiento adaptativo por si solo se comio los 4500 sin dejar nada para el texto. El capitulo pedido son 900-1200 palabras (~1500-2000 tokens en espanol) — 8000 deja margen real para pensar Y escribir, sin acercarse al limite de salida del modelo.
   "/humanizar": async function (env, body, f) { return { contenido: (await askClaude(env, PROMPTS.humanizar(body), 8000, f)).trim() }; }, // v3 (Nico, 5-sep): idem — reescribe el mismo capitulo, mismo riesgo
-  // v27: /editar — mismo max_tokens 8000 que /capitulo y /humanizar (mismo riesgo de pensamiento adaptativo comiendose la respuesta, ver comentario de askClaude). Separa por la PRIMERA "SUGERENCIAS:" (insensible a mayusculas): todo lo anterior es "contenido", lo siguiente se parte en lineas, se les quita el "N. "/"N) " inicial y las vacias se descartan, hasta 5. Sin el marcador, sugerencias queda en []. Si "contenido" queda vacio (p.ej. el modelo respondio arrancando con SUGERENCIAS:), se lanza "empty_response" — mismo patron que askClaude ya usa para una respuesta vacia de Anthropic.
-  // v27: /editar — same max_tokens 8000 as /capitulo and /humanizar (same risk of adaptive thinking eating the response, see askClaude's comment). Splits on the FIRST "SUGERENCIAS:" (case-insensitive): everything before is "contenido", everything after is split into lines, stripped of a leading "N. "/"N) " and empties dropped, up to 5. No marker -> sugerencias stays []. If "contenido" ends up empty (e.g. the model answered starting with SUGERENCIAS:), "empty_response" is thrown — same pattern askClaude already uses for an empty Anthropic reply.
+  // v27: /editar — mismo max_tokens 8000 que /capitulo y /humanizar (mismo riesgo de pensamiento adaptativo comiendose la respuesta, ver comentario de askClaude).
+  // v28 (CRITICO 3 + MEDIO 1, Nico): el marcador se busca como LINEA COMPLETA (^...:$ , insensible a mayusculas) y se
+  // toma la ULTIMA aparicion, no la primera en cualquier posicion. Joga Books escribe libros de autoayuda: que el
+  // AUTOR tenga su propia seccion "SUGERENCIAS:" dentro del capitulo no es un caso raro, y buscar la primera
+  // coincidencia en cualquier parte de la linea le cortaba el texto ahi mismo, convirtiendo el resto de su capitulo
+  // en "sugerencias de la IA". Acepta tambien "SUGGESTIONS:" (el prompt pide "SUGERENCIAS:" en su ultima linea sin
+  // importar el idioma de salida, pero el codigo anterior de Jog-A aceptaba los dos y hay que seguir cubriendo eso).
+  // Todo lo anterior al marcador es "contenido"; lo siguiente se parte en lineas, se les quita el "N. "/"N) " inicial
+  // y las vacias se descartan, hasta 5. Sin el marcador, sugerencias queda en []. Si "contenido" queda vacio,
+  // se lanza "empty_response" — mismo patron que askClaude ya usa para una respuesta vacia de Anthropic.
+  // v27: /editar — same max_tokens 8000 as /capitulo and /humanizar (same risk of adaptive thinking eating the response, see askClaude's comment).
+  // v28 (CRITICAL 3 + MEDIUM 1, Nico): the marker is matched as a WHOLE LINE (^...:$ , case-insensitive) and the
+  // LAST occurrence wins, not the first one anywhere in the text. Joga Books writes self-help books: the AUTHOR
+  // having their own "SUGERENCIAS:" section inside a chapter isn't a rare case, and matching the first hit anywhere
+  // on a line cut the text right there, turning the rest of their chapter into "AI suggestions". Also accepts
+  // "SUGGESTIONS:" (the prompt asks for "SUGERENCIAS:" on its final line regardless of output language, but the
+  // older Jog-A code accepted both and that coverage needs to stay). Everything before the marker is "contenido";
+  // everything after is split into lines, stripped of a leading "N. "/"N) " and empties dropped, up to 5. No
+  // marker -> sugerencias stays []. If "contenido" ends up empty, "empty_response" is thrown — same pattern
+  // askClaude already uses for an empty Anthropic reply.
   "/editar": async function (env, body, f) {
     var texto = (await askClaude(env, PROMPTS.editar(body), 8000, f)).trim();
-    var marcador = /SUGERENCIAS:/i.exec(texto);
-    var contenido = (marcador ? texto.slice(0, marcador.index) : texto).trim();
-    var sugerencias = marcador
-      ? texto.slice(marcador.index + marcador[0].length).split("\n")
+    var regexMarcador = /^[ \t]*(SUGERENCIAS|SUGGESTIONS):[ \t]*$/gim;
+    var coincidencia, ultimaCoincidencia = null;
+    while ((coincidencia = regexMarcador.exec(texto)) !== null) { ultimaCoincidencia = coincidencia; }
+    var contenido = (ultimaCoincidencia ? texto.slice(0, ultimaCoincidencia.index) : texto).trim();
+    var sugerencias = ultimaCoincidencia
+      ? texto.slice(ultimaCoincidencia.index + ultimaCoincidencia[0].length).split("\n")
           .map(function (l) { return l.replace(/^\s*\d+[.)]\s*/, "").trim(); })
           .filter(Boolean).slice(0, 5)
       : [];
