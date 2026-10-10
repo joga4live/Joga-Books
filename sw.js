@@ -1,4 +1,4 @@
-/* sw.js — Joga Books Service Worker
+/* sw.js — Jog-A Books Service Worker
    Cache First para assets propios (misma origin). Network First para
    llamadas al Worker (otra origin: WORKER_URL). Cada cambio de archivos
    servidos sube la version del cache abajo.
@@ -9,7 +9,7 @@
    Regla de version / version rule: joga-books-v1 -> v2 -> v3 ... (AGENTS.md #3)
 */
 "use strict";
-var CACHE_NAME = "joga-books-v34"; // v34: Joga Edit llama al Worker de Joga Books; sin subir la version, el edit.html roto se queda en cache (Nico, CRITICO 1) / v34: Joga Edit calls the Joga Books Worker; without bumping the version, the broken edit.html stays cached (Nico, CRITICAL 1)
+var CACHE_NAME = "joga-books-v34"; // v34: Jog-A Edit llama al Worker de Jog-A Books; sin subir la version, el edit.html roto se queda en cache (Nico, CRITICO 1) / v34: Jog-A Edit calls the Jog-A Books Worker; without bumping the version, the broken edit.html stays cached (Nico, CRITICAL 1)
 
 // Archivos core: si alguno falta, el install debe fallar (bug real).
 // Core files: if any is missing, install should fail (a real bug).

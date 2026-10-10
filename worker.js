@@ -1,10 +1,10 @@
-/* worker.js — Joga Books, Cloudflare Worker. 4 endpoints con los 4 prompts EXACTOS del brief (BRIEF.md); ANTHROPIC_API_KEY se lee como secreto de Cloudflare, nunca hardcodeada aqui.
+/* worker.js — Jog-A Books, Cloudflare Worker. 4 endpoints con los 4 prompts EXACTOS del brief (BRIEF.md); ANTHROPIC_API_KEY se lee como secreto de Cloudflare, nunca hardcodeada aqui.
    v16: lista blanca de CORS (antes "*", capa liviana, ver ORIGENES_PERMITIDOS) + limites diario/mensual por KV. v18 (plan-mvp-25ago-v18.md): 3 agujeros de gasto que Nico midio ejecutando el codigo (C1/C2/C3, ver esos comentarios) + guard de KV (I1) + effort de Opus explicito (I2). Detalle completo en implementacion-mvp-25ago-v18.md, no repetido aqui.
-   v27 (plan-books-edit-21sep.md): + ruta /editar para Joga Edit (edit.html llamaba al Worker equivocado, joga-ai, y siempre fallaba con app_desconocida). Prompt en el servidor, opciones de edicion contra una lista blanca fija (OPCIONES_EDITAR), max_tokens 8000 como /capitulo y /humanizar, respuesta {contenido, sugerencias}.
+   v27 (plan-books-edit-21sep.md): + ruta /editar para Jog-A Edit (edit.html llamaba al Worker equivocado, joga-ai, y siempre fallaba con app_desconocida). Prompt en el servidor, opciones de edicion contra una lista blanca fija (OPCIONES_EDITAR), max_tokens 8000 como /capitulo y /humanizar, respuesta {contenido, sugerencias}.
    v28 (plan-books-edit-21sep-v2.md, veredicto CAMBIOS de Nico): CRITICO 3 — el marcador de sugerencias de /editar se busca ahora como LINEA COMPLETA y se toma la ULTIMA aparicion (antes: la primera "SUGERENCIAS:" en cualquier posicion, lo que le cortaba el texto a un autor que usa esa misma palabra en su capitulo). MEDIO 1 — acepta tambien "SUGGESTIONS:". MENOR 2 — "opciones" se deduplica DESPUES de filtrar contra la lista blanca (antes, opciones repetidas dejaban lineas de instruccion identicas en el prompt).
    4 endpoints with the 4 EXACT prompts from BRIEF.md; ANTHROPIC_API_KEY is read as a Cloudflare secret, never hardcoded here.
    v16: allowlisted CORS (was "*", light layer, see ORIGENES_PERMITIDOS) + KV-backed daily/monthly limits. v18 (plan-mvp-25ago-v18.md): 3 spend holes Nico measured by running the code (C1/C2/C3, see those comments) + a KV guard (I1) + explicit Opus effort (I2). Full detail in implementacion-mvp-25ago-v18.md, not repeated here.
-   v27 (plan-books-edit-21sep.md): + /editar route for Joga Edit (edit.html was calling the wrong Worker, joga-ai, and always failed with app_desconocida). Prompt lives server-side, edit options checked against a fixed whitelist (OPCIONES_EDITAR), max_tokens 8000 like /capitulo and /humanizar, response {contenido, sugerencias}.
+   v27 (plan-books-edit-21sep.md): + /editar route for Jog-A Edit (edit.html was calling the wrong Worker, joga-ai, and always failed with app_desconocida). Prompt lives server-side, edit options checked against a fixed whitelist (OPCIONES_EDITAR), max_tokens 8000 like /capitulo and /humanizar, response {contenido, sugerencias}.
    v28 (plan-books-edit-21sep-v2.md, Nico's CAMBIOS verdict): CRITICAL 3 — /editar's suggestions marker is now matched as a WHOLE LINE and the LAST occurrence wins (before: the first "SUGERENCIAS:" anywhere, which cut an author's chapter short if they used that same word). MEDIUM 1 — also accepts "SUGGESTIONS:". MINOR 2 — "opciones" is deduplicated AFTER filtering against the whitelist (before, repeated options left identical instruction lines in the prompt). */
 "use strict";
 
@@ -84,9 +84,9 @@ var MAX_CORTO = 200;   // nicho, audiencia, titulo, titulo_libro, nombre_capitul
 var MAX_TONO = 50;     // tono, idioma: valores fijos cortos / short fixed values
 var MAX_TEXTO = 20000; // humanizar y editar: un capitulo real ronda 7000 caracteres, da margen / humanizar and editar: a real chapter runs ~7000 chars, this gives headroom
 
-// v27: /editar (Joga Edit) — mapa fijo de opcion -> instruccion concreta para el prompt.
+// v27: /editar (Jog-A Edit) — mapa fijo de opcion -> instruccion concreta para el prompt.
 // Esta MISMA lista blanca filtra "opciones" en limpiarCuerpo: solo estas 7 llaves llegan al prompt.
-// v27: /editar (Joga Edit) — fixed map of option -> concrete prompt instruction.
+// v27: /editar (Jog-A Edit) — fixed map of option -> concrete prompt instruction.
 // This SAME whitelist filters "opciones" in limpiarCuerpo: only these 7 keys reach the prompt.
 var OPCIONES_EDITAR = {
   gramatica: "Corrige ortografia, gramatica y puntuacion.",
@@ -177,8 +177,8 @@ var PROMPTS = {
       "Texto a humanizar:\n" + b.texto + "\n\n" +
       "Responde SOLO con el texto humanizado, sin explicaciones.";
   },
-  // v27: /editar (Joga Edit). "b.opciones" ya llego limpio y no vacio desde limpiarCuerpo (lista blanca OPCIONES_EDITAR, min 1 elemento).
-  // v27: /editar (Joga Edit). "b.opciones" arrives already clean and non-empty from limpiarCuerpo (OPCIONES_EDITAR whitelist, at least 1 item).
+  // v27: /editar (Jog-A Edit). "b.opciones" ya llego limpio y no vacio desde limpiarCuerpo (lista blanca OPCIONES_EDITAR, min 1 elemento).
+  // v27: /editar (Jog-A Edit). "b.opciones" arrives already clean and non-empty from limpiarCuerpo (OPCIONES_EDITAR whitelist, at least 1 item).
   editar: function (b) {
     var instrucciones = b.opciones.map(function (o) { return "- " + OPCIONES_EDITAR[o]; }).join("\n");
     return "Eres un editor literario profesional.\n" +
@@ -206,7 +206,7 @@ var HANDLERS = {
   "/humanizar": async function (env, body, f) { return { contenido: (await askClaude(env, PROMPTS.humanizar(body), 8000, f)).trim() }; }, // v3 (Nico, 5-sep): idem — reescribe el mismo capitulo, mismo riesgo
   // v27: /editar — mismo max_tokens 8000 que /capitulo y /humanizar (mismo riesgo de pensamiento adaptativo comiendose la respuesta, ver comentario de askClaude).
   // v28 (CRITICO 3 + MEDIO 1, Nico): el marcador se busca como LINEA COMPLETA (^...:$ , insensible a mayusculas) y se
-  // toma la ULTIMA aparicion, no la primera en cualquier posicion. Joga Books escribe libros de autoayuda: que el
+  // toma la ULTIMA aparicion, no la primera en cualquier posicion. Jog-A Books escribe libros de autoayuda: que el
   // AUTOR tenga su propia seccion "SUGERENCIAS:" dentro del capitulo no es un caso raro, y buscar la primera
   // coincidencia en cualquier parte de la linea le cortaba el texto ahi mismo, convirtiendo el resto de su capitulo
   // en "sugerencias de la IA". Acepta tambien "SUGGESTIONS:" (el prompt pide "SUGERENCIAS:" en su ultima linea sin
@@ -216,7 +216,7 @@ var HANDLERS = {
   // se lanza "empty_response" — mismo patron que askClaude ya usa para una respuesta vacia de Anthropic.
   // v27: /editar — same max_tokens 8000 as /capitulo and /humanizar (same risk of adaptive thinking eating the response, see askClaude's comment).
   // v28 (CRITICAL 3 + MEDIUM 1, Nico): the marker is matched as a WHOLE LINE (^...:$ , case-insensitive) and the
-  // LAST occurrence wins, not the first one anywhere in the text. Joga Books writes self-help books: the AUTHOR
+  // LAST occurrence wins, not the first one anywhere in the text. Jog-A Books writes self-help books: the AUTHOR
   // having their own "SUGERENCIAS:" section inside a chapter isn't a rare case, and matching the first hit anywhere
   // on a line cut the text right there, turning the rest of their chapter into "AI suggestions". Also accepts
   // "SUGGESTIONS:" (the prompt asks for "SUGERENCIAS:" on its final line regardless of output language, but the

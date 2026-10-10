@@ -1,4 +1,4 @@
-/* gate.js — Joga Books
+/* gate.js — Jog-A Books
    Validacion de licencia: SHA-256 local del codigo ingresado contra una lista
    de hashes validos. Offline, sin fetch, sin dependencias. NUNCA codigos en
    claro en este archivo — viven solo en .joga/handoff/implementacion-mvp-25ago.md

@@ -1,4 +1,4 @@
-/* assets/i18n.js — Joga Books
+/* assets/i18n.js — Jog-A Books
    Motor generico de traduccion, compartido por las 5 pantallas. Cada HTML
    define su propio diccionario const i18n = { es:{...}, en:{...} } (con los
    textos EXACTOS del brief) y llama a jogaI18n(i18n) una vez cargado el DOM.

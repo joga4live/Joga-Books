@@ -1,4 +1,4 @@
-/* assets/wizard-data.js — Joga Books
+/* assets/wizard-data.js — Jog-A Books
    Datos estaticos de wizard.html (20 nichos, 4 audiencias, diccionario i18n
    de los 5 pasos). Separado del HTML solo para que wizard.html se mantenga
    cerca del limite de 200 lineas de AGENTS.md — es un modulo privado del
@@ -41,7 +41,7 @@ var SIZES = [
   {id:"largo",capitulos:29,paginas:120}
 ];
 var WIZARD_I18N = {
-  es: { title:"Joga Books — Nuevo libro", steps:["Nicho","Audiencia","Título","Outline","Listo"],
+  es: { title:"Jog-A Books — Nuevo libro", steps:["Nicho","Audiencia","Título","Outline","Listo"],
     s1:{ title:"¿Sobre qué eres experto?", own:"Mi nicho es:", ownPh:"Escribe tu nicho...", next:"Continuar →" },
     s2:{ title:"¿Para quién es tu libro?", back:"← Atrás", next:"Continuar →" },
     s3:{ title:"Generando opciones de título...", doneTitle:"Elige tu título", errTitle:"No se pudo generar", pick:"Elegir",
@@ -57,7 +57,7 @@ var WIZARD_I18N = {
     tiempoAgotado:"Tardó demasiado y se cortó. Vuelve a intentarlo.", sinConexion:"Se perdió la conexión con el servicio. Revisa tu internet e intenta de nuevo.", respuestaIncompleta:"La respuesta llegó incompleta. Intenta de nuevo.", 
     limiteDiario:"Llegaste a tu límite de hoy. Vuelve mañana.",
     limiteMensual:"El servicio alcanzó su límite del mes. Vuelve el día 1." },
-  en: { title:"Joga Books — New Book", steps:["Niche","Audience","Title","Outline","Done"],
+  en: { title:"Jog-A Books — New Book", steps:["Niche","Audience","Title","Outline","Done"],
     s1:{ title:"What are you an expert in?", own:"My niche is:", ownPh:"Type your niche...", next:"Continue →" },
     s2:{ title:"Who is your book for?", back:"← Back", next:"Continue →" },
     s3:{ title:"Generating title options...", doneTitle:"Choose your title", errTitle:"Could not generate", pick:"Choose",
